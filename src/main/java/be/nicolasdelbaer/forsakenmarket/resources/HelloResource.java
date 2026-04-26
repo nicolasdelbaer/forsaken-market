@@ -1,10 +1,14 @@
 package be.nicolasdelbaer.forsakenmarket.resources;
 
+import be.nicolasdelbaer.forsakenmarket.entities.Player;
 import be.nicolasdelbaer.forsakenmarket.utils.EntityFactory;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+
+import java.util.Optional;
 
 @Path("/hello-world")
 public class HelloResource {

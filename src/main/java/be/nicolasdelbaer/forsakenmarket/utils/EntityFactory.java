@@ -1,6 +1,5 @@
 package be.nicolasdelbaer.forsakenmarket.utils;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
@@ -13,12 +12,10 @@ public class EntityFactory {
     private static EntityManagerFactory emf;
 
     public static EntityManagerFactory getInstance() {
-        Dotenv dotenv = Dotenv.load();
-
         Map<String, String> props = new HashMap<>();
-        props.put("jakarta.persistence.jdbc.url", dotenv.get("DB_URL"));
-        props.put("jakarta.persistence.jdbc.user", dotenv.get("DB_USER"));
-        props.put("jakarta.persistence.jdbc.password", dotenv.get("DB_PASSWORD"));
+        props.put("jakarta.persistence.jdbc.url", System.getenv("DB_URL"));
+        props.put("jakarta.persistence.jdbc.user", System.getenv("DB_USER"));
+        props.put("jakarta.persistence.jdbc.password", System.getenv("DB_PASSWORD"));
 
         if(Objects.isNull(emf))
             emf = Persistence.createEntityManagerFactory("forsakenPU", props);
