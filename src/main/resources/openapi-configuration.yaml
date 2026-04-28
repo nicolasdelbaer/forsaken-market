@@ -1,0 +1,7 @@
+resourcePackages:
+  - be.nicolasdelbaer.forsakenmarket.resources
+openAPI:
+  info:
+    title: "Forsaken Market API"
+    version: "0.1.0"
+    description: ""

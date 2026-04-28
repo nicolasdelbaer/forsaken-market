@@ -11,6 +11,9 @@ import be.nicolasdelbaer.forsakenmarket.repositories.MarketPriceRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRepository;
 import be.nicolasdelbaer.forsakenmarket.services.InventoryService;
 import be.nicolasdelbaer.forsakenmarket.services.MarketService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -22,6 +25,7 @@ import jakarta.ws.rs.core.Response;
 
 @RequestScoped
 @Path("/market")
+@Tag(name = "Market", description = "Opérations d'achat et vente")
 public class MarketResource {
 
     @Inject
@@ -30,6 +34,7 @@ public class MarketResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/buy-item/{id}")
+    @Operation(summary = "Buy an item", description = "Buy an item from the market")
     public Response buyItem(@PathParam("id") Long id) {
         Response response;
         try {
@@ -46,6 +51,7 @@ public class MarketResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/sell-item/{id}")
+    @Operation(summary = "Sell an item", description = "Sell an item from their inventory")
     public Response sellItem(@PathParam("id") Long id) {
         Response response;
         try {
@@ -62,6 +68,7 @@ public class MarketResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/reroll-item/{id}")
+    @Operation(summary = "Reroll an item", description = "Reroll an item from the market")
     public Response rerollItem(@PathParam("id") Long id) {
         Response response;
         try {
