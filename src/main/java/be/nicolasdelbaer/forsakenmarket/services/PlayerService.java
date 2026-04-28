@@ -5,6 +5,7 @@ import be.nicolasdelbaer.forsakenmarket.entities.Player;
 import be.nicolasdelbaer.forsakenmarket.exceptions.EmailAlreadyUsedException;
 import be.nicolasdelbaer.forsakenmarket.models.player.CreateUserDto;
 import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRepository;
+import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -12,7 +13,9 @@ import jakarta.inject.Inject;
 public class PlayerService {
 
     @Inject
-    PlayerRepository playerRepository;
+    private PlayerRepository playerRepository;
+    @Inject
+    private GameConfiguration gameConfiguration;
 
     public PlayerService() {
     }
@@ -26,13 +29,18 @@ public class PlayerService {
         String envCost = System.getenv("BCRYPT_COST");
         int cost = Integer.parseInt(envCost);
 
-        Player player = new Player();
-        player.setName(createUserDto.userName());
-        player.setWallet(createUserDto.userWallet());
-        player.setEmail(createUserDto.email());
-        player.setPassword(BCrypt.withDefaults().hashToString(cost, createUserDto.pwd().toCharArray()));
+        Player player = new Player(
+            createUserDto.userName(),
+            createUserDto.email(),
+            BCrypt.withDefaults().hashToString(cost, createUserDto.pwd().toCharArray()),
+            gameConfiguration.getStartingWallet()
+        );
 
         playerRepository.save(player);
         return player;
+    }
+
+    public void addReputation(Player player, Integer reputationScore){
+        player.addReputation(reputationScore);
     }
 }

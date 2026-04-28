@@ -1,22 +1,25 @@
 package be.nicolasdelbaer.forsakenmarket.entities;
 
+import be.nicolasdelbaer.forsakenmarket.exceptions.PlayerInsufficientFundsException;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
+@Table
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
 public class Player {
+    private static final int[] LEVEL_THRESHOLDS = {0, 100, 250, 500, 1000};
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
-    Long id;
+    private Integer id;
 
     @Column(nullable = false)
     @Getter @Setter
-    String name;
+    private String name;
 
     @Column(nullable = false, unique = true)
     @Getter @Setter
@@ -26,8 +29,68 @@ public class Player {
     @Getter @Setter
     private String password;
 
-    @Column
-    @Getter @Setter
-    Integer wallet;
+    /*
+     * Current money that player can use to buy new item
+     * User debit & credit for managing the wallet
+     */
+    @Getter
+    private Integer wallet;
 
+    /*
+    * Current level of the player
+    * It'll grow as the player wins experience by selling items
+    * and interacting with the game. It'll eventually unlock new
+    * items, skills, events, ...
+    */
+    @Getter @Setter
+    private Integer level;
+
+    /*
+     * Reputation represents exp
+     * All won reputation points from the account creation
+     */
+    @Getter @Setter
+    private Integer totReput;
+
+    /*
+    * Reputation represents exp
+    * current reputation is the won points from the current level
+    * used to persist the progression
+    */
+    @Getter @Setter
+    private Integer currentReput;
+
+
+    public Player(String name, String email, String password, int startingWallet) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.wallet = startingWallet;
+        this.level = 1;
+        this.totReput = 0;
+        this.currentReput = 0;
+    }
+
+    public void debit(Integer amount) throws PlayerInsufficientFundsException {
+        if(!canAfford(amount))
+            throw new PlayerInsufficientFundsException("cannot afford item");
+        wallet -= amount;
+    }
+    public void credit(Integer amount){
+        wallet += amount;
+    }
+
+    public boolean canAfford(Integer cost){
+        return cost <= wallet;
+    }
+
+    public void addReputation(Integer reputationScore) {
+        currentReput += reputationScore;
+        totReput += reputationScore;
+
+        if (level <= LEVEL_THRESHOLDS.length && currentReput >= LEVEL_THRESHOLDS[level-1]) {
+            currentReput -= LEVEL_THRESHOLDS[level-1];
+            level ++;
+        }
+    }
 }

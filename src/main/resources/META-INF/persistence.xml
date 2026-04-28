@@ -7,8 +7,13 @@
     <persistence-unit name="forsakenPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
+        <class>be.nicolasdelbaer.forsakenmarket.entities.BoughtItem</class>
+        <class>be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint</class>
+        <class>be.nicolasdelbaer.forsakenmarket.entities.ItemCategory</class>
+        <class>be.nicolasdelbaer.forsakenmarket.entities.MarketItem</class>
+        <class>be.nicolasdelbaer.forsakenmarket.entities.MarketPrice</class>
         <class>be.nicolasdelbaer.forsakenmarket.entities.Player</class>
-        <class>be.nicolasdelbaer.forsakenmarket.entities.PlayerAuth</class>
+        <class>be.nicolasdelbaer.forsakenmarket.entities.PlayerReroll</class>
         <properties>
             <!-- Connexion -->
             <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
