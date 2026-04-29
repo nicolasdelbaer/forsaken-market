@@ -51,6 +51,8 @@
 
 ### DTO
 - Check if needs of DTO for requests & queries
+- Ajouter les validations via annotations @NotBlank, length etc.
+- Utiliser PlayerResponse comme container du User
 
 ### Game State
 - Add a dedicated table with 1 id and store current round & stuff

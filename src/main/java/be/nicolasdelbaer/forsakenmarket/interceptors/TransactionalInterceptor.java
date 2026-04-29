@@ -16,21 +16,19 @@ import jakarta.persistence.EntityTransaction;
 public class TransactionalInterceptor {
 
     @Inject
-    private EntityManagerFactory entityManagerFactory;
+    private EntityManager entityManager;
 
     @AroundInvoke
     public Object manageTransaction(InvocationContext context) throws Exception {
-        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
-            EntityTransaction entityTransaction = entityManager.getTransaction();
-            entityTransaction.begin();
-            try {
-                Object result = context.proceed();
-                entityTransaction.commit();
-                return result;
-            } catch (Exception e) {
-                entityTransaction.rollback();
-                throw e;
-            }
+        EntityTransaction tx = entityManager.getTransaction();
+        tx.begin();
+        try {
+            Object result = context.proceed();
+            tx.commit();
+            return result;
+        } catch (Exception e) {
+            tx.rollback();
+            throw e;
         }
     }
 }

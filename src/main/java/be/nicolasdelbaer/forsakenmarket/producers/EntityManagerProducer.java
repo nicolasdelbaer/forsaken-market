@@ -47,4 +47,6 @@ public class EntityManagerProducer {
     public void destroy() {
         if (entityManagerFactory.isOpen()) entityManagerFactory.close();
     }
+
+
 }

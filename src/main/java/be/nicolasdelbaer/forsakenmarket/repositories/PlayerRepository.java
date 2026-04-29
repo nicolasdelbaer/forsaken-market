@@ -19,4 +19,11 @@ public class PlayerRepository extends CrudRepository<Player, Integer> {
                 .isEmpty();
         return exists;
     }
+    public Player findByEmail(EntityManager entityManager, String email) {
+        Player player = null;
+        player = entityManager.createQuery("select t from Player t where t.email = :email", Player.class)
+                .setParameter("email", email)
+                .getSingleResult();
+        return player;
+    }
 }

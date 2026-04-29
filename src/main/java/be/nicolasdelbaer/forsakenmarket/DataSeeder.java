@@ -56,7 +56,7 @@ public class DataSeeder {
 
     private void createPlayers(EntityManager entityManager) {
         Player player;
-        Integer cost = Integer.parseInt(System.getenv("BCRYPT_COST"));
+        int cost = Integer.parseInt(System.getenv("BCRYPT_COST"));
         player = new Player(
                 "Nidel",
                 "nidel@gmail.com",
