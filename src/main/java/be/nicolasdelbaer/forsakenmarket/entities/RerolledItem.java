@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"player_id", "marketitem_id"}))
-public class PlayerReroll {
+public class RerolledItem {
     @Setter @Id @GeneratedValue Long id;
     @Getter @Setter @ManyToOne Player player;
     @Getter @Setter @ManyToOne MarketItem marketItem;

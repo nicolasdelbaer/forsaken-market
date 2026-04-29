@@ -1,5 +1,6 @@
 package be.nicolasdelbaer.forsakenmarket.repositories;
 
+import be.nicolasdelbaer.forsakenmarket.entities.MarketItem;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 
@@ -38,9 +39,33 @@ public abstract class CrudRepository<T, I> {
         return item;
     }
 
+    public List<T> saveAll(EntityManager entityManager, List<T> itemList){
+        int batchSize = 50;
+        for (int i = 0; i < itemList.size(); i++) {
+            entityManager.persist(itemList.get(i));
+            if (i % batchSize == 0) {
+                entityManager.flush(); // batching
+                entityManager.clear(); // free persistence context
+            }
+        }
+        return itemList;
+    }
+
     public T update(EntityManager entityManager, T item){
         item = entityManager.merge(item);
         return item;
+    }
+
+    public List<T> updateAll(EntityManager entityManager, List<T> itemList){
+        int batchSize = 50;
+        for (int i = 0; i < itemList.size(); i++) {
+            entityManager.merge(itemList.get(i));
+            if (i % batchSize == 0) {
+                entityManager.flush(); // batching
+                entityManager.clear(); // free persistence context
+            }
+        }
+        return itemList;
     }
 
     public T delete(EntityManager entityManager, T item){

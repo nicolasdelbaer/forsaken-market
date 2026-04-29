@@ -1,6 +1,5 @@
 package be.nicolasdelbaer.forsakenmarket.entities;
 
-import be.nicolasdelbaer.forsakenmarket.enums.ItemRarity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,11 +24,17 @@ public class MarketItem {
     @JoinColumn(name = "item_blueprint_id")
     private ItemBlueprint itemBlueprint;
 
+    /*
+     * Initial time of market availability in round nb
+     */
     @Getter @Setter
     private Integer timeToLive;
 
+    /*
+     * The round where the item has been added to the market
+     */
     @Getter @Setter
-    private Integer roundId;
+    private Long roundId;
 
 
     @Getter @Setter
@@ -40,4 +45,12 @@ public class MarketItem {
     @Getter @Setter
     private boolean expired;
 
+
+    public void updateExpiration(Long currentRoundId) {
+        boolean shouldExpire = currentRoundId > (roundId+timeToLive);
+        if(shouldExpire){
+            expired = true;
+            expiredAt = LocalDateTime.now();
+        }
+    }
 }

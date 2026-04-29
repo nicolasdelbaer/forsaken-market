@@ -57,7 +57,19 @@ public class BoughtItem {
     @Getter @Setter
     private LocalDateTime decayAt;
 
+    //TODO meh ? relicat? voir statut ?
     @Getter @Setter
     private boolean expired;
 
+    public void updateExpiration(Long currentRound) {
+        if(!(status == MarketItemStatus.BOUGHT)) {
+            //should not go here
+            System.out.println("---SHOULD NOT update a non BOUGHT status from BoughtItem");
+            return;
+        }
+        if(currentRound > (boughtRoundId + decayNbRounds)) {
+            status = MarketItemStatus.DECAYED;
+            expired = true;
+        }
+    }
 }

@@ -5,6 +5,7 @@ import be.nicolasdelbaer.forsakenmarket.entities.MarketPrice;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 
+import java.util.List;
 import java.util.Optional;
 
 @ApplicationScoped
@@ -35,4 +36,5 @@ public class MarketPriceRepository extends CrudRepository<MarketPrice, Long> {
                 .getSingleResult();
         return Optional.of(marketPrice);
     }
+
 }

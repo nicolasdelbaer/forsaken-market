@@ -25,7 +25,7 @@ import jakarta.ws.rs.core.Response;
 
 @RequestScoped
 @Path("/market")
-@Tag(name = "Market", description = "Opérations d'achat et vente")
+@Tag(name = "Market", description = "Buy & sell operations")
 public class MarketResource {
 
     @Inject private MarketService marketService;

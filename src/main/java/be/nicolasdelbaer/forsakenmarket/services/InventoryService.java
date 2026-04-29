@@ -4,17 +4,20 @@ import be.nicolasdelbaer.forsakenmarket.entities.BoughtItem;
 import be.nicolasdelbaer.forsakenmarket.enums.MarketItemStatus;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItemDto;
 import be.nicolasdelbaer.forsakenmarket.repositories.BoughtItemRepository;
+import be.nicolasdelbaer.forsakenmarket.utils.GameState;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @ApplicationScoped
 public class InventoryService {
 
     @Inject private BoughtItemRepository boughtItemRepository;
     @Inject private EntityManager entityManager;
+    @Inject private GameState gameState;
 
     public void addToInventory(BuyItemDto buyItemDto){
         Integer decayTime = 8; //TODO calculte right round nb time
@@ -34,11 +37,20 @@ public class InventoryService {
         boughtItemRepository.save(entityManager, boughtItem);
     }
 
-    //TODO clean old refs on schedule?
+    //TODO use soldTransaction Table keeping records of sells ? (stats, leaderboard, etc)
     public void removeFromInventory(BoughtItem boughtItem, Long currentRound){
         boughtItem.setSoldAt(LocalDateTime.now());
         boughtItem.setStatus(MarketItemStatus.SOLD);
         boughtItem.setSoldRoundId(currentRound);
         boughtItemRepository.save(entityManager, boughtItem);
+    }
+
+    //TODO keep decay feature ? QUID if sold, lost of data due to decay status; no data on sold price
+    public void updateDecay(EntityManager entityManager) {
+        List<BoughtItem> ownedItems = boughtItemRepository.findAllBought(entityManager);
+        Long currentRound = gameState.getCurrentRound();
+        for (BoughtItem ownedItem : ownedItems) {
+            ownedItem.updateExpiration(currentRound);
+        }
     }
 }

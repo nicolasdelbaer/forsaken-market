@@ -13,7 +13,7 @@
         <class>be.nicolasdelbaer.forsakenmarket.entities.MarketItem</class>
         <class>be.nicolasdelbaer.forsakenmarket.entities.MarketPrice</class>
         <class>be.nicolasdelbaer.forsakenmarket.entities.Player</class>
-        <class>be.nicolasdelbaer.forsakenmarket.entities.PlayerReroll</class>
+        <class>be.nicolasdelbaer.forsakenmarket.entities.RerolledItem</class>
         <properties>
             <!-- Connexion -->
             <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>

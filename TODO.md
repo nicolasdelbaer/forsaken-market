@@ -10,44 +10,36 @@
 - player won exp when selling
 - player can buy item to their inventory
 - player can sell item from their inventory
-- player can reroll an item for money
+- player can reroll an item from the market for a price
 
 ### Cycle & game state related
 - populate items to market
 - handle schedule ticks on server
 - items will decay
-- items will be out of market
+- items will get out of market
 
 ### Track items price movement
-- get price from the current round
-- store movements
-- retrieve movements
+- update prices for the current round
+- store movements (player buy & sell actions)
+- retrieve movements (player buy & sell actions)
 
 
 
 ## TO DO NEXT
 ### Market
-- Add transactions to services
-- Handle MarketItems cycle
-    - populate if missing items
-    - add item config limit
-    - items TTL
-    - add default price
-- Buy Item test
-- Sell Item test
 - Reroll items
-- Filtered Market item list
-- Cycle
-  - Items decay
-  - Market price evolution
-  - Fetch range of price evolution
+- ? Filtered Market item list
+- Market price have to progress and update trends
+- Fetch range of price evolution for display
 
+### Project
+- Code & project review
 
 
 ## TO KEEP IN MIND
-### Transaction within services
-- Usage of transactions inside services and not in repos
-- Pass entity manager to repository
+### Refacto
+- Split MarketService to MarketService & ScheduleMarketService for clarity
+- Clean BoughtItem responsability cf player movements.
 
 ### DTO
 - Check if needs of DTO for requests & queries
@@ -61,11 +53,11 @@
 - Create & add test cases
 
 ### Auth
-- Use proper auth & session usage for retrieving current player entity
+- Update & Clean auth filter flow
 
-### Exception management
-- Add exceptions for generic cases of orElseThrow
+### Update theory & must known
+- Update notion (Filters, Annotations, Auth, Scope & Beans, Scheduler lifecycle, Interceptor, Producer, Jql joins)
+
 
 ### Features
-- Fetch valid market items through endpoint
-- 
+- Test feature as a user with basic front view
