@@ -28,8 +28,7 @@ import jakarta.ws.rs.core.Response;
 @Tag(name = "Market", description = "Opérations d'achat et vente")
 public class MarketResource {
 
-    @Inject
-    private MarketService marketService;
+    @Inject private MarketService marketService;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

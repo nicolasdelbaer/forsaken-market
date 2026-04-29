@@ -1,5 +1,6 @@
 package be.nicolasdelbaer.forsakenmarket.services;
 
+import be.nicolasdelbaer.forsakenmarket.annotations.Transactional;
 import be.nicolasdelbaer.forsakenmarket.entities.*;
 import be.nicolasdelbaer.forsakenmarket.exceptions.BadItemOwnerException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.MaxRerollReachedException;
@@ -10,6 +11,7 @@ import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
 import be.nicolasdelbaer.forsakenmarket.utils.GameState;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,45 +30,51 @@ public class MarketService {
     @Inject private GameConfiguration gameConfiguration;
     @Inject private PlayerRepository playerRepository;
 
+    //private static final EntityManagerFactory entityManagerFactory = EntityFactory.getInstance();
+
+    @Inject private EntityManager entityManager;
+
     public List<MarketItem> fetchAvailableItems(Player player){
         List<MarketItem> results = new ArrayList<>();
         //TODO return elements not rerolled
         return results;
     }
 
+    @Transactional
     public void rerollItem(Integer playerId, Long itemId) throws PlayerInsufficientFundsException, MaxRerollReachedException {
         Long currentRound = gameState.getCurrentRound();
-        MarketItem itemInstance = marketItemRepository.findById(itemId).orElseThrow();
-        Player player = playerRepository.findById(playerId).orElseThrow();
+        MarketItem itemInstance = marketItemRepository.findById(entityManager, itemId).orElseThrow();
+        Player player = playerRepository.findById(entityManager, playerId).orElseThrow();
 
         //cannot reroll if you've already used all available rerolls for the current round
-        Integer nbReroll = playerRerollRepository.getRerollCount(currentRound);
+        Integer nbReroll = playerRerollRepository.getRerollCount(entityManager, currentRound);
         if(nbReroll >= gameConfiguration.getMaxRerollsPerRound())
             throw new MaxRerollReachedException("too many rerolls for this round");
 
         //remove player's money
         player.debit(gameConfiguration.getRerollCost()); //TODO calculate the reroll price from dedicated static thresolds
-        playerRepository.save(player);
+        playerRepository.save(entityManager, player);
 
         PlayerReroll playerReroll = new PlayerReroll();
         playerReroll.setMarketItem(itemInstance);
         playerReroll.setPlayer(player);
         playerReroll.setRerolledAt(LocalDateTime.now());
         playerReroll.setRoundId(currentRound);
-        playerRerollRepository.save(playerReroll);
+        playerRerollRepository.save(entityManager, playerReroll);
 
         //TODO update market view for player
     }
 
+    @Transactional
     public void buyItem(Integer playerId, Long itemId) throws PlayerInsufficientFundsException {
         //Note, the current round id is resolved here for keeping coherence
         // Idea -> could use a window of tolerance in the future allowing players to get the item even with lags
         Long currentRound = gameState.getCurrentRound();
 
         //Retrieving items
-        MarketItem itemInstance = marketItemRepository.findById(itemId).orElseThrow();
-        MarketPrice marketPrice = marketPriceRepository.findByBlueprint(itemInstance.getItemBlueprint(), currentRound).orElseThrow();
-        Player player = playerRepository.findById(playerId).orElseThrow();
+        MarketItem itemInstance = marketItemRepository.findById(entityManager, itemId).orElseThrow();
+        MarketPrice marketPrice = marketPriceRepository.findByBlueprint(entityManager, itemInstance.getItemBlueprint(), currentRound).orElseThrow();
+        Player player = playerRepository.findById(entityManager, playerId).orElseThrow();
 
         //verify data integrity (current round, datetime request)
         //TODO check & user input
@@ -74,19 +82,20 @@ public class MarketService {
 
         //remove player's money
         player.debit(marketPrice.getCurrentPrice());
-        playerRepository.save(player);
+        playerRepository.save(entityManager, player);
 
         //add item to inventory
         inventoryService.addToInventory(new BuyItemDto(player, itemInstance, marketPrice, currentRound));
     }
 
+    @Transactional
     public void sellItem(Integer playerId, Long itemId) throws BadItemOwnerException {
         //Note, the current round id is resolved here for keeping coherence
         // Idea -> could use a window of tolerance in the future allowing players to get the item even with lags
         Long currentRound = gameState.getCurrentRound();
 
-        BoughtItem itemInstance = boughtItemRepository.findById(itemId).orElseThrow();
-        Player player = playerRepository.findById(playerId).orElseThrow();
+        BoughtItem itemInstance = boughtItemRepository.findById(entityManager, itemId).orElseThrow();
+        Player player = playerRepository.findById(entityManager, playerId).orElseThrow();
 
         //verify data integrity (current round, datetime request)
         //TODO check & user input
@@ -96,12 +105,12 @@ public class MarketService {
         }
 
         //Fetch current market price
-        MarketPrice marketPrice = marketPriceRepository.findByBlueprint(itemInstance.getItemBlueprint(), currentRound).orElseThrow();
+        MarketPrice marketPrice = marketPriceRepository.findByBlueprint(entityManager, itemInstance.getItemBlueprint(), currentRound).orElseThrow();
 
         //remove player's money
         player.credit(marketPrice.getCurrentPrice());
         player.addReputation(10); //TODO calculate reputation score in util class
-        playerRepository.save(player);
+        playerRepository.save(entityManager, player);
 
         //add item to inventory
         inventoryService.removeFromInventory(itemInstance, currentRound);

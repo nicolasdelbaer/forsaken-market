@@ -10,15 +10,13 @@ public class PlayerRepository extends CrudRepository<Player, Integer> {
         super(Player.class);
     }
 
-    public boolean emailExists(String email) {
+    public boolean emailExists(EntityManager entityManager, String email) {
         boolean exists = false;
-        try(EntityManager entityManager = entityManagerFactory.createEntityManager()){
-            exists = !entityManager.createQuery("select 1 from Player t where t.email = :email", Integer.class)
-                    .setParameter("email", email)
-                    .setMaxResults(1)
-                    .getResultList()
-                    .isEmpty();
-            return exists;
-        }
+        exists = !entityManager.createQuery("select 1 from Player t where t.email = :email", Integer.class)
+                .setParameter("email", email)
+                .setMaxResults(1)
+                .getResultList()
+                .isEmpty();
+        return exists;
     }
 }

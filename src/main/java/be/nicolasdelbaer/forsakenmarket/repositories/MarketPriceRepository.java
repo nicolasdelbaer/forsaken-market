@@ -13,30 +13,26 @@ public class MarketPriceRepository extends CrudRepository<MarketPrice, Long> {
         super(MarketPrice.class);
     }
 
-    public Optional<MarketPrice> findByLastBlueprint(ItemBlueprint itemBlueprint) {
+    public Optional<MarketPrice> findByLastBlueprint(EntityManager entityManager, ItemBlueprint itemBlueprint) {
         MarketPrice marketPrice = null;
-        try(EntityManager entityManager = entityManagerFactory.createEntityManager()){
-            marketPrice = entityManager
-                    .createQuery("select t from MarketPrice t where t.itemBlueprint = :itemBlueprint order by t.roundId DESC",
-                            MarketPrice.class)
-                    .setParameter("itemBlueprint", itemBlueprint)
-                    .setMaxResults(1)
-                    .getSingleResult();
-            return Optional.of(marketPrice);
-        }
+        marketPrice = entityManager
+                .createQuery("select t from MarketPrice t where t.itemBlueprint = :itemBlueprint order by t.roundId DESC",
+                        MarketPrice.class)
+                .setParameter("itemBlueprint", itemBlueprint)
+                .setMaxResults(1)
+                .getSingleResult();
+        return Optional.of(marketPrice);
     }
 
-    public Optional<MarketPrice> findByBlueprint(ItemBlueprint itemBlueprint, Long roundId) {
+    public Optional<MarketPrice> findByBlueprint(EntityManager entityManager, ItemBlueprint itemBlueprint, Long roundId) {
         MarketPrice marketPrice = null;
-        try(EntityManager entityManager = entityManagerFactory.createEntityManager()){
-            marketPrice = entityManager
-                    .createQuery("select t from MarketPrice t where t.itemBlueprint = :itemBlueprint and t.roundId = :roundId",
-                            MarketPrice.class)
-                    .setParameter("itemBlueprint", itemBlueprint)
-                    .setParameter("roundId", roundId)
-                    .setMaxResults(1)
-                    .getSingleResult();
-            return Optional.of(marketPrice);
-        }
+        marketPrice = entityManager
+                .createQuery("select t from MarketPrice t where t.itemBlueprint = :itemBlueprint and t.roundId = :roundId",
+                        MarketPrice.class)
+                .setParameter("itemBlueprint", itemBlueprint)
+                .setParameter("roundId", roundId)
+                .setMaxResults(1)
+                .getSingleResult();
+        return Optional.of(marketPrice);
     }
 }

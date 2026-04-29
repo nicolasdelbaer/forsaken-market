@@ -6,14 +6,15 @@ import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItemDto;
 import be.nicolasdelbaer.forsakenmarket.repositories.BoughtItemRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 
 import java.time.LocalDateTime;
 
 @ApplicationScoped
 public class InventoryService {
 
-    @Inject
-    private BoughtItemRepository boughtItemRepository;
+    @Inject private BoughtItemRepository boughtItemRepository;
+    @Inject private EntityManager entityManager;
 
     public void addToInventory(BuyItemDto buyItemDto){
         Integer decayTime = 8; //TODO calculte right round nb time
@@ -30,7 +31,7 @@ public class InventoryService {
         boughtItem.setDecayNbRounds(decayTime);
         boughtItem.setBoughtRoundId(buyItemDto.roundId());
 
-        boughtItemRepository.save(boughtItem);
+        boughtItemRepository.save(entityManager, boughtItem);
     }
 
     //TODO clean old refs on schedule?
@@ -38,6 +39,6 @@ public class InventoryService {
         boughtItem.setSoldAt(LocalDateTime.now());
         boughtItem.setStatus(MarketItemStatus.SOLD);
         boughtItem.setSoldRoundId(currentRound);
-        boughtItemRepository.save(boughtItem);
+        boughtItemRepository.save(entityManager, boughtItem);
     }
 }

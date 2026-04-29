@@ -12,7 +12,6 @@ public class GameConfiguration {
     @Getter private final int roundDurationSeconds = 45;
     @Getter private final int startingWallet = 500;
 
-
     @Getter private final int rerollCost = 20;
     @Getter private final int maxRerollsPerRound = 3;
 

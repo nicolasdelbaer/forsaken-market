@@ -11,15 +11,13 @@ public class PlayerRerollRepository extends CrudRepository<PlayerReroll, Long> {
         super(PlayerReroll.class);
     }
 
-    public Integer getRerollCount(Long roundId) {
+    public Integer getRerollCount(EntityManager entityManager, Long roundId) {
         Integer count = 0;
-        try(EntityManager entityManager = entityManagerFactory.createEntityManager()){
-            count = entityManager
-                    .createQuery("select count(t) from PlayerReroll t where t.roundId = :roundId group by t.roundId",
-                            MarketPrice.class)
-                    .setParameter("roundId", roundId)
-                    .executeUpdate();
-            return count;
-        }
+        count = entityManager
+                .createQuery("select count(t) from PlayerReroll t where t.roundId = :roundId group by t.roundId",
+                        MarketPrice.class)
+                .setParameter("roundId", roundId)
+                .executeUpdate();
+        return count;
     }
 }

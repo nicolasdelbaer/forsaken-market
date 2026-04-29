@@ -1,4 +1,3 @@
-
 # TODO LIST
 
 ## MVP content
@@ -25,8 +24,25 @@
 - retrieve movements
 
 
+
 ## TO DO NEXT
-### 
+### Market
+- Add transactions to services
+- Handle MarketItems cycle
+    - populate if missing items
+    - add item config limit
+    - items TTL
+    - add default price
+- Buy Item test
+- Sell Item test
+- Reroll items
+- Filtered Market item list
+- Cycle
+  - Items decay
+  - Market price evolution
+  - Fetch range of price evolution
+
+
 
 ## TO KEEP IN MIND
 ### Transaction within services

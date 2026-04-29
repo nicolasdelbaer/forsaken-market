@@ -8,22 +8,21 @@ import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 
 @ApplicationScoped
 public class PlayerService {
 
-    @Inject
-    private PlayerRepository playerRepository;
-    @Inject
-    private GameConfiguration gameConfiguration;
+    @Inject private PlayerRepository playerRepository;
+    @Inject private GameConfiguration gameConfiguration;
+    @Inject private EntityManager entityManager;
 
     public PlayerService() {
     }
 
 
     public Player register(CreateUserDto createUserDto) throws EmailAlreadyUsedException {
-
-        if(playerRepository.emailExists(createUserDto.email()))
+        if(playerRepository.emailExists(entityManager, createUserDto.email()))
             throw new EmailAlreadyUsedException("Cannot create this player, the email already exists");
 
         String envCost = System.getenv("BCRYPT_COST");
@@ -36,7 +35,7 @@ public class PlayerService {
             gameConfiguration.getStartingWallet()
         );
 
-        playerRepository.save(player);
+        playerRepository.save(entityManager, player);
         return player;
     }
 
