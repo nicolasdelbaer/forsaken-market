@@ -7,7 +7,6 @@ import jakarta.interceptor.AroundInvoke;
 import jakarta.interceptor.Interceptor;
 import jakarta.interceptor.InvocationContext;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 
 @Interceptor
@@ -21,13 +20,17 @@ public class TransactionalInterceptor {
     @AroundInvoke
     public Object manageTransaction(InvocationContext context) throws Exception {
         EntityTransaction transaction = entityManager.getTransaction();
-        transaction.begin();
+
+        //Propagation, if transactional already open, just continue
+        boolean isActive = transaction.isActive();
+
+        if(!isActive) transaction.begin();
         try {
             Object result = context.proceed();
-            transaction.commit();
+            if(!isActive) transaction.commit();
             return result;
         } catch (Exception e) {
-            transaction.rollback();
+            if(!isActive) transaction.rollback();
             throw e;
         }
     }
