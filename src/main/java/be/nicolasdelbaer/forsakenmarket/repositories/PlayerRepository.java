@@ -11,19 +11,24 @@ public class PlayerRepository extends CrudRepository<Player, Integer> {
     }
 
     public boolean emailExists(EntityManager entityManager, String email) {
-        boolean exists = false;
-        exists = !entityManager.createQuery("select 1 from Player t where t.email = :email", Integer.class)
+        return !entityManager.createQuery("select 1 from Player t where t.email = :email", Integer.class)
                 .setParameter("email", email)
                 .setMaxResults(1)
                 .getResultList()
                 .isEmpty();
-        return exists;
     }
     public Player findByEmail(EntityManager entityManager, String email) {
-        Player player = null;
-        player = entityManager.createQuery("select t from Player t where t.email = :email", Player.class)
+        return entityManager.createQuery("select t from Player t where t.email = :email", Player.class)
                 .setParameter("email", email)
                 .getSingleResult();
-        return player;
+    }
+
+    public Integer getWallet(EntityManager entityManager, Integer playerId) {
+        return entityManager.createQuery("""
+                        select t.wallet from Player t
+                        where t.id = :playerId
+                        """, Integer.class)
+                .setParameter("playerId", playerId)
+                .getSingleResult();
     }
 }

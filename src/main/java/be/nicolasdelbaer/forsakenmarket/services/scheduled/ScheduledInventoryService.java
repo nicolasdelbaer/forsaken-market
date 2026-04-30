@@ -22,7 +22,7 @@ public class ScheduledInventoryService {
      * Decayed items cannot be sold anymore, updates will occur each round
      */
     public void updateDecay(EntityManager entityManager) throws CannotUpdateDecayOnItemException {
-        List<BoughtItem> ownedItems = boughtItemRepository.fetchActiveItems(entityManager);
+        List<BoughtItem> ownedItems = boughtItemRepository.fetchBoughtItems(entityManager);
         Long currentRound = gameState.getCurrentRound();
         for (BoughtItem ownedItem : ownedItems) {
             if(ownedItem.getStatus() != MarketItemStatus.BOUGHT)

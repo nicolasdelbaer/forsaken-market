@@ -14,27 +14,27 @@ public class MarketPriceRepository extends CrudRepository<MarketPrice, Long> {
         super(MarketPrice.class);
     }
 
-    public Optional<MarketPrice> findByLastBlueprint(EntityManager entityManager, ItemBlueprint itemBlueprint) {
-        MarketPrice marketPrice = null;
-        marketPrice = entityManager
-                .createQuery("select t from MarketPrice t where t.itemBlueprint = :itemBlueprint order by t.roundId DESC",
-                        MarketPrice.class)
-                .setParameter("itemBlueprint", itemBlueprint)
-                .setMaxResults(1)
-                .getSingleResult();
-        return Optional.of(marketPrice);
-    }
-
     public Optional<MarketPrice> findByBlueprint(EntityManager entityManager, ItemBlueprint itemBlueprint, Long roundId) {
         MarketPrice marketPrice = null;
         marketPrice = entityManager
-                .createQuery("select t from MarketPrice t where t.itemBlueprint = :itemBlueprint and t.roundId = :roundId",
-                        MarketPrice.class)
-                .setParameter("itemBlueprint", itemBlueprint)
+                .createQuery("""
+                        select t from MarketPrice t
+                        where t.itemBlueprint.id = :itemBlueprint
+                            and t.roundId = :roundId
+                        """, MarketPrice.class)
+                .setParameter("itemBlueprint", itemBlueprint.getId())
                 .setParameter("roundId", roundId)
-                .setMaxResults(1)
                 .getSingleResult();
         return Optional.of(marketPrice);
     }
 
+    public List<MarketPrice> findByRoundId(EntityManager entityManager, Long roundId) {
+        return entityManager.createQuery("""
+                        select t from MarketPrice t
+                        where t.roundId = :roundId
+                    """, MarketPrice.class)
+                .setParameter("roundId", roundId)
+                .getResultList();
+
+    }
 }

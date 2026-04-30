@@ -10,6 +10,7 @@ import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketPriceNotFoundExc
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.MaxRerollReachedException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerInsufficientFundsException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerNotFoundException;
+import be.nicolasdelbaer.forsakenmarket.models.market.MarketItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItemDto;
 import be.nicolasdelbaer.forsakenmarket.models.player.ReputationScoreData;
 import be.nicolasdelbaer.forsakenmarket.repositories.*;
@@ -21,7 +22,6 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @ApplicationScoped
@@ -39,6 +39,8 @@ public class MarketService {
 
     @Inject private EntityManager entityManager;
     @Inject private ItemBlueprintRepository itemBlueprintRepository;
+    @Inject
+    private PlayerService playerService;
 
     @Transactional
     public void rerollItem(Integer playerId, Long itemId) throws PlayerInsufficientFundsException, MaxRerollReachedException, MarkeItemDoesNotExistException, PlayerNotFoundException {
@@ -119,9 +121,22 @@ public class MarketService {
     }
 
 
-    public List<MarketItem> fetchAvailableItems(Integer playerId){
-        List<MarketItem> results = new ArrayList<>();
-        results = marketItemRepository.findAllValidItemsForPlayer(entityManager, gameState.getCurrentRound(), playerId);
-        return results;
+    public List<MarketItemResponse> fetchAvailableItems(Integer playerId){
+        return marketItemRepository
+                .findAllValidItemsForPlayer(entityManager, gameState.getCurrentRound(), playerId)
+                .stream().map(
+                    row ->{
+                     MarketItem item = (MarketItem) row[0];
+                     Integer currentPrice = (Integer) row[1];
+                     return new MarketItemResponse(
+                             item.getId(),
+                             item.getItemBlueprint().getTitle(),
+                             item.getItemBlueprint().getDescription(),
+                             item.getItemBlueprint().getIcon(),
+                             item.getItemBlueprint().getRarity().name(),
+                             currentPrice
+                     );
+                    }
+                ).toList();
     }
 }

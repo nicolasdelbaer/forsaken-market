@@ -55,4 +55,8 @@ public class BoughtItem {
         if(currentRound >= (boughtRoundId + decayNbRounds-1))
             status = MarketItemStatus.DECAYED;
     }
+
+    public boolean isDecayed(){
+        return status.equals(MarketItemStatus.DECAYED);
+    }
 }

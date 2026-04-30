@@ -14,13 +14,24 @@ public class BoughtItemRepository extends CrudRepository<BoughtItem, Long> {
         super(BoughtItem.class);
     }
 
-    public List<BoughtItem> fetchActiveItems(EntityManager entityManager) {
+    public List<BoughtItem> fetchBoughtItems(EntityManager entityManager) {
         return entityManager.createQuery("""
                     select bi from BoughtItem bi
                     where bi.status = :status
                     """, BoughtItem.class)
             .setParameter("status", MarketItemStatus.BOUGHT)
             .getResultList();
+    }
+
+    public List<BoughtItem> fetchAvailableItemsForPlayer(EntityManager entityManager, Integer playerId) {
+        return entityManager.createQuery("""
+                    select bi from BoughtItem bi
+                    where bi.status IN (:statusList)
+                        and bi.player.id = :playerId
+                    """, BoughtItem.class)
+                .setParameter("statusList", List.of(MarketItemStatus.BOUGHT, MarketItemStatus.DECAYED))
+                .setParameter("playerId", playerId)
+                .getResultList();
     }
 
     public Optional<BoughtItem> getItemFromPlayer(

@@ -2,42 +2,45 @@
 
 ## MVP content
 ### User login
-- register as player
-- login as player
-- logout as player
+- [x] register as player
+- [x] login as player
+- [x] logout as player
 
 ### User interactions
-- player won exp when selling
-- player can buy item to their inventory
-- player can sell item from their inventory
-- player can reroll an item from the market for a price
+- [ ] player won exp when selling
+- [x] player can buy item to their inventory
+- [x] player can sell item from their inventory
+- [ ] player can reroll an item from the market for a price
 
 ### Cycle & game state related
-- populate items to market
-- handle schedule ticks on server
-- items will decay
-- items will get out of market
+- [x] populate items to market
+- [x] handle schedule ticks on server
+- [ ] items will decay
+- [x] items will get out of market
 
 ### Track items price movement
-- update prices for the current round
-- store movements (player buy & sell actions)
-- retrieve movements (player buy & sell actions)
+- [x] update prices for the current round
+- [ ] store movements (player buy & sell actions)
+- [ ] retrieve movements (player buy & sell actions)
 
 
 
 
 ## TO DO NEXT
+
 ### Market
-- Price 
-- Reroll items
-- ? Filtered Market item list
+- Reroll items (crash)
 - Market price have to progress and update trends
-- Fetch range of price evolution for display ->extended entity without table?
+- Fetch range of price evolution for display 
+
+### Meta
+- Sync server & client (send date for auto refresh + data)
+- Send data for player exp/reput & display
 
 ### Project
-- Code & project review
+- Update & Clean auth filter flow
 
-### Rules
+### Game Rules
 - Decay must be very high & based on rarity (utils)
 - Time to live based on ranged & rarity (utils)
 
@@ -46,27 +49,20 @@
 
 ## TO KEEP IN MIND
 ### Refacto
+- Code & project review
 - Clean BoughtItem responsability cf player movements?
 
 ### DTO
 - Check if needs of DTO for requests & queries
-- Ajouter les validations via annotations @NotBlank, length etc.
+- Add validations via annotations @NotBlank, length etc. from incoming data
 
 ### Game State
 - Add a dedicated table with 1 id and store current round & stuff
 
 ### Testing
-- Create & add test cases
-
-### Auth
-- Update & Clean auth filter flow
+- Add new test cases
 
 ### Update theory & must known
-- Update notion (Filters, Annotations, Auth, Scope & Beans, Scheduler lifecycle, Interceptor, Producer, Jql joins)
 
 ### Optimisation
-- Persist only when necessary
 - Review db accesses & server cached data ()
-
-### Features
-- Test feature as a user with basic front view

@@ -7,7 +7,9 @@ import be.nicolasdelbaer.forsakenmarket.models.player.LoginRequestDto;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.models.player.RegisterPlayerDto;
 import be.nicolasdelbaer.forsakenmarket.services.PlayerService;
+import be.nicolasdelbaer.forsakenmarket.utils.BadResponseUtils;
 import be.nicolasdelbaer.forsakenmarket.utils.JwtUtils;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolation;
@@ -18,14 +20,18 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
 @Path("/auth")
 @RequestScoped
 @Public
+@Tag(name = "Auth", description = "Manage users")
 public class AuthResource {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthResource.class);
     @Inject private PlayerService playerService;
     @Inject private Validator validator;
 
@@ -45,7 +51,7 @@ public class AuthResource {
             playerService.register(registerPlayerDto);
             response = Response.ok().build();
         } catch (EmailAlreadyUsedException e) {
-            response = Response.status(400).entity(e.getMessage()).build();
+            response = Response.status(400).entity(BadResponseUtils.AlreadyUsedEmail).build();
         }
 
         return response;
@@ -69,7 +75,8 @@ public class AuthResource {
             String token = JwtUtils.generateToken(player);
             response = Response.ok(token).build();
         } catch (PlayerLoginException e) {
-            response = Response.status(400).entity(e.getMessage()).build();
+            response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), BadResponseUtils.WrongLoginOrPass).build();
+            log.warn(e.getMessage(), e);
         }
 
         return response;

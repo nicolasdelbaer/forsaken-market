@@ -5,7 +5,6 @@ import be.nicolasdelbaer.forsakenmarket.annotations.Transactional;
 import be.nicolasdelbaer.forsakenmarket.entities.Player;
 import be.nicolasdelbaer.forsakenmarket.exceptions.auth.EmailAlreadyUsedException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerLoginException;
-import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerNotFoundException;
 import be.nicolasdelbaer.forsakenmarket.models.player.LoginRequestDto;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.models.player.RegisterPlayerDto;
@@ -56,10 +55,8 @@ public class PlayerService {
         return PlayerSession.fromPlayer(player);
     }
 
-    @Transactional
-    public void addReputation(Integer playerId, Integer reputationScore) throws PlayerNotFoundException {
-        Player player = playerRepository.findById(entityManager, playerId).orElseThrow(() -> new PlayerNotFoundException(""));
-        player.addReputation(reputationScore);
-        playerRepository.save(entityManager, player);
+
+    public Integer getWallet(Integer playerId) {
+        return playerRepository.getWallet(entityManager, playerId);
     }
 }

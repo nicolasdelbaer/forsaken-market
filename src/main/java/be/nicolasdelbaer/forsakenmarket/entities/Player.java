@@ -97,6 +97,7 @@ public class Player {
         }
     }
 
+    //TODO change roles
     public List<String> getRoles() {
         return List.of("player");
     }
