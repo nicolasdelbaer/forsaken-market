@@ -2,7 +2,7 @@ package be.nicolasdelbaer.forsakenmarket.services.scheduled;
 
 import be.nicolasdelbaer.forsakenmarket.entities.BoughtItem;
 import be.nicolasdelbaer.forsakenmarket.enums.MarketItemStatus;
-import be.nicolasdelbaer.forsakenmarket.exceptions.CannotUpdateDecayOnItemException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.schedule.CannotUpdateDecayOnItemException;
 import be.nicolasdelbaer.forsakenmarket.repositories.BoughtItemRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.GameState;
 import jakarta.enterprise.context.ApplicationScoped;

@@ -1,6 +1,6 @@
 package be.nicolasdelbaer.forsakenmarket.resources;
 
-import be.nicolasdelbaer.forsakenmarket.exceptions.CannotDiscardItemException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.CannotDiscardItemException;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.services.InventoryService;
 import io.swagger.v3.oas.annotations.Operation;

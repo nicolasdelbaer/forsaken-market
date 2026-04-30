@@ -1,8 +1,8 @@
 package be.nicolasdelbaer.forsakenmarket.resources;
 
 import be.nicolasdelbaer.forsakenmarket.annotations.Public;
-import be.nicolasdelbaer.forsakenmarket.exceptions.EmailAlreadyUsedException;
-import be.nicolasdelbaer.forsakenmarket.exceptions.PlayerLoginException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.auth.EmailAlreadyUsedException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerLoginException;
 import be.nicolasdelbaer.forsakenmarket.models.player.LoginRequestDto;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.models.player.RegisterPlayerDto;

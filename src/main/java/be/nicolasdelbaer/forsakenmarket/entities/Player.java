@@ -1,6 +1,6 @@
 package be.nicolasdelbaer.forsakenmarket.entities;
 
-import be.nicolasdelbaer.forsakenmarket.exceptions.PlayerInsufficientFundsException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerInsufficientFundsException;
 import jakarta.persistence.*;
 import lombok.*;
 

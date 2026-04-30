@@ -1,4 +1,4 @@
-package be.nicolasdelbaer.forsakenmarket.exceptions;
+package be.nicolasdelbaer.forsakenmarket.exceptions.player;
 
 public class PlayerInsufficientFundsException extends Exception {
     public PlayerInsufficientFundsException(String message) {

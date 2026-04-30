@@ -1,6 +1,12 @@
 package be.nicolasdelbaer.forsakenmarket.resources;
 
-import be.nicolasdelbaer.forsakenmarket.exceptions.*;
+import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.BadItemOwnershipException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.market.CannotSellInactiveItemException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarkeItemDoesNotExistException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketPriceNotFoundException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.market.MaxRerollReachedException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerInsufficientFundsException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerNotFoundException;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.services.MarketService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -65,7 +71,8 @@ public class MarketResource {
         try {
             marketService.rerollItem(playerSession.id(), itemId);
             response = Response.ok().build();
-        } catch (PlayerInsufficientFundsException | MaxRerollReachedException | MarkeItemDoesNotExistException | PlayerNotFoundException e) {
+        } catch (PlayerInsufficientFundsException | MaxRerollReachedException | MarkeItemDoesNotExistException |
+                 PlayerNotFoundException e) {
             response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), e.getMessage()).build();
         }
         return response;

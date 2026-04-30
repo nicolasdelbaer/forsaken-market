@@ -2,12 +2,9 @@ package be.nicolasdelbaer.forsakenmarket.services;
 
 import be.nicolasdelbaer.forsakenmarket.annotations.Transactional;
 import be.nicolasdelbaer.forsakenmarket.entities.BoughtItem;
-import be.nicolasdelbaer.forsakenmarket.entities.MarketPrice;
 import be.nicolasdelbaer.forsakenmarket.enums.MarketItemStatus;
-import be.nicolasdelbaer.forsakenmarket.exceptions.BadItemOwnershipException;
-import be.nicolasdelbaer.forsakenmarket.exceptions.CannotSellInactiveItemException;
-import be.nicolasdelbaer.forsakenmarket.exceptions.CannotDiscardItemException;
-import be.nicolasdelbaer.forsakenmarket.exceptions.CannotUpdateDecayOnItemException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.market.CannotSellInactiveItemException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.CannotDiscardItemException;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItemDto;
 import be.nicolasdelbaer.forsakenmarket.repositories.BoughtItemRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.GameState;
@@ -16,7 +13,6 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @ApplicationScoped
 public class InventoryService {

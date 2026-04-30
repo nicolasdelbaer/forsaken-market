@@ -46,8 +46,7 @@
 
 ## TO KEEP IN MIND
 ### Refacto
-- Split MarketService to MarketService & ScheduleMarketService for clarity
-- Clean BoughtItem responsability cf player movements.
+- Clean BoughtItem responsability cf player movements?
 
 ### DTO
 - Check if needs of DTO for requests & queries
