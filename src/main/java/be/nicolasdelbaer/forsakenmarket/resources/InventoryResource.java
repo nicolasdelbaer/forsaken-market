@@ -1,10 +1,8 @@
 package be.nicolasdelbaer.forsakenmarket.resources;
 
-import be.nicolasdelbaer.forsakenmarket.exceptions.BadItemOwnershipException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.CannotDiscardItemException;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.services.InventoryService;
-import be.nicolasdelbaer.forsakenmarket.services.MarketService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.POST;

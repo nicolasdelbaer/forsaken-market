@@ -40,10 +40,10 @@ public class MarketService {
         Long currentRound = gameState.getCurrentRound();
         MarketItem itemInstance = marketItemRepository.
                 findById(entityManager, itemId)
-                .orElseThrow(() -> new MarkeItemDoesNotExistException("Item not found"));;
+                .orElseThrow(() -> new MarkeItemDoesNotExistException("Item not found"));
         Player player = playerRepository
                 .findById(entityManager, playerId)
-                .orElseThrow(() -> new PlayerNotFoundException("player not found"));;
+                .orElseThrow(() -> new PlayerNotFoundException("player not found"));
 
         //cannot reroll if you've already used all available rerolls for the current round
         Integer nbReroll = playerRerollRepository.getRerollCount(entityManager, currentRound);
