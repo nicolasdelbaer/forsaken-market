@@ -20,14 +20,14 @@ public class TransactionalInterceptor {
 
     @AroundInvoke
     public Object manageTransaction(InvocationContext context) throws Exception {
-        EntityTransaction tx = entityManager.getTransaction();
-        tx.begin();
+        EntityTransaction transaction = entityManager.getTransaction();
+        transaction.begin();
         try {
             Object result = context.proceed();
-            tx.commit();
+            transaction.commit();
             return result;
         } catch (Exception e) {
-            tx.rollback();
+            transaction.rollback();
             throw e;
         }
     }
