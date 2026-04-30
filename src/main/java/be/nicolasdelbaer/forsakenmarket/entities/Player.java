@@ -4,6 +4,8 @@ import be.nicolasdelbaer.forsakenmarket.exceptions.PlayerInsufficientFundsExcept
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table
 @NoArgsConstructor
@@ -88,9 +90,14 @@ public class Player {
         currentReput += reputationScore;
         totReput += reputationScore;
 
+        //update level from thresholds table
         if (level <= LEVEL_THRESHOLDS.length && currentReput >= LEVEL_THRESHOLDS[level-1]) {
             currentReput -= LEVEL_THRESHOLDS[level-1];
             level ++;
         }
+    }
+
+    public List<String> getRoles() {
+        return List.of("player");
     }
 }

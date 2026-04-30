@@ -6,7 +6,7 @@ import be.nicolasdelbaer.forsakenmarket.entities.Player;
 import be.nicolasdelbaer.forsakenmarket.exceptions.EmailAlreadyUsedException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.PlayerLoginException;
 import be.nicolasdelbaer.forsakenmarket.models.player.LoginRequestDto;
-import be.nicolasdelbaer.forsakenmarket.models.player.PlayerResponse;
+import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.models.player.RegisterPlayerDto;
 import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
@@ -26,7 +26,7 @@ public class PlayerService {
 
 
     @Transactional
-    public PlayerResponse register(RegisterPlayerDto registerPlayerDto) throws EmailAlreadyUsedException {
+    public void register(RegisterPlayerDto registerPlayerDto) throws EmailAlreadyUsedException {
         if(playerRepository.emailExists(entityManager, registerPlayerDto.email()))
             throw new EmailAlreadyUsedException("Cannot create this player, the email already exists");
 
@@ -41,7 +41,6 @@ public class PlayerService {
         );
 
         playerRepository.save(entityManager, player);
-        return PlayerResponse.fromPlayer(player);
     }
 
     @Transactional
@@ -49,7 +48,7 @@ public class PlayerService {
         player.addReputation(reputationScore);
     }
 
-    public PlayerResponse login(LoginRequestDto loginRequestDto) throws PlayerLoginException {
+    public PlayerSession login(LoginRequestDto loginRequestDto) throws PlayerLoginException {
         if(!playerRepository.emailExists(entityManager, loginRequestDto.email()))
             throw new PlayerLoginException("Incorrect password or login");
 
@@ -58,6 +57,6 @@ public class PlayerService {
         if(!BCrypt.verifyer().verify(loginRequestDto.password().toCharArray(), player.getPassword()).verified)
             throw new PlayerLoginException("Incorrect password or login");
 
-        return PlayerResponse.fromPlayer(player);
+        return PlayerSession.fromPlayer(player);
     }
 }

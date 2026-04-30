@@ -1,6 +1,7 @@
 package be.nicolasdelbaer.forsakenmarket.filters;
 
 import be.nicolasdelbaer.forsakenmarket.annotations.Public;
+import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.utils.JwtUtils;
 import io.jsonwebtoken.Claims;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -41,19 +42,26 @@ public class AuthFilter implements ContainerRequestFilter {
             return;
         }
 
-        String token = authHeader.substring(7);
-
         try {
+            String token = authHeader.substring(7);
             Claims claims = JwtUtils.getClaims(token);
-            //String name = JwtUtils.getUsername(claims, token);
-            //String email = JwtUtils.getEmail(claims, token);
             List<String> roles = JwtUtils.getRoles(claims, token);
-            String id = String.valueOf(JwtUtils.getId(claims, token));
+            PlayerSession playerSession = new PlayerSession(
+                    JwtUtils.getId(claims, token),
+                    JwtUtils.getEmail(claims, token),
+                    JwtUtils.getUsername(claims, token),
+                    JwtUtils.getRoles(claims, token)
+                    );
 
+            /*
+             * Security context to retrieve from endpoints with
+             * @Context SecurityContext securityContext as param
+             * then -> securityContext.getUserPrincipal()
+             */
             SecurityContext securityContext = new SecurityContext() {
                 @Override
                 public Principal getUserPrincipal() {
-                    return () -> id;
+                    return playerSession;
                 }
                 @Override
                 public boolean isUserInRole(String role) { return roles.contains(role); }

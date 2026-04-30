@@ -10,6 +10,7 @@ import be.nicolasdelbaer.forsakenmarket.repositories.MarketItemRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.MarketPriceRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRepository;
 import be.nicolasdelbaer.forsakenmarket.services.InventoryService;
+import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.services.MarketService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -20,8 +21,10 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.SecurityContext;
 
 @RequestScoped
 @Path("/market")
@@ -29,6 +32,7 @@ import jakarta.ws.rs.core.Response;
 public class MarketResource {
 
     @Inject private MarketService marketService;
+    @Context private SecurityContext securityContext;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -37,7 +41,7 @@ public class MarketResource {
     public Response buyItem(@PathParam("id") Long id) {
         Response response;
         try {
-            marketService.buyItem(1, id); //TODO get playerId from session
+            marketService.buyItem(playerSession.id(), itemId);
             response = Response.ok().build();
         } catch (PlayerInsufficientFundsException e) {
             response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), "insufficient funds").build();
@@ -54,7 +58,7 @@ public class MarketResource {
     public Response sellItem(@PathParam("id") Long id) {
         Response response;
         try {
-            marketService.sellItem(1, id); //TODO get playerId from session
+            marketService.sellItem(playerSession.id(), itemId);
             response = Response.ok().build();
         } catch (BadItemOwnerException e) {
             response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), "player doesn't own the item").build();
@@ -68,7 +72,7 @@ public class MarketResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/reroll-item/{id}")
     @Operation(summary = "Reroll an item", description = "Reroll an item from the market")
-    public Response rerollItem(@PathParam("id") Long id) {
+    public Response rerollItem(@PathParam("id") Long itemId) {
         Response response;
         try {
             marketService.rerollItem(1, id); //TODO get playerId from session

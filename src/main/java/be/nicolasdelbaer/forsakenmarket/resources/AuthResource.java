@@ -4,7 +4,7 @@ import be.nicolasdelbaer.forsakenmarket.annotations.Public;
 import be.nicolasdelbaer.forsakenmarket.exceptions.EmailAlreadyUsedException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.PlayerLoginException;
 import be.nicolasdelbaer.forsakenmarket.models.player.LoginRequestDto;
-import be.nicolasdelbaer.forsakenmarket.models.player.PlayerResponse;
+import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.models.player.RegisterPlayerDto;
 import be.nicolasdelbaer.forsakenmarket.services.PlayerService;
 import be.nicolasdelbaer.forsakenmarket.utils.JwtUtils;
@@ -42,7 +42,7 @@ public class AuthResource {
         //Data are validated
         Response response;
         try {
-            PlayerResponse player = playerService.register(registerPlayerDto);
+            playerService.register(registerPlayerDto);
             response = Response.ok().build();
         } catch (EmailAlreadyUsedException e) {
             response = Response.status(400).entity(e.getMessage()).build();
@@ -65,7 +65,7 @@ public class AuthResource {
         //Data are validated
         Response response;
         try {
-            PlayerResponse player = playerService.login(loginRequestDto);
+            PlayerSession player = playerService.login(loginRequestDto);
             String token = JwtUtils.generateToken(player);
             response = Response.ok(token).build();
         } catch (PlayerLoginException e) {

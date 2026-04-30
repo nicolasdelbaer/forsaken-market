@@ -1,6 +1,6 @@
 package be.nicolasdelbaer.forsakenmarket.utils;
 
-import be.nicolasdelbaer.forsakenmarket.models.player.PlayerResponse;
+import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -21,7 +21,7 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(secretKeyString.getBytes());
     }
 
-    public static String generateToken(PlayerResponse player){
+    public static String generateToken(PlayerSession player){
         return Jwts.builder().signWith(getSecretKey())
                 .subject(player.name())
                 .id(player.id().toString())
