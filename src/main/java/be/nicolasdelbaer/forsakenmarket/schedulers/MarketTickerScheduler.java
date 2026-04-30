@@ -1,7 +1,7 @@
 package be.nicolasdelbaer.forsakenmarket.schedulers;
 
-import be.nicolasdelbaer.forsakenmarket.services.InventoryService;
-import be.nicolasdelbaer.forsakenmarket.services.MarketService;
+import be.nicolasdelbaer.forsakenmarket.services.scheduled.ScheduledInventoryService;
+import be.nicolasdelbaer.forsakenmarket.services.scheduled.ScheduledMarketService;
 import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
 import be.nicolasdelbaer.forsakenmarket.utils.GameState;
 import jakarta.annotation.Priority;
@@ -23,15 +23,12 @@ public class MarketTickerScheduler implements ServletContextListener {
 
     private ScheduledExecutorService scheduler;
     @Inject private EntityManagerFactory entityManagerFactory;
-
-    @Inject private MarketService marketService;
-    @Inject private InventoryService inventoryService;
+    @Inject private ScheduledMarketService scheduledMarketService;
+    @Inject private ScheduledInventoryService scheduledInventoryService;
     @Inject private GameState gameState;
-    @Inject
-    private GameConfiguration gameConfiguration;
+    @Inject private GameConfiguration gameConfiguration;
 
     public void onStart(@Observes @Priority(GameConfiguration.SchedulerPriority) @Initialized(ApplicationScoped.class) Object e) {
-
         scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(
                 this::tick,
@@ -55,16 +52,16 @@ public class MarketTickerScheduler implements ServletContextListener {
                 gameState.nextRound();
 
                 //Prices will change towards their trends. Trends will be updated.
-                marketService.updateMarketPrices(entityManager);
+                scheduledMarketService.updateMarketPrices(entityManager);
                 //Check & handle market items expiration
-                marketService.updateTimeToLive(entityManager);
+                scheduledMarketService.updateTimeToLive(entityManager);
                 //Check & handle inventory item decay; they'll lost value once decayed
-                inventoryService.updateDecay(entityManager);
+                scheduledInventoryService.updateDecay(entityManager);
 
                 //Populate new items if some slots are missing,
                 //using gameConfiguration to setup a pool of max available items
                 //shared for all players (- bought or rerolled items)
-                marketService.refreshMarket(entityManager);
+                scheduledMarketService.refreshMarket(entityManager);
                 System.out.printf("Current round: %s%n", gameState.getCurrentRound());
                 transaction.commit();
             } catch (Exception e) {

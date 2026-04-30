@@ -120,7 +120,6 @@ public class MarketService {
         return results;
     }
 
-
     /*
      * Executed by scheduler -> need to pass its entityManager
      * Market Refresh consists on:

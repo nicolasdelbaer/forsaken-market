@@ -45,12 +45,6 @@ public class InventoryService {
         boughtItemRepository.save(entityManager, boughtItem);
     }
 
-    //TODO keep decay feature ? QUID if sold, lost of data due to decay status; no data on sold price
-    public void updateDecay(EntityManager entityManager) {
-        List<BoughtItem> ownedItems = boughtItemRepository.findAllBought(entityManager);
         Long currentRound = gameState.getCurrentRound();
-        for (BoughtItem ownedItem : ownedItems) {
-            ownedItem.updateExpiration(currentRound);
-        }
     }
 }
