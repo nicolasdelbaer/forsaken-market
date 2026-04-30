@@ -25,15 +25,23 @@
 
 
 
+
 ## TO DO NEXT
 ### Market
+- Price 
 - Reroll items
 - ? Filtered Market item list
 - Market price have to progress and update trends
-- Fetch range of price evolution for display
+- Fetch range of price evolution for display ->extended entity without table?
 
 ### Project
 - Code & project review
+
+### Rules
+- Decay must be very high & based on rarity (utils)
+- Time to live based on ranged & rarity (utils)
+
+
 
 
 ## TO KEEP IN MIND
@@ -44,7 +52,6 @@
 ### DTO
 - Check if needs of DTO for requests & queries
 - Ajouter les validations via annotations @NotBlank, length etc.
-- Utiliser PlayerResponse comme container du User
 
 ### Game State
 - Add a dedicated table with 1 id and store current round & stuff
@@ -58,6 +65,9 @@
 ### Update theory & must known
 - Update notion (Filters, Annotations, Auth, Scope & Beans, Scheduler lifecycle, Interceptor, Producer, Jql joins)
 
+### Optimisation
+- Persist only when necessary
+- Review db accesses & server cached data ()
 
 ### Features
 - Test feature as a user with basic front view

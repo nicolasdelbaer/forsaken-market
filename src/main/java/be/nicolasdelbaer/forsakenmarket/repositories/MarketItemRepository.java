@@ -43,7 +43,7 @@ public class MarketItemRepository extends CrudRepository<MarketItem, Long> {
                         select t from MarketItem t
                         left join BoughtItem bi on bi.player.id = :playerId AND bi.marketItemId = t.id
                         left join RerolledItem ri on ri.player.id = :playerId AND ri.marketItem.id = t.id
-                        where t.roundId = :roundId
+                        where t.createdRounId = :roundId
                             and t.expired = false
                             and bi.id is null
                             and ri.id is null
