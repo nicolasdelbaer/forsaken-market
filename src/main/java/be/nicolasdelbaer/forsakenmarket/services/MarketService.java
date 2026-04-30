@@ -103,7 +103,9 @@ public class MarketService {
         //remove player's money
         Player player = playerRepository.findById(entityManager, playerId).orElseThrow();
         player.credit(marketPrice.getCurrentPrice());
-        player.addReputation(10); //TODO calculate reputation score in proper class
+        player.addReputation(ReputationCalculator.calculate(new ReputationScoreData(
+                itemInstance, marketPrice
+        )));
         playerRepository.save(entityManager, player);
 
         //add item to inventory
