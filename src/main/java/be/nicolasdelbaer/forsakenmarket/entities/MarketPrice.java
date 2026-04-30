@@ -53,4 +53,7 @@ public class MarketPrice {
     public Integer getCurrentPrice() {
         return close;
     }
+    public void setCurrentPrice(Integer value) {
+        this.close = value;
+    }
 }
