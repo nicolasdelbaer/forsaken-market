@@ -17,59 +17,42 @@ public class BoughtItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Getter
-    private Long id;
+    @Getter private Long id;
 
     //No need for fk here
-    @Getter @Setter
-    private Long marketItemId;
+    @Getter @Setter private Long marketItemId;
 
-    @Getter @Setter
     @ManyToOne
     @JoinColumn(name = "item_blueprint_id")
-    private ItemBlueprint itemBlueprint;
+    @Getter @Setter private ItemBlueprint itemBlueprint;
 
-    @Getter @Setter
     @ManyToOne
-    private Player player;
+    @Getter @Setter private Player player;
+
+    @Getter @Setter private Integer boughtPrice;
+
+    @Getter @Setter private Integer decayNbRounds;
 
     @Getter @Setter
-    private Integer boughtPrice;
-
-    @Getter @Setter
-    private Integer decayNbRounds;
-
-    @Getter @Setter
-    private Long boughtRoundId;
-
-    @Getter @Setter
-    private Long soldRoundId;
-
-    @Getter @Setter
-    @Enumerated(EnumType.STRING)
-    private MarketItemStatus status;
+    @Enumerated(EnumType.STRING) private MarketItemStatus status;
 
 
-    @Getter @Setter @Column(nullable = false)
-    private LocalDateTime boughtAt;
-    @Getter @Setter
-    private LocalDateTime soldAt;
-    @Getter @Setter
-    private LocalDateTime decayAt;
+    //TODO use table for action history avoiding redundance
+    @Column(nullable = false)
+    @Getter @Setter private Long boughtRoundId;
+    @Getter @Setter private Long soldRoundId;
+    @Getter @Setter private Long decayedRoundId;
+    @Getter @Setter private Long discardedRoundId;
 
-    //TODO meh ? relicat? voir statut ?
-    @Getter @Setter
-    private boolean expired;
+    @Column(nullable = false)
+    @Getter @Setter private LocalDateTime boughtAt;
+    @Getter @Setter private LocalDateTime soldAt;
+    @Getter @Setter private LocalDateTime decayedAt;
+    @Getter @Setter private LocalDateTime discardedAt;
+
 
     public void updateExpiration(Long currentRound) {
-        if(!(status == MarketItemStatus.BOUGHT)) {
-            //should not go here
-            System.out.println("---SHOULD NOT update a non BOUGHT status from BoughtItem");
-            return;
-        }
-        if(currentRound > (boughtRoundId + decayNbRounds)) {
+        if(currentRound >= (boughtRoundId + decayNbRounds-1))
             status = MarketItemStatus.DECAYED;
-            expired = true;
-        }
     }
 }

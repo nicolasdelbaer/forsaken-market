@@ -16,38 +16,31 @@ public class MarketItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Getter
-    private Long id;
+    @Getter private Long id;
 
-    @Getter @Setter
     @ManyToOne
     @JoinColumn(name = "item_blueprint_id")
-    private ItemBlueprint itemBlueprint;
+    @Getter @Setter private ItemBlueprint itemBlueprint;
 
     /*
      * Initial time of market availability in round nb
      */
-    @Getter @Setter
-    private Integer timeToLive;
+    @Getter @Setter private Integer timeToLive;
 
     /*
      * The round where the item has been added to the market
      */
-    @Getter @Setter
-    private Long roundId;
+    @Getter @Setter private Long createdRoundId;
 
 
-    @Getter @Setter
-    private LocalDateTime createdAt;
-    @Getter @Setter
-    private LocalDateTime expiredAt;
+    @Getter @Setter private LocalDateTime createdAt;
+    @Getter @Setter private LocalDateTime expiredAt;
 
-    @Getter @Setter
-    private boolean expired;
+    @Getter @Setter private boolean expired;
 
 
     public void updateExpiration(Long currentRoundId) {
-        boolean shouldExpire = currentRoundId > (roundId+timeToLive);
+        boolean shouldExpire = currentRoundId >= (createdRoundId +timeToLive-1);
         if(shouldExpire){
             expired = true;
             expiredAt = LocalDateTime.now();
