@@ -17,6 +17,7 @@
 - [x] handle schedule ticks on server
 - [ ] items will decay
 - [x] items will get out of market
+- [ ] market cycle ends after 20 rounds
 
 ### Track items price movement
 - [x] update prices for the current round
@@ -29,9 +30,12 @@
 ## TO DO NEXT
 
 ### Market
-- Reroll items (crash)
 - Market price have to progress and update trends
-- Fetch range of price evolution for display 
+- Market price as single value
+- Keep prices in server cache and persist cycles prices info (20 rounds)
+- Clean old MarketPrice references & change name for OCHL
+- Fetch range of price evolution for display
+- Reroll items (crash)
 
 ### Meta
 - Sync server & client (send date for auto refresh + data)

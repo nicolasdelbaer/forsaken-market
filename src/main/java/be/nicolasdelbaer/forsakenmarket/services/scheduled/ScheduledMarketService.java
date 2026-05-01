@@ -2,19 +2,23 @@ package be.nicolasdelbaer.forsakenmarket.services.scheduled;
 
 import be.nicolasdelbaer.forsakenmarket.entities.*;
 import be.nicolasdelbaer.forsakenmarket.enums.MarketTrend;
+import be.nicolasdelbaer.forsakenmarket.models.market.MarketPriceHistory;
 import be.nicolasdelbaer.forsakenmarket.repositories.*;
 import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
 import be.nicolasdelbaer.forsakenmarket.utils.GameState;
+import be.nicolasdelbaer.forsakenmarket.utils.PricesCalculator;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.random.RandomGenerator;
 
+
+/*
+ * Executed by scheduler -> need to pass the entityManager to methods
+ */
 @ApplicationScoped
 public class ScheduledMarketService {
 
@@ -22,27 +26,26 @@ public class ScheduledMarketService {
     @Inject private MarketPriceRepository marketPriceRepository;
 
     @Inject private GameState gameState;
-    @Inject private GameConfiguration gameConfiguration;
 
     @Inject private ItemBlueprintRepository itemBlueprintRepository;
 
 
     /*
-     * Executed by scheduler -> need to pass its entityManager
      * Market Refresh consists on:
      *   - adding new items to fill the gaps
      */
     public void refreshMarket(EntityManager entityManager) {
         System.out.println("Refreshing Market!");
         int count = marketItemRepository.getValidElementCount(entityManager);
-        int nbItems = gameConfiguration.getMarketPoolSize() - count;
+        int nbItems = GameConfiguration.marketPoolSize - count;
         for (int i = 0; i <nbItems; i++) {
             createNewItem(entityManager);
         }
     }
 
     /*
-     * Executed by scheduler -> need to pass its entityManager
+     * Add a random new item from the item db to the market available items
+     * They'll get an expiration time in rounds to get bought
      */
     private void createNewItem(EntityManager entityManager) {
         List<ItemBlueprint> blueprintRepositoryAll = itemBlueprintRepository.findAll(entityManager);
@@ -61,9 +64,9 @@ public class ScheduledMarketService {
     }
 
     /*
-    * Executed by scheduler -> need to pass its entityManager
+    * TODO market prices will express a full cycle of rounds
     */
-    public void updateMarketPrices(EntityManager entityManager) {
+    public void recordMarketPriceMovements(EntityManager entityManager) {
         //TODO query for getting all info to fill market price properly
         List<MarketPrice> marketPriceList = new ArrayList<>();
         List<ItemBlueprint> blueprintList = itemBlueprintRepository.findAll(entityManager);
@@ -83,7 +86,8 @@ public class ScheduledMarketService {
     }
 
     /*
-     * Executed by scheduler -> need to pass its entityManager
+     * Updates items duration on market.
+     * When over they'll disappear from the available list and will have the expired status.
      */
     public void updateTimeToLive(EntityManager entityManager) {
         List<MarketItem> marketItemList = marketItemRepository
@@ -97,5 +101,25 @@ public class ScheduledMarketService {
         }
         marketItemRepository.updateAll(entityManager, expiredList);
 
+    }
+
+    /*
+     * Update prices in server cache based on previous price
+     */
+    public void updateMarketPrices(EntityManager entityManager) {
+        Map<Long, MarketPriceHistory> marketPriceList = new HashMap<>();
+        List<ItemBlueprint> blueprintList = itemBlueprintRepository.findAll(entityManager);
+
+        for (ItemBlueprint blueprint : blueprintList) {
+            marketPriceList.put(
+                blueprint.getId(),
+                PricesCalculator.getNextPrice(
+                    blueprint,
+                    gameState.getPriceHistory(blueprint.getId())
+                )
+            );
+        }
+
+        gameState.setPrices(marketPriceList);
     }
 }

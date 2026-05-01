@@ -14,6 +14,9 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.servlet.ServletContextListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -21,19 +24,19 @@ import java.util.concurrent.TimeUnit;
 @ApplicationScoped
 public class MarketTickerScheduler implements ServletContextListener {
 
+    private static final Logger log = LoggerFactory.getLogger(MarketTickerScheduler.class);
     private ScheduledExecutorService scheduler;
     @Inject private EntityManagerFactory entityManagerFactory;
     @Inject private ScheduledMarketService scheduledMarketService;
     @Inject private ScheduledInventoryService scheduledInventoryService;
     @Inject private GameState gameState;
-    @Inject private GameConfiguration gameConfiguration;
 
     public void onStart(@Observes @Priority(GameConfiguration.SchedulerPriority) @Initialized(ApplicationScoped.class) Object e) {
         scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(
                 this::tick,
                 0,
-                gameConfiguration.getRoundDurationSeconds(),
+                GameConfiguration.roundDurationSeconds,
                 TimeUnit.SECONDS
         );
     }
@@ -63,15 +66,21 @@ public class MarketTickerScheduler implements ServletContextListener {
                 //shared for all players (- bought or rerolled items)
                 scheduledMarketService.refreshMarket(entityManager);
                 System.out.printf("Current round: %s%n", gameState.getCurrentRound());
+
+
+                if(gameState.getCurrentRound() % GameConfiguration.roundsByCycle == 0) {
+                    scheduledMarketService.recordMarketPriceMovements(entityManager);
+                }
+                if(gameState.getCurrentRound() % GameConfiguration.roundsBeforeClean == 0) {
+                    cleanupData();
+                }
                 transaction.commit();
             } catch (Exception e) {
                 transaction.rollback();
-                e.printStackTrace(); //TODO use logger
+                log.error(e.getMessage(), e);
             }
         }
 
-        if(gameState.getCurrentRound() % 50 == 0)
-            cleanupData();
     }
 
     private void cleanupData() {

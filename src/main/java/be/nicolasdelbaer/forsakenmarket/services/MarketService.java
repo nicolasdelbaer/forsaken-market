@@ -12,6 +12,7 @@ import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerInsufficientFund
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerNotFoundException;
 import be.nicolasdelbaer.forsakenmarket.models.market.MarketItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItemDto;
+import be.nicolasdelbaer.forsakenmarket.models.market.MarketPriceHistory;
 import be.nicolasdelbaer.forsakenmarket.models.player.ReputationScoreData;
 import be.nicolasdelbaer.forsakenmarket.repositories.*;
 import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
@@ -34,7 +35,6 @@ public class MarketService {
 
     @Inject private InventoryService inventoryService;
     @Inject private GameState gameState;
-    @Inject private GameConfiguration gameConfiguration;
     @Inject private PlayerRepository playerRepository;
 
     @Inject private EntityManager entityManager;
@@ -55,11 +55,11 @@ public class MarketService {
 
         //cannot reroll if you've already used all available rerolls for the current round
         Integer nbReroll = playerRerollRepository.getRerollCount(entityManager, currentRound);
-        if(nbReroll >= gameConfiguration.getMaxRerollsPerRound())
+        if(nbReroll >= GameConfiguration.maxRerollsPerRound)
             throw new MaxRerollReachedException("too many rerolls for this round");
 
         //remove player's money
-        player.debit(gameConfiguration.getRerollCost()); //TODO calculate the reroll price from dedicated static thresolds
+        player.debit(GameConfiguration.rerollCost); //TODO calculate the reroll price from dedicated static thresolds
         playerRepository.save(entityManager, player);
 
         RerolledItem rerolledItem = new RerolledItem();
@@ -79,15 +79,13 @@ public class MarketService {
         MarketItem itemInstance = marketItemRepository
                 .findById(entityManager, itemId)
                 .orElseThrow(() -> new MarkeItemDoesNotExistException("Item not found"));
-        MarketPrice marketPrice = marketPriceRepository
-                .findByBlueprint(entityManager, itemInstance.getItemBlueprint(), currentRound)
-                .orElseThrow(() -> new MarketPriceNotFoundException("No price for item"));
+        MarketPriceHistory marketPrice = gameState.getPriceHistory(itemInstance.getItemBlueprint().getId());
         Player player = playerRepository
                 .findById(entityManager, playerId)
                 .orElseThrow(() -> new PlayerNotFoundException("player not found"));
 
         //remove player's money
-        player.debit(marketPrice.getCurrentPrice());
+        player.debit(marketPrice.currentPrice());
         playerRepository.save(entityManager, player);
 
         //add item to inventory
@@ -104,13 +102,15 @@ public class MarketService {
                 .orElseThrow(() -> new BadItemOwnershipException("Invalid item or unauthorized access"));
 
         //Fetch current market price
-        MarketPrice marketPrice = marketPriceRepository
-                .findByBlueprint(entityManager, itemInstance.getItemBlueprint(), currentRound)
-                .orElseThrow(() -> new MarketPriceNotFoundException("No price for item"));
+        //MarketPrice marketPrice = marketPriceRepository
+        //        .findByBlueprint(entityManager, itemInstance.getItemBlueprint(), currentRound)
+        //        .orElseThrow(() -> new MarketPriceNotFoundException("No price for item"));
+
+        MarketPriceHistory marketPrice = gameState.getPriceHistory(itemInstance.getItemBlueprint().getId());
 
         //remove player's money
         Player player = playerRepository.findById(entityManager, playerId).orElseThrow();
-        player.credit(marketPrice.getCurrentPrice());
+        player.credit(marketPrice.currentPrice());
         player.addReputation(ReputationCalculator.calculate(new ReputationScoreData(
                 itemInstance, marketPrice
         )));
@@ -125,16 +125,16 @@ public class MarketService {
         return marketItemRepository
                 .findAllValidItemsForPlayer(entityManager, gameState.getCurrentRound(), playerId)
                 .stream().map(
-                    row ->{
-                     MarketItem item = (MarketItem) row[0];
-                     Integer currentPrice = (Integer) row[1];
+                    marketItem ->{
+                     MarketItem item = marketItem;
+                     MarketPriceHistory currentPrice = gameState.getPriceHistory(marketItem.getItemBlueprint().getId());
                      return new MarketItemResponse(
                              item.getId(),
                              item.getItemBlueprint().getTitle(),
                              item.getItemBlueprint().getDescription(),
                              item.getItemBlueprint().getIcon(),
                              item.getItemBlueprint().getRarity().name(),
-                             currentPrice
+                             currentPrice.currentPrice()
                      );
                     }
                 ).toList();

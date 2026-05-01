@@ -49,11 +49,4 @@ public class MarketPrice {
 
     @Getter @Setter
     private LocalDateTime createdAt;
-
-    public Integer getCurrentPrice() {
-        return close;
-    }
-    public void setCurrentPrice(Integer value) {
-        this.close = value;
-    }
 }

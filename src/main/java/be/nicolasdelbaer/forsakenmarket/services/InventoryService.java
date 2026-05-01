@@ -2,12 +2,12 @@ package be.nicolasdelbaer.forsakenmarket.services;
 
 import be.nicolasdelbaer.forsakenmarket.annotations.Transactional;
 import be.nicolasdelbaer.forsakenmarket.entities.BoughtItem;
-import be.nicolasdelbaer.forsakenmarket.entities.MarketPrice;
 import be.nicolasdelbaer.forsakenmarket.enums.MarketItemStatus;
 import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.CannotDiscardItemException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.CannotSellInactiveItemException;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItemDto;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.InventoryItemResponse;
+import be.nicolasdelbaer.forsakenmarket.models.market.MarketPriceHistory;
 import be.nicolasdelbaer.forsakenmarket.repositories.BoughtItemRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.MarketPriceRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.GameState;
@@ -18,8 +18,6 @@ import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class InventoryService {
@@ -44,7 +42,7 @@ public class InventoryService {
         boughtItem.setMarketItemId(buyItemDto.marketItem().getId());
         boughtItem.setPlayer(buyItemDto.player());
 
-        boughtItem.setBoughtPrice(buyItemDto.marketPrice().getCurrentPrice());
+        boughtItem.setBoughtPrice(buyItemDto.marketPrice().currentPrice());
         boughtItem.setBoughtAt(LocalDateTime.now());
         boughtItem.setStatus(MarketItemStatus.BOUGHT);
 
@@ -91,10 +89,7 @@ public class InventoryService {
      */
     @Transactional
     public List<InventoryItemResponse> fetchItems(Integer playerId) {
-        Map<Long, MarketPrice> priceList = marketPriceRepository
-                .findByRoundId(entityManager, gameState.getCurrentRound())
-                .stream()
-                .collect(Collectors.toMap(marketPrice -> marketPrice.getItemBlueprint().getId(), Function.identity()));
+        Map<Long, MarketPriceHistory> priceList = gameState.getPricesHistory();
 
         return boughtItemRepository.fetchAvailableItemsForPlayer(entityManager, playerId)
                 .stream()
@@ -106,7 +101,7 @@ public class InventoryService {
                             boughtItem.getItemBlueprint().getIcon(),
                             boughtItem.getItemBlueprint().getRarity().name(),
                             boughtItem.getBoughtPrice(),
-                            priceList.get(boughtItem.getItemBlueprint().getId()).getCurrentPrice(),
+                            priceList.get(boughtItem.getItemBlueprint().getId()).currentPrice(),
                             boughtItem.isDecayed()
                     );
                 }).toList();

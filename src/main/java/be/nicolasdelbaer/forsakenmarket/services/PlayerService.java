@@ -18,7 +18,6 @@ import jakarta.persistence.EntityManager;
 public class PlayerService {
 
     @Inject private PlayerRepository playerRepository;
-    @Inject private GameConfiguration gameConfiguration;
     @Inject private EntityManager entityManager;
 
     public PlayerService() {
@@ -37,7 +36,7 @@ public class PlayerService {
             registerPlayerDto.userName(),
             registerPlayerDto.email(),
             BCrypt.withDefaults().hashToString(cost, registerPlayerDto.pwd().toCharArray()),
-            gameConfiguration.getStartingWallet()
+            GameConfiguration.startingWallet
         );
 
         playerRepository.save(entityManager, player);

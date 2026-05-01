@@ -1,7 +1,7 @@
 package be.nicolasdelbaer.forsakenmarket.utils;
 
 import be.nicolasdelbaer.forsakenmarket.entities.BoughtItem;
-import be.nicolasdelbaer.forsakenmarket.entities.MarketPrice;
+import be.nicolasdelbaer.forsakenmarket.models.market.MarketPriceHistory;
 import be.nicolasdelbaer.forsakenmarket.models.player.ReputationScoreData;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -18,8 +18,7 @@ class ReputationCalculatorTest {
         BoughtItem boughtItem = new BoughtItem();
         boughtItem.setBoughtPrice(100);
 
-        MarketPrice marketPrice = new MarketPrice();
-        marketPrice.setCurrentPrice(50); // vendu moins cher que acheté → profit
+        MarketPriceHistory marketPrice = new MarketPriceHistory(50,50);
 
         ReputationScoreData data = new ReputationScoreData(boughtItem, marketPrice);
 
@@ -36,8 +35,7 @@ class ReputationCalculatorTest {
         BoughtItem boughtItem = new BoughtItem();
         boughtItem.setBoughtPrice(100);
 
-        MarketPrice marketPrice = new MarketPrice();
-        marketPrice.setCurrentPrice(100); // vendu au même prix → pas de profit
+        MarketPriceHistory marketPrice = new MarketPriceHistory(100,100);
 
         ReputationScoreData data = new ReputationScoreData(boughtItem, marketPrice);
 
@@ -52,8 +50,7 @@ class ReputationCalculatorTest {
         BoughtItem boughtItem = new BoughtItem();
         boughtItem.setBoughtPrice(50);
 
-        MarketPrice marketPrice = new MarketPrice();
-        marketPrice.setCurrentPrice(100); // vendu plus cher → perte
+        MarketPriceHistory marketPrice = new MarketPriceHistory(100,100);
 
         ReputationScoreData data = new ReputationScoreData(boughtItem, marketPrice);
 
@@ -68,9 +65,7 @@ class ReputationCalculatorTest {
         BoughtItem boughtItem = new BoughtItem();
         boughtItem.setBoughtPrice(0);
 
-        MarketPrice marketPrice = new MarketPrice();
-        marketPrice.setCurrentPrice(50);
-
+        MarketPriceHistory marketPrice = new MarketPriceHistory(50,50);
         ReputationScoreData data = new ReputationScoreData(boughtItem, marketPrice);
 
         assertDoesNotThrow(() -> ReputationCalculator.calculate(data));

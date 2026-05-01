@@ -36,22 +36,19 @@ public class MarketItemRepository extends CrudRepository<MarketItem, Long> {
                 .intValue();
     }
 
-    public List<Object[]> findAllValidItemsForPlayer(EntityManager entityManager, Long roundId, Integer playerId) {
-        List<Object[]> rows = entityManager
+    public List<MarketItem> findAllValidItemsForPlayer(EntityManager entityManager, Long roundId, Integer playerId) {
+        return entityManager
                 .createQuery("""
-                        select t, mp.close as currentPrice from MarketItem t
+                        select t as currentPrice from MarketItem t
                         left join BoughtItem bi on bi.player.id = :playerId AND bi.marketItemId = t.id
                         left join RerolledItem ri on ri.player.id = :playerId AND ri.marketItem.id = t.id
-                        join MarketPrice mp on mp.itemBlueprint.id = t.itemBlueprint.id AND mp.roundId = :roundId
                         where 1=1
                             and t.expired = false
                             and bi.id is null
                             and ri.id is null
                         """,
-                        Object[].class)
-                .setParameter("roundId", roundId)
+                        MarketItem.class)
                 .setParameter("playerId", playerId)
                 .getResultList();
-        return rows;
     }
 }

@@ -1,9 +1,5 @@
 package be.nicolasdelbaer.forsakenmarket.utils;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import lombok.Getter;
-
-@ApplicationScoped
 public class GameConfiguration {
 
     //Annotations
@@ -11,14 +7,14 @@ public class GameConfiguration {
     public static final int SchedulerPriority = 10;
 
     //Meta rules
-    @Getter private final int roundDurationSeconds = 45;
-    @Getter private final int startingWallet = 500;
+    public static final int roundDurationSeconds = 10;
+    public static final int startingWallet = 500;
 
     //Market rules
-    @Getter private final int marketPoolSize = 20;
-    @Getter private final int maxRerollsPerRound = 3;
-    @Getter private final int rerollCost = 20;
+    public static final int marketPoolSize = 20;
+    public static final int maxRerollsPerRound = 3;
+    public static final int rerollCost = 20;
+    public static final int roundsByCycle = 5; //5 for testing, 20 by design
 
-    public GameConfiguration() {
-    }
+    public static final int roundsBeforeClean = 100;
 }
