@@ -70,7 +70,7 @@
     margin-left: auto; display: none;
     flex-direction: column; align-items: flex-end; gap: 1px;
   }
-  #player-info .p-name { font-family: var(--ff-title); font-size: 11px; color: var(--gold); letter-spacing: 1px; }
+  #player-info .p-username { font-family: var(--ff-title); font-size: 11px; color: var(--gold); letter-spacing: 1px; }
   #player-info .p-email { font-family: var(--ff-body); font-size: 11px; color: var(--muted); font-style: italic; }
   #btn-logout {
     background: none; border: 1px solid var(--crimson); color: var(--crimson-hi);
@@ -224,7 +224,7 @@
   <div class="logo">⚔ Arcane Market <span>/ dev client</span></div>
   <input id="base-url" type="text" value="http://localhost:8080" />
   <div id="player-info">
-    <div class="p-name" id="player-name">—</div>
+    <div class="p-username" id="player-username">—</div>
     <div class="p-email" id="player-email">—</div>
   </div>
   <button id="btn-logout">⬡ Déconnexion</button>
@@ -238,14 +238,14 @@
     <div class="card">
       <h2>Connexion</h2>
       <div class="field"><label>Email</label><input id="l-email" type="email" /></div>
-      <div class="field"><label>Mot de passe</label><input id="l-pass" type="password" /></div>
+      <div class="field"><label>Mot de passe</label><input id="l-pwd" type="password" /></div>
       <button class="btn" onclick="doLogin()">Entrer</button>
     </div>
     <div class="card">
       <h2>Inscription</h2>
-      <div class="field"><label>Nom</label><input id="r-name" type="text" /></div>
+      <div class="field"><label>Nom</label><input id="r-username" type="text" /></div>
       <div class="field"><label>Email</label><input id="r-email" type="email" /></div>
-      <div class="field"><label>Mot de passe</label><input id="r-pass" type="password" /></div>
+      <div class="field"><label>Mot de passe</label><input id="r-pwd" type="password" /></div>
       <button class="btn secondary" onclick="doRegister()">Créer un compte</button>
     </div>
   </div>
@@ -302,24 +302,24 @@
     setTimeout(() => t.remove(), 3000);
   }
 
-  async function doLogin(email, pass) {
+  async function doLogin(email, pwd) {
     email = email || document.getElementById('l-email').value;
-    pass  = pass  || document.getElementById('l-pass').value;
+    pwd  = pwd  || document.getElementById('l-pwd').value;
     try {
-      const res = await api('POST', '/api/auth/login', { email, password: pass });
+      const res = await api('POST', '/api/auth/login', { email, password: pwd });
       setToken(res);
     } catch(e) { toast(e.message, 'err'); }
   }
 
   async function doRegister() {
-    const name  = document.getElementById('r-name').value;
+    const userName  = document.getElementById('r-username').value;
     const email = document.getElementById('r-email').value;
-    const pass  = document.getElementById('r-pass').value;
+    const pwd  = document.getElementById('r-pwd').value;
     try {
-      const res = await api('POST', '/api/auth/register', { name, email, password: pass });
+      const res = await api('POST', '/api/auth/register', { userName, email, password: pwd });
       const tok = typeof res === 'string' ? res : (res?.token || res?.accessToken || res?.jwt);
       if (tok) { setToken(tok); }
-      else { toast('Compte créé', 'ok'); await doLogin(email, pass); }
+      else { toast('Compte créé', 'ok'); await doLogin(email, pwd); }
     } catch(e) { toast(e.message, 'err'); }
   }
 
@@ -349,7 +349,7 @@
     document.getElementById('btn-logout').style.display = 'block';
     try {
       const player = await api('GET', '/api/account/info');
-      document.getElementById('player-name').textContent  = player.name  || '—';
+      document.getElementById('player-username').textContent  = player.userName  || '—';
       document.getElementById('player-email').textContent = player.email || '—';
       document.getElementById('player-info').style.display = 'flex';
     } catch {}
@@ -392,7 +392,7 @@
     try {
       const player = await api('GET', '/api/account/info');
       document.getElementById('wallet-amount').textContent = player.wallet ?? '—';
-      document.getElementById('wallet-sub').textContent = player.name || player.email || '—';
+      document.getElementById('wallet-sub').textContent = player.userName || player.email || '—';
     } catch {}
   }
 
