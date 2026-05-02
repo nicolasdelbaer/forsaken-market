@@ -54,8 +54,8 @@ public class JwtUtils {
 
     public static boolean isValid(Claims claims){
         Date now = new Date();
-        return now.before(claims.getIssuedAt()) &&
-                now.after(claims.getIssuedAt());
+        return now.after(claims.getIssuedAt()) &&
+                now.before(claims.getExpiration());
 
     }
 }
