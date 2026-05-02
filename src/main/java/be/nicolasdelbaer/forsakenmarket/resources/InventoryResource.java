@@ -40,7 +40,7 @@ public class InventoryResource {
         PlayerSession playerSession = (PlayerSession) securityContext.getUserPrincipal();
         try {
             inventoryService.discardItem(playerSession.id(), itemId);
-            response = Response.ok().build();
+            response = Response.ok().build(); //TODO send back data with results
         } catch (CannotDiscardItemException e) {
             response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), BadResponseUtils.CannotDiscardItem).build();
             log.warn(e.getMessage(), e);
@@ -57,7 +57,7 @@ public class InventoryResource {
         PlayerSession playerSession = (PlayerSession) securityContext.getUserPrincipal();
         try {
             marketService.sellItem(playerSession.id(), itemId);
-            response = Response.ok().build();
+            response = Response.ok().build(); //TODO send back data with results
         } catch (BadItemOwnershipException | CannotSellInactiveItemException | MarketPriceNotFoundException e) {
             response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), BadResponseUtils.CannotSellItem).build();
             log.warn(e.getMessage(), e);

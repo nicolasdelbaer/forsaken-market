@@ -101,11 +101,6 @@ public class MarketService {
                 .getItemFromPlayer(entityManager, itemId, playerId, MarketItemStatus.BOUGHT)
                 .orElseThrow(() -> new BadItemOwnershipException("Invalid item or unauthorized access"));
 
-        //Fetch current market price
-        //MarketPrice marketPrice = marketPriceRepository
-        //        .findByBlueprint(entityManager, itemInstance.getItemBlueprint(), currentRound)
-        //        .orElseThrow(() -> new MarketPriceNotFoundException("No price for item"));
-
         MarketPriceHistory marketPrice = gameState.getPriceHistory(itemInstance.getItemBlueprint().getId());
 
         //remove player's money

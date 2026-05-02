@@ -40,7 +40,7 @@ public class MarketResource {
         PlayerSession playerSession = (PlayerSession) securityContext.getUserPrincipal();
         try {
             marketService.buyItem(playerSession.id(), itemId);
-            response = Response.ok().build();
+            response = Response.ok().build(); //TODO send back data with results
         } catch (PlayerInsufficientFundsException e) {
             response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), BadResponseUtils.InsufficientFunds).build();
         } catch (Exception e) {
@@ -59,7 +59,7 @@ public class MarketResource {
         PlayerSession playerSession = (PlayerSession) securityContext.getUserPrincipal();
         try {
             marketService.rerollItem(playerSession.id(), itemId);
-            response = Response.ok().build();
+            response = Response.ok().build(); //TODO send back data with results
         } catch (PlayerInsufficientFundsException | MaxRerollReachedException | MarkeItemDoesNotExistException |
                  PlayerNotFoundException e) {
             response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), BadResponseUtils.cannotRerollItem).build();

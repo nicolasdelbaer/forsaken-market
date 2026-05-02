@@ -91,8 +91,8 @@ public class Player {
         totReput += reputationScore;
 
         //update level from thresholds table
-        if (level <= LEVEL_THRESHOLDS.length && currentReput >= LEVEL_THRESHOLDS[level-1]) {
-            currentReput -= LEVEL_THRESHOLDS[level-1];
+        while (level < LEVEL_THRESHOLDS.length && currentReput >= LEVEL_THRESHOLDS[level]) {
+            currentReput -= LEVEL_THRESHOLDS[level];
             level ++;
         }
     }
