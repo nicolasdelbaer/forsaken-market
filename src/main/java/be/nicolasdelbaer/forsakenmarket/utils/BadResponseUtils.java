@@ -9,6 +9,9 @@ public class BadResponseUtils {
     public static String CannotDiscardItem = "cannot discard item";
 
     public static String InsufficientFunds = "insufficient funds";
-    public static String cannotRerollItem = "cannot reroll items";;
+    public static String CannotRerollItem = "cannot reroll items";;
     public static String WrongLoginOrPass = "wrong login or password";
+
+    public static String InvalidItemOrUnauthorized = "Invalid item or unauthorized access";
+    public static String PlayerNotFound = "Player not found";
 }

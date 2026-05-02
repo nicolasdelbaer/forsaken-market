@@ -1,6 +1,6 @@
 package be.nicolasdelbaer.forsakenmarket.resources;
 
-import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarkeItemDoesNotExistException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketItemDoesNotExistException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.MaxRerollReachedException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerInsufficientFundsException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerNotFoundException;
@@ -60,9 +60,9 @@ public class MarketResource {
         try {
             marketService.rerollItem(playerSession.id(), itemId);
             response = Response.ok().build(); //TODO send back data with results
-        } catch (PlayerInsufficientFundsException | MaxRerollReachedException | MarkeItemDoesNotExistException |
+        } catch (PlayerInsufficientFundsException | MaxRerollReachedException | MarketItemDoesNotExistException |
                  PlayerNotFoundException e) {
-            response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), BadResponseUtils.cannotRerollItem).build();
+            response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), BadResponseUtils.CannotRerollItem).build();
             log.warn(e.getMessage(), e);
         }
         return response;

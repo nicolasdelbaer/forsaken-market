@@ -4,6 +4,7 @@ import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.BadItemOwnershipExc
 import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.CannotDiscardItemException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.CannotSellInactiveItemException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketPriceNotFoundException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerNotFoundException;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.InventoryItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.services.InventoryService;
@@ -58,7 +59,7 @@ public class InventoryResource {
         try {
             marketService.sellItem(playerSession.id(), itemId);
             response = Response.ok().build(); //TODO send back data with results
-        } catch (BadItemOwnershipException | CannotSellInactiveItemException | MarketPriceNotFoundException e) {
+        } catch (PlayerNotFoundException | BadItemOwnershipException | CannotSellInactiveItemException | MarketPriceNotFoundException e) {
             response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), BadResponseUtils.CannotSellItem).build();
             log.warn(e.getMessage(), e);
         }

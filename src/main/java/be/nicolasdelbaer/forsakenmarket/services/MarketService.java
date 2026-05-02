@@ -5,7 +5,7 @@ import be.nicolasdelbaer.forsakenmarket.entities.*;
 import be.nicolasdelbaer.forsakenmarket.enums.MarketItemStatus;
 import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.BadItemOwnershipException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.CannotSellInactiveItemException;
-import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarkeItemDoesNotExistException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketItemDoesNotExistException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketPriceNotFoundException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.MaxRerollReachedException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerInsufficientFundsException;
@@ -15,6 +15,7 @@ import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItemDto;
 import be.nicolasdelbaer.forsakenmarket.models.market.MarketPriceHistory;
 import be.nicolasdelbaer.forsakenmarket.models.player.ReputationScoreData;
 import be.nicolasdelbaer.forsakenmarket.repositories.*;
+import be.nicolasdelbaer.forsakenmarket.utils.BadResponseUtils;
 import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
 import be.nicolasdelbaer.forsakenmarket.utils.GameState;
 import be.nicolasdelbaer.forsakenmarket.utils.ReputationCalculator;
@@ -43,12 +44,12 @@ public class MarketService {
     private PlayerService playerService;
 
     @Transactional
-    public void rerollItem(Integer playerId, Long itemId) throws PlayerInsufficientFundsException, MaxRerollReachedException, MarkeItemDoesNotExistException, PlayerNotFoundException {
+    public void rerollItem(Integer playerId, Long itemId) throws PlayerInsufficientFundsException, MaxRerollReachedException, MarketItemDoesNotExistException, PlayerNotFoundException {
         //Note, the current round id is resolved here for keeping coherence
         Long currentRound = gameState.getCurrentRound();
         MarketItem itemInstance = marketItemRepository.
                 findById(entityManager, itemId)
-                .orElseThrow(() -> new MarkeItemDoesNotExistException("Item not found"));
+                .orElseThrow(() -> new MarketItemDoesNotExistException("Item not found"));
         Player player = playerRepository
                 .findById(entityManager, playerId)
                 .orElseThrow(() -> new PlayerNotFoundException("player not found"));
@@ -71,14 +72,14 @@ public class MarketService {
     }
 
     @Transactional
-    public void buyItem(Integer playerId, Long itemId) throws PlayerInsufficientFundsException, MarkeItemDoesNotExistException, PlayerNotFoundException, MarketPriceNotFoundException {
+    public void buyItem(Integer playerId, Long itemId) throws PlayerInsufficientFundsException, MarketItemDoesNotExistException, PlayerNotFoundException, MarketPriceNotFoundException {
         //Note, the current round id is resolved here for keeping coherence
         Long currentRound = gameState.getCurrentRound();
 
         //Retrieving items
         MarketItem itemInstance = marketItemRepository
                 .findById(entityManager, itemId)
-                .orElseThrow(() -> new MarkeItemDoesNotExistException("Item not found"));
+                .orElseThrow(() -> new MarketItemDoesNotExistException("Item not found"));
         MarketPriceHistory marketPrice = gameState.getPriceHistory(itemInstance.getItemBlueprint().getId());
         Player player = playerRepository
                 .findById(entityManager, playerId)
@@ -93,18 +94,20 @@ public class MarketService {
     }
 
     @Transactional
-    public void sellItem(Integer playerId, Long itemId) throws BadItemOwnershipException, CannotSellInactiveItemException, MarketPriceNotFoundException {
+    public void sellItem(Integer playerId, Long itemId) throws BadItemOwnershipException, CannotSellInactiveItemException, MarketPriceNotFoundException, PlayerNotFoundException {
         //Note, the current round id is resolved here for keeping coherence
         Long currentRound = gameState.getCurrentRound();
 
         BoughtItem itemInstance = boughtItemRepository
                 .getItemFromPlayer(entityManager, itemId, playerId, MarketItemStatus.BOUGHT)
-                .orElseThrow(() -> new BadItemOwnershipException("Invalid item or unauthorized access"));
+                .orElseThrow(() -> new BadItemOwnershipException(BadResponseUtils.InvalidItemOrUnauthorized));
 
         MarketPriceHistory marketPrice = gameState.getPriceHistory(itemInstance.getItemBlueprint().getId());
 
         //remove player's money
-        Player player = playerRepository.findById(entityManager, playerId).orElseThrow();
+        Player player = playerRepository
+                .findById(entityManager, playerId)
+                .orElseThrow(() -> new PlayerNotFoundException(BadResponseUtils.PlayerNotFound));
         player.credit(marketPrice.currentPrice());
         player.addReputation(ReputationCalculator.calculate(new ReputationScoreData(
                 itemInstance, marketPrice
