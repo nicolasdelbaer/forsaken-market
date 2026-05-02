@@ -5,7 +5,7 @@ import be.nicolasdelbaer.forsakenmarket.exceptions.auth.EmailAlreadyUsedExceptio
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerLoginException;
 import be.nicolasdelbaer.forsakenmarket.models.player.LoginRequestDto;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
-import be.nicolasdelbaer.forsakenmarket.models.player.RegisterPlayerDto;
+import be.nicolasdelbaer.forsakenmarket.models.player.RegisterPlayerRequest;
 import be.nicolasdelbaer.forsakenmarket.services.PlayerService;
 import be.nicolasdelbaer.forsakenmarket.utils.BadResponseUtils;
 import be.nicolasdelbaer.forsakenmarket.utils.JwtUtils;
@@ -39,16 +39,16 @@ public class AuthResource {
     @Path("/register")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response registerPlayer(RegisterPlayerDto registerPlayerDto){
+    public Response registerPlayer(RegisterPlayerRequest registerPlayerRequest){
         //Input validation
-        Set<ConstraintViolation<RegisterPlayerDto>> violations = validator.validate(registerPlayerDto);
+        Set<ConstraintViolation<RegisterPlayerRequest>> violations = validator.validate(registerPlayerRequest);
         if (!violations.isEmpty())
             return Response.status(400).entity(violations).build();
 
         //Data are validated
         Response response;
         try {
-            playerService.register(registerPlayerDto);
+            playerService.register(registerPlayerRequest);
             response = Response.ok().build();
         } catch (EmailAlreadyUsedException e) {
             response = Response.status(400).entity(BadResponseUtils.AlreadyUsedEmail).build();

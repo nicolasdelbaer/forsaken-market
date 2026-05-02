@@ -7,7 +7,7 @@ import be.nicolasdelbaer.forsakenmarket.exceptions.auth.EmailAlreadyUsedExceptio
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerLoginException;
 import be.nicolasdelbaer.forsakenmarket.models.player.LoginRequestDto;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
-import be.nicolasdelbaer.forsakenmarket.models.player.RegisterPlayerDto;
+import be.nicolasdelbaer.forsakenmarket.models.player.RegisterPlayerRequest;
 import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -25,17 +25,17 @@ public class PlayerService {
 
 
     @Transactional
-    public void register(RegisterPlayerDto registerPlayerDto) throws EmailAlreadyUsedException {
-        if(playerRepository.emailExists(entityManager, registerPlayerDto.email()))
+    public void register(RegisterPlayerRequest registerPlayerRequest) throws EmailAlreadyUsedException {
+        if(playerRepository.emailExists(entityManager, registerPlayerRequest.email()))
             throw new EmailAlreadyUsedException("Cannot create this player, the email already exists");
 
         String envCost = System.getenv("BCRYPT_COST");
         int cost = Integer.parseInt(envCost);
 
         Player player = new Player(
-            registerPlayerDto.userName(),
-            registerPlayerDto.email(),
-            BCrypt.withDefaults().hashToString(cost, registerPlayerDto.pwd().toCharArray()),
+            registerPlayerRequest.userName(),
+            registerPlayerRequest.email(),
+            BCrypt.withDefaults().hashToString(cost, registerPlayerRequest.password().toCharArray()),
             GameConfiguration.startingWallet
         );
 

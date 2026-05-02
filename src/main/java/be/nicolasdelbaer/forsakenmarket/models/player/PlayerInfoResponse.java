@@ -1,6 +1,6 @@
 package be.nicolasdelbaer.forsakenmarket.models.player;
 
-public record PlayerResponseDto(
+public record PlayerInfoResponse(
     Integer id,
     String email,
     String name,

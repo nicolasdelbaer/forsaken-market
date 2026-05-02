@@ -1,6 +1,6 @@
 package be.nicolasdelbaer.forsakenmarket.resources;
 
-import be.nicolasdelbaer.forsakenmarket.models.player.PlayerResponseDto;
+import be.nicolasdelbaer.forsakenmarket.models.player.PlayerInfoResponse;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.services.PlayerService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,7 +33,7 @@ public class AccountResource {
         PlayerSession playerSession = (PlayerSession) securityContext.getUserPrincipal();
         try {
             Integer wallet = playerService.getWallet(playerSession.id());
-            response = Response.ok(new PlayerResponseDto(playerSession.id(), playerSession.email(), playerSession.name(), wallet)).build();
+            response = Response.ok(new PlayerInfoResponse(playerSession.id(), playerSession.email(), playerSession.name(), wallet)).build();
         } catch (Exception e) {
             response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), "").build();
             log.warn(e.getMessage(), e);

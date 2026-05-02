@@ -7,7 +7,7 @@
 - [x] logout as player
 
 ### User interactions
-- [ ] player won exp when selling
+- [x] player won reput when selling
 - [x] player can buy item to their inventory
 - [x] player can sell item from their inventory
 - [ ] player can reroll an item from the market for a price
@@ -54,7 +54,7 @@
 ## TO KEEP IN MIND
 ### Refacto
 - Code & project review
-- Clean BoughtItem responsability cf player movements?
+- Clean BoughtItem responsibility cf player movements?
 
 ### DTO
 - Check if needs of DTO for requests & queries
