@@ -8,7 +8,7 @@ public class ReputationCalculator {
         int profit = data.marketPrice().currentPrice() - boughtPrice;
         int result = 0;
         if(boughtPrice != 0)
-            result =  Math.max(0, (int)((double) (profit / boughtPrice) * 10));
+            result =  Math.max(0, (int)(((double)profit / boughtPrice) * 10));
         return result;
     }
 }
