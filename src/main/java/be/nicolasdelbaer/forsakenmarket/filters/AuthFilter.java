@@ -45,19 +45,14 @@ public class AuthFilter implements ContainerRequestFilter {
         try {
             String token = authHeader.substring(7);
             Claims claims = JwtUtils.getClaims(token);
-            List<String> roles = JwtUtils.getRoles(claims, token);
-            PlayerSession playerSession = new PlayerSession(
-                    JwtUtils.getId(claims, token),
-                    JwtUtils.getEmail(claims, token),
-                    JwtUtils.getUsername(claims, token),
-                    JwtUtils.getRoles(claims, token)
-                    );
+            if(!JwtUtils.isValid(claims)) return;
 
-            /*
-             * Security context to retrieve from endpoints with
-             * @Context SecurityContext securityContext as param
-             * then -> securityContext.getUserPrincipal()
-             */
+            List<String> roles = JwtUtils.getRoles(claims, token);
+            PlayerSession playerSession = getPlayerSession(claims, token);
+
+            //Security context to retrieve from endpoints with
+            //@Context SecurityContext securityContext as param
+            //then -> securityContext.getUserPrincipal()
             SecurityContext securityContext = new SecurityContext() {
                 @Override
                 public Principal getUserPrincipal() {
@@ -78,5 +73,14 @@ public class AuthFilter implements ContainerRequestFilter {
                     Response.status(Response.Status.UNAUTHORIZED).build()
             );
         }
+    }
+
+    private static PlayerSession getPlayerSession(Claims claims, String token) {
+        return new PlayerSession(
+                JwtUtils.getId(claims, token),
+                JwtUtils.getEmail(claims, token),
+                JwtUtils.getUsername(claims, token),
+                JwtUtils.getRoles(claims, token)
+        );
     }
 }

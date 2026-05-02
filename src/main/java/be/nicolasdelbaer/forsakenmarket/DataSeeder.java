@@ -25,6 +25,7 @@ import jakarta.transaction.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -77,7 +78,8 @@ public class DataSeeder {
 
     private void createPlayers(EntityManager entityManager) {
         Player player;
-        int cost = Integer.parseInt(System.getenv("BCRYPT_COST"));
+        String envCost = System.getenv("BCRYPT_COST");
+        int cost = Objects.nonNull(envCost) ? Integer.parseInt(envCost) : 12;
         player = new Player(
                 "Nidel",
                 "nidel@gmail.com",

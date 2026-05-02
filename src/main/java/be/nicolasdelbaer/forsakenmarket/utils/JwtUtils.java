@@ -12,13 +12,11 @@ import java.util.List;
 
 @ApplicationScoped
 public class JwtUtils {
-    private static final String secretKeyString = "dfnçà\"'à&çur~~Dzdkjdkdajzm19384MAXHDD`133ùÙ$knjdvFFèDDhbfkdn!304°29càé!'\"DKFMe";
-
-    //15min -> 15*60*60
+    //15min -> 15*60*1000
     private static final long expiration = 900_000;
 
     public static SecretKey getSecretKey() {
-        return Keys.hmacShaKeyFor(secretKeyString.getBytes());
+        return Keys.hmacShaKeyFor(System.getenv("JWT_SECRET").getBytes());
     }
 
     public static String generateToken(PlayerSession player){
@@ -54,9 +52,10 @@ public class JwtUtils {
         return Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token).getPayload();
     }
 
-    public boolean isValid(String token){
+    public static boolean isValid(Claims claims){
         Date now = new Date();
-        return getClaims(token).getIssuedAt().before(now) && getClaims(token).getIssuedAt().after(now);
+        return now.before(claims.getIssuedAt()) &&
+                now.after(claims.getIssuedAt());
 
     }
 }
