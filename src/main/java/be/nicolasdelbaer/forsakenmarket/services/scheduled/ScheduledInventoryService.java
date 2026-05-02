@@ -1,9 +1,6 @@
 package be.nicolasdelbaer.forsakenmarket.services.scheduled;
 
-import be.nicolasdelbaer.forsakenmarket.annotations.Transactional;
 import be.nicolasdelbaer.forsakenmarket.entities.BoughtItem;
-import be.nicolasdelbaer.forsakenmarket.enums.MarketItemStatus;
-import be.nicolasdelbaer.forsakenmarket.exceptions.schedule.CannotUpdateDecayOnItemException;
 import be.nicolasdelbaer.forsakenmarket.repositories.BoughtItemRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.GameState;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -22,15 +19,12 @@ public class ScheduledInventoryService {
      * EntityManager is passed because of the scheduler scope
      * Decayed items cannot be sold anymore, updates will occur each round
      */
-    @Transactional
-    public void updateDecay(EntityManager entityManager) throws CannotUpdateDecayOnItemException {
+    public void updateDecay(EntityManager entityManager) {
         List<BoughtItem> ownedItems = boughtItemRepository.fetchBoughtItems(entityManager);
         Long currentRound = gameState.getCurrentRound();
-        for (BoughtItem ownedItem : ownedItems) {
-            if(ownedItem.getStatus() != MarketItemStatus.BOUGHT)
-                throw new CannotUpdateDecayOnItemException("Cannot throw away a non decayed item");
+        for (BoughtItem ownedItem : ownedItems)
             ownedItem.updateExpiration(currentRound);
-        }
         boughtItemRepository.updateAll(entityManager, ownedItems);
+
     }
 }
