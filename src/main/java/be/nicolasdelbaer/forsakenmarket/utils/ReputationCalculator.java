@@ -5,10 +5,10 @@ import be.nicolasdelbaer.forsakenmarket.models.player.ReputationScoreData;
 public class ReputationCalculator {
     public static Integer calculate(ReputationScoreData data) {
         int boughtPrice = data.boughtItem().getBoughtPrice();
-        int profit = boughtPrice - data.marketPrice().currentPrice();
+        int profit = data.marketPrice().currentPrice() - boughtPrice;
         int result = 0;
         if(boughtPrice != 0)
-            result =  Math.max(0, (int)((double) profit / boughtPrice * 10));
+            result =  Math.max(0, (int)((double) (profit / boughtPrice) * 10));
         return result;
     }
 }

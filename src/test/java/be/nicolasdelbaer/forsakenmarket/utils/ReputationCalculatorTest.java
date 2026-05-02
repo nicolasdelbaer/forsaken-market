@@ -16,9 +16,9 @@ class ReputationCalculatorTest {
     void shouldReturnPositiveReputation_whenProfitable() {
         // Arrange
         BoughtItem boughtItem = new BoughtItem();
-        boughtItem.setBoughtPrice(100);
+        boughtItem.setBoughtPrice(50);
 
-        MarketPriceHistory marketPrice = new MarketPriceHistory(50,50);
+        MarketPriceHistory marketPrice = new MarketPriceHistory(100,100);
 
         ReputationScoreData data = new ReputationScoreData(boughtItem, marketPrice);
 
@@ -48,9 +48,9 @@ class ReputationCalculatorTest {
     @Test
     void shouldReturnZero_whenLoss() {
         BoughtItem boughtItem = new BoughtItem();
-        boughtItem.setBoughtPrice(50);
+        boughtItem.setBoughtPrice(100);
 
-        MarketPriceHistory marketPrice = new MarketPriceHistory(100,100);
+        MarketPriceHistory marketPrice = new MarketPriceHistory(50,50);
 
         ReputationScoreData data = new ReputationScoreData(boughtItem, marketPrice);
 
