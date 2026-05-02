@@ -13,15 +13,13 @@ public class MarketItemRepository extends CrudRepository<MarketItem, Long> {
     }
 
     public List<MarketItem> findAllByRoundId(EntityManager entityManager) {
-        List<MarketItem> marketItemList = null;
-        marketItemList = entityManager
+        return entityManager
                 .createQuery("""
                         select t from MarketItem t
                         where t.expired = false
                        \s""",
                         MarketItem.class)
                 .getResultList();
-        return marketItemList;
     }
 
     //TODO
@@ -39,14 +37,19 @@ public class MarketItemRepository extends CrudRepository<MarketItem, Long> {
     public List<MarketItem> findAllValidItemsForPlayer(EntityManager entityManager, Long roundId, Integer playerId) {
         return entityManager
                 .createQuery("""
-                        select t as currentPrice from MarketItem t
-                        left join BoughtItem bi on bi.player.id = :playerId AND bi.marketItemId = t.id
-                        left join RerolledItem ri on ri.player.id = :playerId AND ri.marketItem.id = t.id
-                        where 1=1
-                            and t.expired = false
-                            and bi.id is null
-                            and ri.id is null
-                        """,
+                      select t from MarketItem t
+                      where t.expired = false
+                      and not exists (
+                          select bi from BoughtItem bi
+                          where bi.marketItemId = t.id
+                          and bi.player.id = :playerId
+                      )
+                      and not exists (
+                          select ri from RerolledItem ri
+                          where ri.marketItem.id = t.id
+                          and ri.player.id = :playerId
+                      )
+                      """,
                         MarketItem.class)
                 .setParameter("playerId", playerId)
                 .getResultList();

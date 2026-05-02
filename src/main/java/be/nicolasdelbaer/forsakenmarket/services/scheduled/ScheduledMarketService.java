@@ -35,11 +35,13 @@ public class ScheduledMarketService {
      *   - adding new items to fill the gaps
      */
     public void refreshMarket(EntityManager entityManager) {
-        System.out.println("Refreshing Market!");
+        List<ItemBlueprint> blueprintRepositoryAll = itemBlueprintRepository.findAll(entityManager);
+        int randomId;
         int count = marketItemRepository.getValidElementCount(entityManager);
         int nbItems = GameConfiguration.marketPoolSize - count;
         for (int i = 0; i <nbItems; i++) {
-            createNewItem(entityManager);
+            randomId = RandomGenerator.getDefault().nextInt(blueprintRepositoryAll.size());
+            createNewItem(entityManager, blueprintRepositoryAll.get(randomId));
         }
     }
 
@@ -47,11 +49,7 @@ public class ScheduledMarketService {
      * Add a random new item from the item db to the market available items
      * They'll get an expiration time in rounds to get bought
      */
-    private void createNewItem(EntityManager entityManager) {
-        List<ItemBlueprint> blueprintRepositoryAll = itemBlueprintRepository.findAll(entityManager);
-        Collections.shuffle(blueprintRepositoryAll);
-        ItemBlueprint itemBlueprint = blueprintRepositoryAll.getFirst();
-
+    private void createNewItem(EntityManager entityManager, ItemBlueprint itemBlueprint) {
         List<MarketItem> marketItemList = new ArrayList<>();
         MarketItem marketItem = new MarketItem();
         marketItem.setCreatedAt(LocalDateTime.now());

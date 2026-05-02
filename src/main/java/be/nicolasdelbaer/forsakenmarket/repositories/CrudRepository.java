@@ -1,10 +1,8 @@
 package be.nicolasdelbaer.forsakenmarket.repositories;
 
-import be.nicolasdelbaer.forsakenmarket.entities.MarketItem;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,11 +20,9 @@ public abstract class CrudRepository<T, I> {
     }
 
     public List<T> findAll(EntityManager entityManager){
-        List<T> itemList = new ArrayList<>();
-            itemList = entityManager.createQuery(
-                    "select t from %s t".formatted(entityName),
-                    classReference).getResultList();
-        return itemList;
+        return entityManager.createQuery(
+            "select t from %s t".formatted(entityName),
+            classReference).getResultList();
     }
 
     public Optional<T> findById(EntityManager entityManager, I itemId){
@@ -44,16 +40,15 @@ public abstract class CrudRepository<T, I> {
         for (int i = 0; i < itemList.size(); i++) {
             entityManager.persist(itemList.get(i));
             if (i % batchSize == 0) {
-                entityManager.flush(); // batching
-                entityManager.clear(); // free persistence context
+                entityManager.flush();
+                entityManager.detach(itemList.get(i));
             }
         }
         return itemList;
     }
 
     public T update(EntityManager entityManager, T item){
-        item = entityManager.merge(item);
-        return item;
+        return entityManager.merge(item);
     }
 
     public List<T> updateAll(EntityManager entityManager, List<T> itemList){
@@ -61,8 +56,8 @@ public abstract class CrudRepository<T, I> {
         for (int i = 0; i < itemList.size(); i++) {
             entityManager.merge(itemList.get(i));
             if (i % batchSize == 0) {
-                entityManager.flush(); // batching
-                entityManager.clear(); // free persistence context
+                entityManager.flush();
+                entityManager.detach(itemList.get(i));
             }
         }
         return itemList;
@@ -76,20 +71,19 @@ public abstract class CrudRepository<T, I> {
 
     public T deleteById(EntityManager entityManager, I id){
         T reference = entityManager.getReference(classReference, id);
+        entityManager.remove(reference);
         return reference;
     }
 
-    public Integer count(EntityManager entityManager){
-        Integer count = entityManager.createQuery("select count(t) from %s t".formatted(entityName), Integer.class).getSingleResult();
-        return count;
+    public Long count(EntityManager entityManager){
+        return entityManager.createQuery("select count(t) from %s t".formatted(entityName), Long.class).getSingleResult();
     }
 
     public boolean exists(EntityManager entityManager, I itemId){
-        boolean exists = !entityManager.createQuery("select 1 from %s t where t.id = :id".formatted(entityName), Integer.class)
+        return !entityManager.createQuery("select 1 from %s t where t.id = :id".formatted(entityName), Integer.class)
                 .setParameter("id", itemId)
                 .setMaxResults(1)
                 .getResultList()
                 .isEmpty();
-        return exists;
     }
 }

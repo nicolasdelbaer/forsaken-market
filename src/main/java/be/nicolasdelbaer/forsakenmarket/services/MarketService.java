@@ -124,14 +124,13 @@ public class MarketService {
                 .findAllValidItemsForPlayer(entityManager, gameState.getCurrentRound(), playerId)
                 .stream().map(
                     marketItem ->{
-                     MarketItem item = marketItem;
                      MarketPriceHistory currentPrice = gameState.getPriceHistory(marketItem.getItemBlueprint().getId());
                      return new MarketItemResponse(
-                             item.getId(),
-                             item.getItemBlueprint().getTitle(),
-                             item.getItemBlueprint().getDescription(),
-                             item.getItemBlueprint().getIcon(),
-                             item.getItemBlueprint().getRarity().name(),
+                             marketItem.getId(),
+                             marketItem.getItemBlueprint().getTitle(),
+                             marketItem.getItemBlueprint().getDescription(),
+                             marketItem.getItemBlueprint().getIcon(),
+                             marketItem.getItemBlueprint().getRarity().name(),
                              currentPrice.currentPrice()
                      );
                     }

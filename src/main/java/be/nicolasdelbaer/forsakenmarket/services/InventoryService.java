@@ -5,6 +5,7 @@ import be.nicolasdelbaer.forsakenmarket.entities.BoughtItem;
 import be.nicolasdelbaer.forsakenmarket.enums.MarketItemStatus;
 import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.CannotDiscardItemException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.CannotSellInactiveItemException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketPriceNotFoundException;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItemDto;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.InventoryItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.market.MarketPriceHistory;
@@ -18,6 +19,7 @@ import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @ApplicationScoped
 public class InventoryService {
@@ -62,7 +64,7 @@ public class InventoryService {
         boughtItem.setSoldAt(LocalDateTime.now());
         boughtItem.setStatus(MarketItemStatus.SOLD);
         boughtItem.setSoldRoundId(currentRound);
-        boughtItemRepository.save(entityManager, boughtItem);
+        boughtItemRepository.update(entityManager, boughtItem);
     }
 
     /*
@@ -81,19 +83,24 @@ public class InventoryService {
         boughtItem.setDiscardedAt(LocalDateTime.now());
         boughtItem.setStatus(MarketItemStatus.DISCARDED);
         boughtItem.setDiscardedRoundId(currentRound);
-        boughtItemRepository.save(entityManager, boughtItem);
+        boughtItemRepository.update(entityManager, boughtItem);
     }
 
     /*
      * Fetch all bought & decayed items
      */
     @Transactional
-    public List<InventoryItemResponse> fetchItems(Integer playerId) {
+    public List<InventoryItemResponse> fetchItems(Integer playerId) throws MarketPriceNotFoundException {
         Map<Long, MarketPriceHistory> priceList = gameState.getPricesHistory();
 
         return boughtItemRepository.fetchAvailableItemsForPlayer(entityManager, playerId)
                 .stream()
                 .map(boughtItem -> {
+                    MarketPriceHistory marketPriceHistory = Optional
+                            .ofNullable(priceList.get(boughtItem.getItemBlueprint().getId()))
+                            .orElseThrow(() -> new MarketPriceNotFoundException("No price found for blueprint"));
+
+
                     return new InventoryItemResponse(
                             boughtItem.getId(),
                             boughtItem.getItemBlueprint().getTitle(),
@@ -101,7 +108,7 @@ public class InventoryService {
                             boughtItem.getItemBlueprint().getIcon(),
                             boughtItem.getItemBlueprint().getRarity().name(),
                             boughtItem.getBoughtPrice(),
-                            priceList.get(boughtItem.getItemBlueprint().getId()).currentPrice(),
+                            marketPriceHistory.currentPrice(),
                             boughtItem.isDecayed()
                     );
                 }).toList();
