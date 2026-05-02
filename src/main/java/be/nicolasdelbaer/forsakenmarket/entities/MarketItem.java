@@ -39,8 +39,10 @@ public class MarketItem {
     @Getter @Setter private boolean expired;
 
 
+    //CreationRound: 5 - Expire in: 3
+    //Round 5: 3 left -> Round 6: 2 left -> Round 7: 1 left -> Round 8: Out of market
     public void updateExpiration(Long currentRoundId) {
-        boolean shouldExpire = currentRoundId >= (createdRoundId +timeToLive-1);
+        boolean shouldExpire = currentRoundId > (createdRoundId +timeToLive-1);
         if(shouldExpire){
             expired = true;
             expiredAt = LocalDateTime.now();

@@ -51,9 +51,14 @@ public class BoughtItem {
     @Getter @Setter private LocalDateTime discardedAt;
 
 
+    //BoughtRound: 5 - Decay: 3
+    //Round 5: 3 left -> Round 6: 2 left -> Round 7: 1 left -> Round 8: 0 left -> Round 9: Decayed
     public void updateExpiration(Long currentRound) {
-        if(currentRound >= (boughtRoundId + decayNbRounds-1))
+        if(currentRound > boughtRoundId + decayNbRounds) {
             status = MarketItemStatus.DECAYED;
+            decayedAt = LocalDateTime.now();
+            decayedRoundId = currentRound;
+        }
     }
 
     public boolean isDecayed(){
