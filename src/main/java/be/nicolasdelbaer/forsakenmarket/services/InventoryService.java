@@ -9,7 +9,7 @@ import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketPriceNotFoundExc
 import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItemDto;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.InventoryItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
-import be.nicolasdelbaer.forsakenmarket.repositories.BoughtItemRepository;
+import be.nicolasdelbaer.forsakenmarket.repositories.InventoryItemRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.MarketPriceRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.GameState;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -24,7 +24,7 @@ import java.util.random.RandomGenerator;
 @ApplicationScoped
 public class InventoryService {
 
-    @Inject private BoughtItemRepository boughtItemRepository;
+    @Inject private InventoryItemRepository inventoryItemRepository;
     @Inject private EntityManager entityManager;
     @Inject private GameState gameState;
     @Inject
@@ -49,7 +49,7 @@ public class InventoryService {
         inventoryItem.setDecayNbRounds(getDecayTime());
         inventoryItem.setBoughtRoundId(buyItemDto.roundId());
 
-        boughtItemRepository.save(entityManager, inventoryItem);
+        inventoryItemRepository.save(entityManager, inventoryItem);
     }
 
     //TODO calculte right round nb time
@@ -67,7 +67,7 @@ public class InventoryService {
         inventoryItem.setSoldAt(LocalDateTime.now());
         inventoryItem.setStatus(MarketItemStatus.SOLD);
         inventoryItem.setSoldRoundId(currentRound);
-        boughtItemRepository.update(entityManager, inventoryItem);
+        inventoryItemRepository.update(entityManager, inventoryItem);
     }
 
     /*
@@ -79,14 +79,14 @@ public class InventoryService {
         // Idea -> could use a window of tolerance in the future allowing players to get the item even with lags
         Long currentRound = gameState.getCurrentRound();
 
-        InventoryItem inventoryItem = boughtItemRepository
+        InventoryItem inventoryItem = inventoryItemRepository
                 .getItemFromPlayer(entityManager, itemId, playerId, MarketItemStatus.DECAYED)
                 .orElseThrow(() -> new CannotDiscardItemException("Invalid item or unauthorized access"));
 
         inventoryItem.setDiscardedAt(LocalDateTime.now());
         inventoryItem.setStatus(MarketItemStatus.DISCARDED);
         inventoryItem.setDiscardedRoundId(currentRound);
-        boughtItemRepository.update(entityManager, inventoryItem);
+        inventoryItemRepository.update(entityManager, inventoryItem);
     }
 
     /*
@@ -94,7 +94,7 @@ public class InventoryService {
      */
     @Transactional
     public List<InventoryItemResponse> fetchItems(Integer playerId) throws MarketPriceNotFoundException {
-        return boughtItemRepository.fetchAvailableItemsForPlayer(entityManager, playerId)
+        return inventoryItemRepository.fetchAvailableItemsForPlayer(entityManager, playerId)
                 .stream()
                 .map(inventoryItem -> {
                     PriceMovementByRound priceMovementByRound = Optional

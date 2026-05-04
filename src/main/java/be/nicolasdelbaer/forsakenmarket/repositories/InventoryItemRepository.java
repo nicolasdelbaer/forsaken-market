@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 @ApplicationScoped
-public class BoughtItemRepository extends CrudRepository<InventoryItem, Long> {
-    public BoughtItemRepository() {
+public class InventoryItemRepository extends CrudRepository<InventoryItem, Long> {
+    public InventoryItemRepository() {
         super(InventoryItem.class);
     }
 

@@ -14,7 +14,7 @@ import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItemDto;
 import be.nicolasdelbaer.forsakenmarket.models.market.MarketItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
 import be.nicolasdelbaer.forsakenmarket.models.player.ReputationScoreData;
-import be.nicolasdelbaer.forsakenmarket.repositories.BoughtItemRepository;
+import be.nicolasdelbaer.forsakenmarket.repositories.InventoryItemRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.MarketItemRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRerollRepository;
@@ -28,7 +28,7 @@ import java.util.List;
 @ApplicationScoped
 public class MarketService {
 
-    @Inject private BoughtItemRepository boughtItemRepository;
+    @Inject private InventoryItemRepository inventoryItemRepository;
     @Inject private MarketItemRepository marketItemRepository;
     @Inject private PlayerRerollRepository playerRerollRepository;
 
@@ -95,7 +95,7 @@ public class MarketService {
         //Note, the current round id is resolved here for keeping coherence
         Long currentRound = gameState.getCurrentRound();
 
-        InventoryItem itemInstance = boughtItemRepository
+        InventoryItem itemInstance = inventoryItemRepository
                 .getItemFromPlayer(entityManager, itemId, playerId, MarketItemStatus.BOUGHT)
                 .orElseThrow(() -> new BadItemOwnershipException(BadResponseUtils.InvalidItemOrUnauthorized));
 
