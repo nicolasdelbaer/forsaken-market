@@ -1,6 +1,6 @@
 package be.nicolasdelbaer.forsakenmarket.filters;
 
-import be.nicolasdelbaer.forsakenmarket.annotations.Public;
+import be.nicolasdelbaer.forsakenmarket.annotations.Authenticated;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.utils.JwtUtils;
 import io.jsonwebtoken.Claims;
@@ -19,26 +19,19 @@ import java.util.List;
 
 @ApplicationScoped
 @Provider
+@Authenticated
 public class AuthFilter implements ContainerRequestFilter {
 
     @Context private ResourceInfo resourceInfo;
-
     @Override
     public void filter(ContainerRequestContext requestContext) {
         String path = requestContext.getUriInfo().getPath();
         if (path.equals("openapi.json") || path.equals("openapi.yaml"))
             return;
 
-        boolean isPublic = resourceInfo.getResourceMethod().isAnnotationPresent(Public.class)
-                || resourceInfo.getResourceClass().isAnnotationPresent(Public.class);
-        if (isPublic) return;
-
         String authHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
-
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            requestContext.abortWith(
-                    Response.status(Response.Status.UNAUTHORIZED).build()
-            );
+            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
             return;
         }
 
@@ -69,9 +62,7 @@ public class AuthFilter implements ContainerRequestFilter {
             requestContext.setSecurityContext(securityContext);
 
         } catch (Exception e) {
-            requestContext.abortWith(
-                    Response.status(Response.Status.UNAUTHORIZED).build()
-            );
+            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
         }
     }
 

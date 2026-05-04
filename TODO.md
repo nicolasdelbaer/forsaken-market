@@ -31,7 +31,6 @@
 - Rework responses content (if cost, send back wallet data and so on)
 
 ### Project
-- Update & Clean auth filter flow (access roles annotation rather than public)
 
 ### Game Rules
 - Decay must be very high & based on rarity (utils)
@@ -41,6 +40,7 @@
 
 ## ideas
 Pk sur marketPrice: bp_id + round_id (no need for generatedId ?)
+
 
 
 ## TO KEEP IN MIND

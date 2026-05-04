@@ -1,5 +1,6 @@
 package be.nicolasdelbaer.forsakenmarket.resources;
 
+import be.nicolasdelbaer.forsakenmarket.annotations.Authenticated;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.UndefinedMarketPriceException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.BadItemOwnershipException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.CannotDiscardItemException;
@@ -13,6 +14,7 @@ import be.nicolasdelbaer.forsakenmarket.services.MarketService;
 import be.nicolasdelbaer.forsakenmarket.utils.BadResponseUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
@@ -25,6 +27,8 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @Path("/inventory")
+@Authenticated
+@RolesAllowed("Merchant")
 @Tag(name = "Inventory", description = "Manage inventory")
 public class InventoryResource {
 

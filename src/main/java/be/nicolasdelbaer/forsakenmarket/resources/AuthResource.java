@@ -1,8 +1,7 @@
 package be.nicolasdelbaer.forsakenmarket.resources;
 
-import be.nicolasdelbaer.forsakenmarket.annotations.Public;
-import be.nicolasdelbaer.forsakenmarket.exceptions.core.MissingEnvConfigurationException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.auth.EmailAlreadyUsedException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.core.MissingEnvConfigurationException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerLoginException;
 import be.nicolasdelbaer.forsakenmarket.models.player.LoginRequestDto;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
@@ -16,9 +15,9 @@ import jakarta.inject.Inject;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.slf4j.Logger;
@@ -28,7 +27,6 @@ import java.util.Set;
 
 @Path("/auth")
 @RequestScoped
-@Public
 @Tag(name = "Auth", description = "Manage users")
 public class AuthResource {
 

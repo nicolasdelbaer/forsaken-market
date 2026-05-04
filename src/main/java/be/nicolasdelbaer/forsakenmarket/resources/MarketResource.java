@@ -1,5 +1,6 @@
 package be.nicolasdelbaer.forsakenmarket.resources;
 
+import be.nicolasdelbaer.forsakenmarket.annotations.Authenticated;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketItemDoesNotExistException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.MaxRerollReachedException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerInsufficientFundsException;
@@ -10,6 +11,7 @@ import be.nicolasdelbaer.forsakenmarket.services.MarketService;
 import be.nicolasdelbaer.forsakenmarket.utils.BadResponseUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -23,6 +25,8 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @RequestScoped
+@Authenticated
+@RolesAllowed("Merchant")
 @Path("/market")
 @Tag(name = "Market", description = "Buy & reroll operations")
 public class MarketResource {

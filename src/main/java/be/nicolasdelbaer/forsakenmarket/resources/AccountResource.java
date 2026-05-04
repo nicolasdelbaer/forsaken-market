@@ -1,10 +1,12 @@
 package be.nicolasdelbaer.forsakenmarket.resources;
 
+import be.nicolasdelbaer.forsakenmarket.annotations.Authenticated;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerInfoResponse;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.services.PlayerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -17,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Path("/account")
+@Authenticated
+@RolesAllowed("Merchant")
 @Tag(name = "Player", description = "Player data")
 public class AccountResource {
     private static final Logger log = LoggerFactory.getLogger(AccountResource.class);
