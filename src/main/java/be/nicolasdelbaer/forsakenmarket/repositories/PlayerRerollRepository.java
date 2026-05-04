@@ -1,9 +1,10 @@
 package be.nicolasdelbaer.forsakenmarket.repositories;
 
-import be.nicolasdelbaer.forsakenmarket.entities.MarketPrice;
 import be.nicolasdelbaer.forsakenmarket.entities.RerolledItem;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
+
+import java.util.Objects;
 
 @ApplicationScoped
 public class PlayerRerollRepository extends CrudRepository<RerolledItem, Long> {
@@ -11,13 +12,18 @@ public class PlayerRerollRepository extends CrudRepository<RerolledItem, Long> {
         super(RerolledItem.class);
     }
 
-    public Integer getRerollCount(EntityManager entityManager, Long roundId) {
-        Integer count = 0;
-        count = entityManager
-                .createQuery("select count(t) from RerolledItem t where t.roundId = :roundId group by t.roundId",
-                        MarketPrice.class)
+    public Integer getRerollCount(EntityManager entityManager, Integer playerId, Long roundId) {
+        Long count = entityManager
+                .createQuery("""
+                    select count(t) from RerolledItem t
+                    where t.player.id = :playerId
+                        and t.roundId = :roundId
+                    """,
+                        Long.class)
+                .setParameter("playerId", playerId)
                 .setParameter("roundId", roundId)
-                .executeUpdate();
-        return count;
+                .getSingleResultOrNull();
+
+        return (Objects.isNull(count))? 0: count.intValue();
     }
 }

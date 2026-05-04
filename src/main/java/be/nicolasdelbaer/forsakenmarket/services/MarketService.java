@@ -53,7 +53,7 @@ public class MarketService {
                 .orElseThrow(() -> new PlayerNotFoundException("player not found"));
 
         //cannot reroll if you've already used all available rerolls for the current round
-        Integer nbReroll = playerRerollRepository.getRerollCount(entityManager, currentRound);
+        Integer nbReroll = playerRerollRepository.getRerollCount(entityManager, player.getId(), currentRound);
         if(nbReroll >= GameConfiguration.maxRerollsPerRound)
             throw new MaxRerollReachedException("too many rerolls for this round");
 
