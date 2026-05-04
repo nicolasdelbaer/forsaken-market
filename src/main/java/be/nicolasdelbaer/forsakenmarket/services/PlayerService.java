@@ -3,18 +3,21 @@ package be.nicolasdelbaer.forsakenmarket.services;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import be.nicolasdelbaer.forsakenmarket.annotations.Transactional;
 import be.nicolasdelbaer.forsakenmarket.entities.Player;
-import be.nicolasdelbaer.forsakenmarket.exceptions.core.MissingEnvConfigurationException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.auth.EmailAlreadyUsedException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.core.MissingEnvConfigurationException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerLoginException;
 import be.nicolasdelbaer.forsakenmarket.models.player.LoginRequestDto;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.models.player.RegisterPlayerRequest;
 import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRepository;
+import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRoleRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
+import be.nicolasdelbaer.forsakenmarket.utils.GameState;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 
+import java.util.List;
 import java.util.Objects;
 
 @ApplicationScoped
@@ -22,6 +25,10 @@ public class PlayerService {
 
     @Inject private PlayerRepository playerRepository;
     @Inject private EntityManager entityManager;
+    @Inject
+    private GameState gameState;
+    @Inject
+    private PlayerRoleRepository playerRoleRepository;
 
     public PlayerService() {
     }
@@ -41,7 +48,8 @@ public class PlayerService {
             registerPlayerRequest.userName(),
             registerPlayerRequest.email(),
             BCrypt.withDefaults().hashToString(cost, registerPlayerRequest.password().toCharArray()),
-            GameConfiguration.startingWallet
+            GameConfiguration.startingWallet,
+            List.of(playerRoleRepository.findByRoleName(entityManager,"Merchant"))
         );
 
         playerRepository.save(entityManager, player);

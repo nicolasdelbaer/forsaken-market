@@ -4,11 +4,13 @@ import at.favre.lib.crypto.bcrypt.BCrypt;
 import be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint;
 import be.nicolasdelbaer.forsakenmarket.entities.ItemCategory;
 import be.nicolasdelbaer.forsakenmarket.entities.Player;
+import be.nicolasdelbaer.forsakenmarket.entities.PlayerRole;
 import be.nicolasdelbaer.forsakenmarket.enums.ItemRarity;
 import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
 import be.nicolasdelbaer.forsakenmarket.repositories.ItemBlueprintRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.ItemCategoryRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRepository;
+import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRoleRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
 import be.nicolasdelbaer.forsakenmarket.utils.GameState;
 import be.nicolasdelbaer.forsakenmarket.utils.PricesCalculator;
@@ -32,6 +34,7 @@ import java.util.logging.Logger;
 public class DataSeeder {
 
     @Inject private PlayerRepository playerRepository;
+    @Inject private PlayerRoleRepository playerRoleRepository;
 
     @Inject private ItemCategoryRepository itemCategoryRepository;
     @Inject private ItemBlueprintRepository itemBlueprintRepository;
@@ -75,6 +78,11 @@ public class DataSeeder {
     }
 
     private void createPlayers(EntityManager entityManager) {
+        PlayerRole playerRoleAdmin = playerRoleRepository.save(entityManager, new PlayerRole("Admin"));
+        PlayerRole playerRoleMerchant = playerRoleRepository.save(entityManager, new PlayerRole("Merchant"));
+        PlayerRole playerRoleNoble = playerRoleRepository.save(entityManager, new PlayerRole("Noble"));
+
+
         Player player;
         String envCost = System.getenv("BCRYPT_COST");
         int cost = Objects.nonNull(envCost) ? Integer.parseInt(envCost) : 12;
@@ -82,21 +90,24 @@ public class DataSeeder {
                 "Nidel",
                 "nidel@gmail.com",
                 BCrypt.withDefaults().hashToString(cost, "pass".toCharArray()),
-                GameConfiguration.startingWallet
+                GameConfiguration.startingWallet,
+                List.of(playerRoleMerchant, playerRoleAdmin)
         );
         playerRepository.save(entityManager, player);
         player = new Player(
                 "Foo",
                 "foo@gmail.com",
                 BCrypt.withDefaults().hashToString(cost, "pass".toCharArray()),
-                GameConfiguration.startingWallet
+                GameConfiguration.startingWallet,
+                List.of(playerRoleMerchant)
         );
         playerRepository.save(entityManager, player);
         player = new Player(
                 "Bar",
                 "bar@gmail.com",
                 BCrypt.withDefaults().hashToString(cost, "pass".toCharArray()),
-                GameConfiguration.startingWallet
+                GameConfiguration.startingWallet,
+                List.of(playerRoleMerchant, playerRoleNoble)
         );
         playerRepository.save(entityManager, player);
     }

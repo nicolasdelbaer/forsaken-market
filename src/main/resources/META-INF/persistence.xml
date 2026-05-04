@@ -15,6 +15,7 @@
         <class>be.nicolasdelbaer.forsakenmarket.entities.MarketPrice</class>
         <class>be.nicolasdelbaer.forsakenmarket.entities.MarketPriceEvolution</class>
         <class>be.nicolasdelbaer.forsakenmarket.entities.Player</class>
+        <class>be.nicolasdelbaer.forsakenmarket.entities.PlayerRole</class>
         <class>be.nicolasdelbaer.forsakenmarket.entities.RerolledItem</class>
         <properties>
             <!-- Connexion -->

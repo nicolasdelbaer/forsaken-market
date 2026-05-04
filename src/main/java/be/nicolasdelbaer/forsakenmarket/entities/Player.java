@@ -62,8 +62,12 @@ public class Player {
     @Getter @Setter
     private Integer currentReput;
 
+    @Getter @Setter
+    @ManyToMany
+    private List<PlayerRole> playerRoles;
 
-    public Player(String name, String email, String password, int startingWallet) {
+
+    public Player(String name, String email, String password, int startingWallet, List<PlayerRole> roles) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -71,6 +75,7 @@ public class Player {
         this.level = 1;
         this.totReput = 0;
         this.currentReput = 0;
+        this.playerRoles = roles;
     }
 
     public void debit(Integer amount) throws PlayerInsufficientFundsException {
@@ -97,8 +102,7 @@ public class Player {
         }
     }
 
-    //TODO change roles
     public List<String> getRoles() {
-        return List.of("player");
+        return playerRoles.stream().map(PlayerRole::getName).toList();
     }
 }
