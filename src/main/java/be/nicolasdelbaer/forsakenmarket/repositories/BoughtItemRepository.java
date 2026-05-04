@@ -28,6 +28,7 @@ public class BoughtItemRepository extends CrudRepository<BoughtItem, Long> {
                     select bi from BoughtItem bi
                     where bi.status IN (:statusList)
                         and bi.player.id = :playerId
+                    order by bi.boughtRoundId DESC
                     """, BoughtItem.class)
                 .setParameter("statusList", List.of(MarketItemStatus.BOUGHT, MarketItemStatus.DECAYED))
                 .setParameter("playerId", playerId)
