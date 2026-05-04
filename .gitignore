@@ -48,4 +48,5 @@ build/
 # OS
 Thumbd.db
 
-.env
+# Custom
+docs/
