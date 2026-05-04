@@ -1,6 +1,8 @@
 package be.nicolasdelbaer.forsakenmarket.exceptions.auth;
 
-public class EmailAlreadyUsedException extends Exception {
+import be.nicolasdelbaer.forsakenmarket.exceptions.core.ForsakenException;
+
+public class EmailAlreadyUsedException extends ForsakenException {
     public EmailAlreadyUsedException(String message) {
         super(message);
     }

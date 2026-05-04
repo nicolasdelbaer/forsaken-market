@@ -2,8 +2,8 @@ package be.nicolasdelbaer.forsakenmarket.exceptions.market;
 
 import be.nicolasdelbaer.forsakenmarket.exceptions.core.ForsakenException;
 
-public class MaxRerollReachedException extends ForsakenException {
-    public MaxRerollReachedException(String msg) {
+public class UndefinedMarketPriceException extends ForsakenException {
+    public UndefinedMarketPriceException(String msg) {
         super(msg);
     }
 }

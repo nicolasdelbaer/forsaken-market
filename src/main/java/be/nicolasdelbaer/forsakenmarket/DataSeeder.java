@@ -20,7 +20,6 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
-import jakarta.transaction.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +40,6 @@ public class DataSeeder {
 
     private static final Logger log = Logger.getLogger(DataSeeder.class.getName());
 
-    @Transactional
     public void seed(@Observes @Priority(GameConfiguration.DataFeedPriority) @Initialized(ApplicationScoped.class) Object init) {
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
 
@@ -73,7 +71,7 @@ public class DataSeeder {
             );
         }
 
-        gameState.setPrices(marketPriceList);
+        gameState.setMarketPriceList(marketPriceList);
     }
 
     private void createPlayers(EntityManager entityManager) {

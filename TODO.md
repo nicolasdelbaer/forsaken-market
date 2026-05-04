@@ -61,7 +61,7 @@
 - Add validations via annotations @NotBlank, length etc. from incoming data
 
 ### Game State
-- Add a dedicated table with 1 id and store current round & stuff
+- Add Persistence ->table with 1 id and store current round & stuff
 
 ### Testing
 - Add new test cases

@@ -1,6 +1,8 @@
 package be.nicolasdelbaer.forsakenmarket.exceptions.market;
 
-public class MarketItemDoesNotExistException extends Exception {
+import be.nicolasdelbaer.forsakenmarket.exceptions.core.ForsakenException;
+
+public class MarketItemDoesNotExistException extends ForsakenException {
     public MarketItemDoesNotExistException(String s) {
         super(s);
     }

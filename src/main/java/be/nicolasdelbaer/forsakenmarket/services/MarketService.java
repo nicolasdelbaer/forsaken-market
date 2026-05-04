@@ -3,6 +3,7 @@ package be.nicolasdelbaer.forsakenmarket.services;
 import be.nicolasdelbaer.forsakenmarket.annotations.Transactional;
 import be.nicolasdelbaer.forsakenmarket.entities.*;
 import be.nicolasdelbaer.forsakenmarket.enums.MarketItemStatus;
+import be.nicolasdelbaer.forsakenmarket.exceptions.market.UndefinedMarketPriceException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.BadItemOwnershipException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.CannotSellInactiveItemException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketItemDoesNotExistException;
@@ -15,10 +16,7 @@ import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItemDto;
 import be.nicolasdelbaer.forsakenmarket.models.market.MarketPriceHistory;
 import be.nicolasdelbaer.forsakenmarket.models.player.ReputationScoreData;
 import be.nicolasdelbaer.forsakenmarket.repositories.*;
-import be.nicolasdelbaer.forsakenmarket.utils.BadResponseUtils;
-import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
-import be.nicolasdelbaer.forsakenmarket.utils.GameState;
-import be.nicolasdelbaer.forsakenmarket.utils.ReputationCalculator;
+import be.nicolasdelbaer.forsakenmarket.utils.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -72,7 +70,7 @@ public class MarketService {
     }
 
     @Transactional
-    public void buyItem(Integer playerId, Long itemId) throws PlayerInsufficientFundsException, MarketItemDoesNotExistException, PlayerNotFoundException, MarketPriceNotFoundException {
+    public void buyItem(Integer playerId, Long itemId) throws PlayerInsufficientFundsException, MarketItemDoesNotExistException, PlayerNotFoundException, MarketPriceNotFoundException, UndefinedMarketPriceException {
         //Note, the current round id is resolved here for keeping coherence
         Long currentRound = gameState.getCurrentRound();
 
@@ -94,7 +92,7 @@ public class MarketService {
     }
 
     @Transactional
-    public void sellItem(Integer playerId, Long itemId) throws BadItemOwnershipException, CannotSellInactiveItemException, MarketPriceNotFoundException, PlayerNotFoundException {
+    public void sellItem(Integer playerId, Long itemId) throws BadItemOwnershipException, CannotSellInactiveItemException, MarketPriceNotFoundException, PlayerNotFoundException, UndefinedMarketPriceException {
         //Note, the current round id is resolved here for keeping coherence
         Long currentRound = gameState.getCurrentRound();
 
@@ -123,17 +121,14 @@ public class MarketService {
         return marketItemRepository
                 .findAllValidItemsForPlayer(entityManager, gameState.getCurrentRound(), playerId)
                 .stream().map(
-                    marketItem ->{
-                     MarketPriceHistory currentPrice = gameState.getPriceHistory(marketItem.getItemBlueprint().getId());
-                     return new MarketItemResponse(
-                             marketItem.getId(),
-                             marketItem.getItemBlueprint().getTitle(),
-                             marketItem.getItemBlueprint().getDescription(),
-                             marketItem.getItemBlueprint().getIcon(),
-                             marketItem.getItemBlueprint().getRarity().name(),
-                             currentPrice.currentPrice()
-                     );
-                    }
-                ).toList();
+                    marketItem -> new MarketItemResponse(
+                         marketItem.getId(),
+                         marketItem.getItemBlueprint().getTitle(),
+                         marketItem.getItemBlueprint().getDescription(),
+                         marketItem.getItemBlueprint().getIcon(),
+                         marketItem.getItemBlueprint().getRarity().name(),
+                            MarketPriceUtils.getMarketPriceHistory(gameState, marketItem.getItemBlueprint()).currentPrice()))
+                .toList();
     }
+
 }

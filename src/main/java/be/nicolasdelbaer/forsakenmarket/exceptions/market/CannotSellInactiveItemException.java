@@ -1,6 +1,8 @@
 package be.nicolasdelbaer.forsakenmarket.exceptions.market;
 
-public class CannotSellInactiveItemException extends Exception {
+import be.nicolasdelbaer.forsakenmarket.exceptions.core.ForsakenException;
+
+public class CannotSellInactiveItemException extends ForsakenException {
     public CannotSellInactiveItemException(String msg) {
         super(msg);
     }

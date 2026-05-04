@@ -1,6 +1,8 @@
 package be.nicolasdelbaer.forsakenmarket.exceptions.inventory;
 
-public class BadItemOwnershipException extends Exception {
+import be.nicolasdelbaer.forsakenmarket.exceptions.core.ForsakenException;
+
+public class BadItemOwnershipException extends ForsakenException {
     public BadItemOwnershipException(String msg) {
         super(msg);
     }

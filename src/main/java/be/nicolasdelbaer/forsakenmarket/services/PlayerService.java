@@ -3,6 +3,7 @@ package be.nicolasdelbaer.forsakenmarket.services;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import be.nicolasdelbaer.forsakenmarket.annotations.Transactional;
 import be.nicolasdelbaer.forsakenmarket.entities.Player;
+import be.nicolasdelbaer.forsakenmarket.exceptions.core.MissingEnvConfigurationException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.auth.EmailAlreadyUsedException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerLoginException;
 import be.nicolasdelbaer.forsakenmarket.models.player.LoginRequestDto;
@@ -13,6 +14,8 @@ import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
+
+import java.util.Objects;
 
 @ApplicationScoped
 public class PlayerService {
@@ -25,11 +28,13 @@ public class PlayerService {
 
 
     @Transactional
-    public void register(RegisterPlayerRequest registerPlayerRequest) throws EmailAlreadyUsedException {
+    public void register(RegisterPlayerRequest registerPlayerRequest) throws EmailAlreadyUsedException, MissingEnvConfigurationException {
         if(playerRepository.emailExists(entityManager, registerPlayerRequest.email()))
             throw new EmailAlreadyUsedException("Cannot create this player, the email already exists");
 
         String envCost = System.getenv("BCRYPT_COST");
+        if(Objects.isNull(envCost))
+            throw new MissingEnvConfigurationException("Cost config is missing");
         int cost = Integer.parseInt(envCost);
 
         Player player = new Player(

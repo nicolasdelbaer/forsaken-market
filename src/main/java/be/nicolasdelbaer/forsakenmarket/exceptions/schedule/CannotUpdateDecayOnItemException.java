@@ -1,6 +1,8 @@
 package be.nicolasdelbaer.forsakenmarket.exceptions.schedule;
 
-public class CannotUpdateDecayOnItemException extends Exception {
+import be.nicolasdelbaer.forsakenmarket.exceptions.core.ForsakenException;
+
+public class CannotUpdateDecayOnItemException extends ForsakenException {
     public CannotUpdateDecayOnItemException(String msg) {
         super(msg);
     }

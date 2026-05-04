@@ -1,5 +1,7 @@
 package be.nicolasdelbaer.forsakenmarket.schedulers;
 
+import be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint;
+import be.nicolasdelbaer.forsakenmarket.repositories.ItemBlueprintRepository;
 import be.nicolasdelbaer.forsakenmarket.services.scheduled.ScheduledInventoryService;
 import be.nicolasdelbaer.forsakenmarket.services.scheduled.ScheduledMarketService;
 import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
@@ -17,6 +19,7 @@ import jakarta.servlet.ServletContextListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -29,9 +32,20 @@ public class MarketTickerScheduler implements ServletContextListener {
     @Inject private EntityManagerFactory entityManagerFactory;
     @Inject private ScheduledMarketService scheduledMarketService;
     @Inject private ScheduledInventoryService scheduledInventoryService;
+    @Inject private ItemBlueprintRepository itemBlueprintRepository;
     @Inject private GameState gameState;
 
-    public void onStart(@Observes @Priority(GameConfiguration.SchedulerPriority) @Initialized(ApplicationScoped.class) Object e) {
+    public void onStart(@Observes @Priority(GameConfiguration.SchedulerPriority) @Initialized(ApplicationScoped.class) Object obj) {
+        try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+            List<ItemBlueprint> test = itemBlueprintRepository.findAll(entityManager);
+            gameState.setItemBlueprintList(test);
+            startScheduler();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    private void startScheduler() {
         scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(
                 this::tick,
@@ -64,9 +78,8 @@ public class MarketTickerScheduler implements ServletContextListener {
                 //Populate new items if some slots are missing,
                 //using gameConfiguration to setup a pool of max available items
                 //shared for all players (- bought or rerolled items)
-                scheduledMarketService.refreshMarket(entityManager);
+                scheduledMarketService.refreshMarket(entityManager, gameState.getItemBlueprintList());
                 System.out.printf("Current round: %s%n", gameState.getCurrentRound());
-
 
                 if(gameState.getCurrentRound() % GameConfiguration.roundsByCycle == 0) {
                     scheduledMarketService.recordMarketPriceMovements(entityManager);

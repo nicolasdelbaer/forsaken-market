@@ -1,6 +1,8 @@
 package be.nicolasdelbaer.forsakenmarket.exceptions.player;
 
-public class PlayerLoginException extends Exception {
+import be.nicolasdelbaer.forsakenmarket.exceptions.core.ForsakenException;
+
+public class PlayerLoginException extends ForsakenException {
     public PlayerLoginException(String message) {
         super(message);
     }

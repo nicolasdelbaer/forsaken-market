@@ -12,14 +12,15 @@ import be.nicolasdelbaer.forsakenmarket.models.market.MarketPriceHistory;
 import be.nicolasdelbaer.forsakenmarket.repositories.BoughtItemRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.MarketPriceRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.GameState;
+import be.nicolasdelbaer.forsakenmarket.utils.MarketPriceUtils;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.random.RandomGenerator;
 
 @ApplicationScoped
 public class InventoryService {
@@ -37,7 +38,7 @@ public class InventoryService {
      */
     @Transactional
     public void acquireItem(BuyItemDto buyItemDto){
-        Integer decayTime = 8; //TODO calculte right round nb time
+
 
         BoughtItem boughtItem = new BoughtItem();
         boughtItem.setItemBlueprint(buyItemDto.marketItem().getItemBlueprint());
@@ -48,10 +49,15 @@ public class InventoryService {
         boughtItem.setBoughtAt(LocalDateTime.now());
         boughtItem.setStatus(MarketItemStatus.BOUGHT);
 
-        boughtItem.setDecayNbRounds(decayTime);
+        boughtItem.setDecayNbRounds(getDecayTime());
         boughtItem.setBoughtRoundId(buyItemDto.roundId());
 
         boughtItemRepository.save(entityManager, boughtItem);
+    }
+
+    //TODO calculte right round nb time
+    private Integer getDecayTime() {
+        return RandomGenerator.getDefault().nextInt(6, 16);
     }
 
     /*
@@ -91,15 +97,12 @@ public class InventoryService {
      */
     @Transactional
     public List<InventoryItemResponse> fetchItems(Integer playerId) throws MarketPriceNotFoundException {
-        Map<Long, MarketPriceHistory> priceList = gameState.getPricesHistory();
-
         return boughtItemRepository.fetchAvailableItemsForPlayer(entityManager, playerId)
                 .stream()
                 .map(boughtItem -> {
                     MarketPriceHistory marketPriceHistory = Optional
-                            .ofNullable(priceList.get(boughtItem.getItemBlueprint().getId()))
+                            .ofNullable(MarketPriceUtils.getMarketPriceHistory(gameState, boughtItem.getItemBlueprint()))
                             .orElseThrow(() -> new MarketPriceNotFoundException("No price found for blueprint"));
-
 
                     return new InventoryItemResponse(
                             boughtItem.getId(),

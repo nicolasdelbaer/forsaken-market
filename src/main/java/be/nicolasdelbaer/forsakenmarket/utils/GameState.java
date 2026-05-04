@@ -1,36 +1,37 @@
 package be.nicolasdelbaer.forsakenmarket.utils;
 
+import be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint;
+import be.nicolasdelbaer.forsakenmarket.exceptions.market.UndefinedMarketPriceException;
 import be.nicolasdelbaer.forsakenmarket.models.market.MarketPriceHistory;
 import jakarta.enterprise.context.ApplicationScoped;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @ApplicationScoped
 public class GameState {
 
+    @Setter
     private Map<Long, MarketPriceHistory> marketPriceList = new HashMap<>();
+    @Setter
+    private List<ItemBlueprint> itemBlueprintList = new ArrayList<>();
 
+    @Getter
     private Long currentRound = 0L;
 
-    public Long getCurrentRound() {
-        return currentRound;
-    }
+
     public void nextRound(){
         currentRound++;
     }
 
-
-    public void setPrices(Map<Long, MarketPriceHistory> marketPriceList) {
-        this.marketPriceList = marketPriceList;
-    }
-
-    public MarketPriceHistory getPriceHistory(Long blueprintId) {
+    public MarketPriceHistory getPriceHistory(Long blueprintId) throws UndefinedMarketPriceException {
+        if(!marketPriceList.containsKey(blueprintId))
+            throw new UndefinedMarketPriceException("Market Price not found, missing init?");
         return marketPriceList.get(blueprintId);
     }
 
-    public Map<Long, MarketPriceHistory> getPricesHistory() {
-        return Collections.unmodifiableMap(marketPriceList);
+    public List<ItemBlueprint> getItemBlueprintList() {
+        return Collections.unmodifiableList(itemBlueprintList);
     }
 }

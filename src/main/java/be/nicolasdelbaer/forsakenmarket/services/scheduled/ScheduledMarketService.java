@@ -1,19 +1,25 @@
 package be.nicolasdelbaer.forsakenmarket.services.scheduled;
 
-import be.nicolasdelbaer.forsakenmarket.entities.*;
+import be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint;
+import be.nicolasdelbaer.forsakenmarket.entities.MarketItem;
+import be.nicolasdelbaer.forsakenmarket.entities.MarketPrice;
 import be.nicolasdelbaer.forsakenmarket.enums.MarketTrend;
-import be.nicolasdelbaer.forsakenmarket.models.market.MarketPriceHistory;
-import be.nicolasdelbaer.forsakenmarket.repositories.*;
+import be.nicolasdelbaer.forsakenmarket.repositories.ItemBlueprintRepository;
+import be.nicolasdelbaer.forsakenmarket.repositories.MarketItemRepository;
+import be.nicolasdelbaer.forsakenmarket.repositories.MarketPriceRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
 import be.nicolasdelbaer.forsakenmarket.utils.GameState;
+import be.nicolasdelbaer.forsakenmarket.utils.MarketPriceUtils;
 import be.nicolasdelbaer.forsakenmarket.utils.PricesCalculator;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.random.RandomGenerator;
+import java.util.stream.Collectors;
 
 
 /*
@@ -24,9 +30,7 @@ public class ScheduledMarketService {
 
     @Inject private MarketItemRepository marketItemRepository;
     @Inject private MarketPriceRepository marketPriceRepository;
-
     @Inject private GameState gameState;
-
     @Inject private ItemBlueprintRepository itemBlueprintRepository;
 
 
@@ -34,8 +38,7 @@ public class ScheduledMarketService {
      * Market Refresh consists on:
      *   - adding new items to fill the gaps
      */
-    public void refreshMarket(EntityManager entityManager) {
-        List<ItemBlueprint> blueprintRepositoryAll = itemBlueprintRepository.findAll(entityManager);
+    public void refreshMarket(EntityManager entityManager, List<ItemBlueprint> blueprintRepositoryAll) {
         int randomId;
         int count = marketItemRepository.getValidElementCount(entityManager);
         int nbItems = GameConfiguration.marketPoolSize - count;
@@ -50,15 +53,18 @@ public class ScheduledMarketService {
      * They'll get an expiration time in rounds to get bought
      */
     private void createNewItem(EntityManager entityManager, ItemBlueprint itemBlueprint) {
-        List<MarketItem> marketItemList = new ArrayList<>();
         MarketItem marketItem = new MarketItem();
         marketItem.setCreatedAt(LocalDateTime.now());
         marketItem.setItemBlueprint(itemBlueprint);
         marketItem.setCreatedRoundId(gameState.getCurrentRound());
-        marketItem.setTimeToLive(RandomGenerator.getDefault().nextInt(3,10)); //TODO get random value from proper class
-        marketItemList.add(marketItem);
+        marketItem.setTimeToLive(getTimeToLive());
 
-        marketItemRepository.saveAll(entityManager, marketItemList);
+        marketItemRepository.save(entityManager, marketItem);
+    }
+
+    //TODO get random value from proper class without magic numbers
+    private static int getTimeToLive() {
+        return RandomGenerator.getDefault().nextInt(3, 10);
     }
 
     /*
@@ -105,19 +111,18 @@ public class ScheduledMarketService {
      * Update prices in server cache based on previous price
      */
     public void updateMarketPrices(EntityManager entityManager) {
-        Map<Long, MarketPriceHistory> marketPriceList = new HashMap<>();
         List<ItemBlueprint> blueprintList = itemBlueprintRepository.findAll(entityManager);
 
-        for (ItemBlueprint blueprint : blueprintList) {
-            marketPriceList.put(
-                blueprint.getId(),
-                PricesCalculator.getNextPrice(
-                    blueprint,
-                    gameState.getPriceHistory(blueprint.getId())
-                )
-            );
-        }
-
-        gameState.setPrices(marketPriceList);
+        gameState.setMarketPriceList(blueprintList.stream()
+                .collect(Collectors.toMap(
+                        ItemBlueprint::getId,
+                        blueprint -> PricesCalculator
+                                .getNextPrice(blueprint, MarketPriceUtils
+                                                .getMarketPriceHistory(gameState, blueprint))
+                )));
     }
+
+
+
+
 }

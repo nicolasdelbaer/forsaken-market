@@ -1,6 +1,7 @@
 package be.nicolasdelbaer.forsakenmarket.resources;
 
 import be.nicolasdelbaer.forsakenmarket.annotations.Public;
+import be.nicolasdelbaer.forsakenmarket.exceptions.core.MissingEnvConfigurationException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.auth.EmailAlreadyUsedException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerLoginException;
 import be.nicolasdelbaer.forsakenmarket.models.player.LoginRequestDto;
@@ -52,6 +53,8 @@ public class AuthResource {
             response = Response.ok().build();
         } catch (EmailAlreadyUsedException e) {
             response = Response.status(400).entity(BadResponseUtils.AlreadyUsedEmail).build();
+        } catch (MissingEnvConfigurationException e) {
+            response = Response.status(400).entity(BadResponseUtils.MissingEnvConfiguration).build();
         }
 
         return response;

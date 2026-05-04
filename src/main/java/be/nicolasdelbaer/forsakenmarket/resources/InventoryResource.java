@@ -1,5 +1,6 @@
 package be.nicolasdelbaer.forsakenmarket.resources;
 
+import be.nicolasdelbaer.forsakenmarket.exceptions.market.UndefinedMarketPriceException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.BadItemOwnershipException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.CannotDiscardItemException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.CannotSellInactiveItemException;
@@ -35,7 +36,7 @@ public class InventoryResource {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/discard/{id}")
-    @Operation(summary = "Sell an item", description = "Sell an item from their inventory")
+    @Operation(summary = "Discard an item", description = "Discard an item from their inventory")
     public Response discardItem(@PathParam("id") Long itemId) {
         Response response;
         PlayerSession playerSession = (PlayerSession) securityContext.getUserPrincipal();
@@ -59,7 +60,7 @@ public class InventoryResource {
         try {
             marketService.sellItem(playerSession.id(), itemId);
             response = Response.ok().build(); //TODO send back data with results
-        } catch (PlayerNotFoundException | BadItemOwnershipException | CannotSellInactiveItemException | MarketPriceNotFoundException e) {
+        } catch (UndefinedMarketPriceException | PlayerNotFoundException | BadItemOwnershipException | CannotSellInactiveItemException | MarketPriceNotFoundException e) {
             response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), BadResponseUtils.CannotSellItem).build();
             log.warn(e.getMessage(), e);
         }
@@ -70,7 +71,7 @@ public class InventoryResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/items")
     @Operation(summary = "Get inventory items", description = "Fetch all item data available in a player's inventory")
-    public Response allItems(){
+    public Response getItems(){
         Response response;
         PlayerSession playerSession = (PlayerSession) securityContext.getUserPrincipal();
         try {
