@@ -1,6 +1,5 @@
 package be.nicolasdelbaer.forsakenmarket.entities;
 
-import be.nicolasdelbaer.forsakenmarket.enums.MarketTrend;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,11 +30,6 @@ public class MarketPriceEvolution {
 
     @Getter @Setter
     private Integer low;
-
-
-    @Getter @Setter
-    @Enumerated(EnumType.STRING)
-    private MarketTrend marketTrend;
 
 
     @Getter @Setter

@@ -2,7 +2,7 @@ package be.nicolasdelbaer.forsakenmarket.repositories;
 
 import be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint;
 import be.nicolasdelbaer.forsakenmarket.entities.MarketPrice;
-import be.nicolasdelbaer.forsakenmarket.models.market.MarketOHCL;
+import be.nicolasdelbaer.forsakenmarket.models.market.MarketOHLC;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 
@@ -38,9 +38,9 @@ public class MarketPriceRepository extends CrudRepository<MarketPrice, Long> {
 
     }
 
-    public List<MarketOHCL> getEvolutionData(EntityManager entityManager, long startRoundId, long duration) {
+    public List<MarketOHLC> getEvolutionData(EntityManager entityManager, long startRoundId, long duration) {
         return entityManager
-                .createNamedQuery("MarketPrice.ohlc", MarketOHCL.class)
+                .createNamedQuery("MarketPrice.ohcl", MarketOHLC.class)
                 .setParameter("startId", startRoundId)
                 .setParameter("endId", startRoundId+duration)
                 .getResultList();

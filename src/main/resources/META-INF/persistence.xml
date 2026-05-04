@@ -6,6 +6,7 @@
 
     <persistence-unit name="forsakenPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <mapping-file>META-INF/orm.xml</mapping-file>
 
         <class>be.nicolasdelbaer.forsakenmarket.entities.InventoryItem</class>
         <class>be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint</class>

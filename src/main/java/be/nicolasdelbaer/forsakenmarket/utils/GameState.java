@@ -1,6 +1,7 @@
 package be.nicolasdelbaer.forsakenmarket.utils;
 
 import be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint;
+import be.nicolasdelbaer.forsakenmarket.exceptions.market.UndefinedBlueprintException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.UndefinedMarketPriceException;
 import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -15,7 +16,7 @@ public class GameState {
     @Setter
     private Map<Long, PriceMovementByRound> marketPriceList = new HashMap<>();
     @Setter
-    private List<ItemBlueprint> itemBlueprintList = new ArrayList<>();
+    private Map<Long, ItemBlueprint> itemBlueprintList = new HashMap<>();
 
     @Getter
     private Long currentRound = 0L;
@@ -25,13 +26,19 @@ public class GameState {
         currentRound++;
     }
 
-    public PriceMovementByRound getPriceHistory(Long blueprintId) throws UndefinedMarketPriceException {
-        if(!marketPriceList.containsKey(blueprintId))
+    public PriceMovementByRound getPriceHistory(Long itemBlueprintId) throws UndefinedMarketPriceException {
+        if(!marketPriceList.containsKey(itemBlueprintId))
             throw new UndefinedMarketPriceException("Market Price not found, missing init?");
-        return marketPriceList.get(blueprintId);
+        return marketPriceList.get(itemBlueprintId);
     }
 
     public List<ItemBlueprint> getItemBlueprintList() {
-        return Collections.unmodifiableList(itemBlueprintList);
+        return itemBlueprintList.values().stream().toList();
+    }
+
+    public ItemBlueprint getItemBlueprint(Long itemBlueprintId) throws UndefinedBlueprintException {
+        if(!marketPriceList.containsKey(itemBlueprintId))
+            throw new UndefinedBlueprintException("Blueprint not found, missing init?");
+        return itemBlueprintList.get(itemBlueprintId);
     }
 }

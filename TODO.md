@@ -10,19 +10,19 @@
 - [x] player won reput when selling
 - [x] player can buy item to their inventory
 - [x] player can sell item from their inventory
-- [ ] player can reroll an item from the market for a price
+- [x] player can reroll an item from the market for a price
 
 ### Cycle & game state related
 - [x] populate items to market
 - [x] handle schedule ticks on server
-- [ ] items will decay
+- [x] items will decay
 - [x] items will get out of market
-- [ ] market cycle ends after 20 rounds
+- [x] update market OCHL after a cycle of rounds
 
 ### Track items price movement
 - [x] update prices for the current round
-- [ ] store movements (player buy & sell actions)
-- [ ] retrieve movements (player buy & sell actions)
+- [ ] store movements (player buy, sell, ... actions)
+- [ ] retrieve movements (player buy, sell, ... actions)
 
 
 
@@ -30,19 +30,15 @@
 ## TO DO NEXT
 
 ### Market
-- Market price have to progress and update trends
-- Market price as single value
-- Keep prices in server cache and persist cycles prices info (20 rounds)
 - Clean old MarketPrice references & change name for OCHL
-- Fetch range of price evolution for display
-- Reroll items (crash)
 
 ### Meta
 - Sync server & client (send date for auto refresh + data)
 - Send data for player exp/reput & display
+- Rework responses content (if cost, send back wallet data and so on)
 
 ### Project
-- Update & Clean auth filter flow
+- Update & Clean auth filter flow (access roles annotation rather than public)
 
 ### Game Rules
 - Decay must be very high & based on rarity (utils)
@@ -54,7 +50,7 @@
 ## TO KEEP IN MIND
 ### Refacto
 - Code & project review
-- Clean BoughtItem responsibility cf player movements?
+- Clean InventoryItem responsibility cf player movements?
 
 ### DTO
 - Check if needs of DTO for requests & queries

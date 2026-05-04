@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://www.hibernate.org/xsd/orm/mapping"
+                 version="3.1">
+
+    <named-native-query name="MarketPrice.ohcl" result-set-mapping="OhlcMapping">
+        <query>
+            SELECT
+                item_blueprint_id,
+                (array_agg(currentPrice order by roundid ASC))[1] as open,
+                max(currentprice) as high,
+                min(currentprice) as low,
+                (array_agg(currentprice order by roundid DESC))[1] as close
+            FROM marketprice
+            WHERE roundid BETWEEN :startId AND :endId
+            GROUP BY item_blueprint_id
+        </query>
+    </named-native-query>
+
+    <sql-result-set-mapping name="OhlcMapping">
+        <constructor-result target-class="be.nicolasdelbaer.forsakenmarket.models.market.MarketOHLC">
+            <column name="item_blueprint_id" class="java.lang.Long"/>
+            <column name="open"  class="java.lang.Integer"/>
+            <column name="close" class="java.lang.Integer"/>
+            <column name="low"   class="java.lang.Integer"/>
+            <column name="high"  class="java.lang.Integer"/>
+        </constructor-result>
+    </sql-result-set-mapping>
+</entity-mappings>

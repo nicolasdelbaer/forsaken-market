@@ -19,10 +19,10 @@ import jakarta.servlet.ServletContextListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class MarketTickerScheduler implements ServletContextListener {
@@ -37,8 +37,13 @@ public class MarketTickerScheduler implements ServletContextListener {
 
     public void onStart(@Observes @Priority(GameConfiguration.SchedulerPriority) @Initialized(ApplicationScoped.class) Object obj) {
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
-            List<ItemBlueprint> test = itemBlueprintRepository.findAll(entityManager);
-            gameState.setItemBlueprintList(test);
+            gameState.setItemBlueprintList(itemBlueprintRepository
+                    .findAll(entityManager).stream()
+                    .collect(Collectors.toMap(
+                            ItemBlueprint::getId,
+                            itemBlueprint -> itemBlueprint
+                    )));
+
             startScheduler();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
