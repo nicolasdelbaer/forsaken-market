@@ -1,6 +1,6 @@
 package be.nicolasdelbaer.forsakenmarket.utils;
 
-import be.nicolasdelbaer.forsakenmarket.entities.BoughtItem;
+import be.nicolasdelbaer.forsakenmarket.entities.InventoryItem;
 import be.nicolasdelbaer.forsakenmarket.models.market.MarketPriceHistory;
 import be.nicolasdelbaer.forsakenmarket.models.player.ReputationScoreData;
 import org.junit.jupiter.api.Test;
@@ -15,12 +15,12 @@ class ReputationCalculatorTest {
     @Test
     void shouldReturnPositiveReputation_whenProfitable() {
         // Arrange
-        BoughtItem boughtItem = new BoughtItem();
-        boughtItem.setBoughtPrice(50);
+        InventoryItem inventoryItem = new InventoryItem();
+        inventoryItem.setBoughtPrice(50);
 
         MarketPriceHistory marketPrice = new MarketPriceHistory(100,100);
 
-        ReputationScoreData data = new ReputationScoreData(boughtItem, marketPrice);
+        ReputationScoreData data = new ReputationScoreData(inventoryItem, marketPrice);
 
         // Act
         Integer result = ReputationCalculator.calculate(data);
@@ -32,12 +32,12 @@ class ReputationCalculatorTest {
 
     @Test
     void shouldReturnZero_whenNoProfit() {
-        BoughtItem boughtItem = new BoughtItem();
-        boughtItem.setBoughtPrice(100);
+        InventoryItem inventoryItem = new InventoryItem();
+        inventoryItem.setBoughtPrice(100);
 
         MarketPriceHistory marketPrice = new MarketPriceHistory(100,100);
 
-        ReputationScoreData data = new ReputationScoreData(boughtItem, marketPrice);
+        ReputationScoreData data = new ReputationScoreData(inventoryItem, marketPrice);
 
         Integer result = ReputationCalculator.calculate(data);
         log.debug("Result: {}",result);
@@ -47,12 +47,12 @@ class ReputationCalculatorTest {
 
     @Test
     void shouldReturnZero_whenLoss() {
-        BoughtItem boughtItem = new BoughtItem();
-        boughtItem.setBoughtPrice(100);
+        InventoryItem inventoryItem = new InventoryItem();
+        inventoryItem.setBoughtPrice(100);
 
         MarketPriceHistory marketPrice = new MarketPriceHistory(50,50);
 
-        ReputationScoreData data = new ReputationScoreData(boughtItem, marketPrice);
+        ReputationScoreData data = new ReputationScoreData(inventoryItem, marketPrice);
 
         Integer result = ReputationCalculator.calculate(data);
         log.debug("Result: {}",result);
@@ -62,12 +62,25 @@ class ReputationCalculatorTest {
 
     @Test
     void shouldNotThrow_whenBoughtPriceIsZero() {
-        BoughtItem boughtItem = new BoughtItem();
-        boughtItem.setBoughtPrice(0);
+        InventoryItem inventoryItem = new InventoryItem();
+        inventoryItem.setBoughtPrice(0);
 
         MarketPriceHistory marketPrice = new MarketPriceHistory(50,50);
-        ReputationScoreData data = new ReputationScoreData(boughtItem, marketPrice);
+        ReputationScoreData data = new ReputationScoreData(inventoryItem, marketPrice);
 
         assertDoesNotThrow(() -> ReputationCalculator.calculate(data));
+    }
+
+    @Test
+    void shouldNotReturnZero_intDivision() {
+        InventoryItem inventoryItem = new InventoryItem();
+        inventoryItem.setBoughtPrice(100);
+
+        MarketPriceHistory marketPrice = new MarketPriceHistory(110,110);
+        ReputationScoreData data = new ReputationScoreData(inventoryItem, marketPrice);
+
+        Integer result = ReputationCalculator.calculate(data);
+
+        assertNotEquals(0, result);
     }
 }

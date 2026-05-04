@@ -42,7 +42,8 @@ public class MarketService {
     private PlayerService playerService;
 
     @Transactional
-    public void rerollItem(Integer playerId, Long itemId) throws PlayerInsufficientFundsException, MaxRerollReachedException, MarketItemDoesNotExistException, PlayerNotFoundException {
+    public void rerollItem(Integer playerId, Long itemId)
+            throws PlayerInsufficientFundsException, MaxRerollReachedException, MarketItemDoesNotExistException, PlayerNotFoundException {
         //Note, the current round id is resolved here for keeping coherence
         Long currentRound = gameState.getCurrentRound();
         MarketItem itemInstance = marketItemRepository.
@@ -70,7 +71,8 @@ public class MarketService {
     }
 
     @Transactional
-    public void buyItem(Integer playerId, Long itemId) throws PlayerInsufficientFundsException, MarketItemDoesNotExistException, PlayerNotFoundException, MarketPriceNotFoundException, UndefinedMarketPriceException {
+    public void buyItem(Integer playerId, Long itemId)
+            throws PlayerInsufficientFundsException, MarketItemDoesNotExistException, PlayerNotFoundException, MarketPriceNotFoundException, UndefinedMarketPriceException {
         //Note, the current round id is resolved here for keeping coherence
         Long currentRound = gameState.getCurrentRound();
 
@@ -92,11 +94,12 @@ public class MarketService {
     }
 
     @Transactional
-    public void sellItem(Integer playerId, Long itemId) throws BadItemOwnershipException, CannotSellInactiveItemException, MarketPriceNotFoundException, PlayerNotFoundException, UndefinedMarketPriceException {
+    public void sellItem(Integer playerId, Long itemId)
+            throws BadItemOwnershipException, CannotSellInactiveItemException, MarketPriceNotFoundException, PlayerNotFoundException, UndefinedMarketPriceException {
         //Note, the current round id is resolved here for keeping coherence
         Long currentRound = gameState.getCurrentRound();
 
-        BoughtItem itemInstance = boughtItemRepository
+        InventoryItem itemInstance = boughtItemRepository
                 .getItemFromPlayer(entityManager, itemId, playerId, MarketItemStatus.BOUGHT)
                 .orElseThrow(() -> new BadItemOwnershipException(BadResponseUtils.InvalidItemOrUnauthorized));
 
@@ -117,6 +120,9 @@ public class MarketService {
     }
 
 
+    /*
+     * Based on a player id, returns their available items excluding already rerolled or bought items from the available market list.
+     */
     public List<MarketItemResponse> fetchAvailableItems(Integer playerId){
         return marketItemRepository
                 .findAllValidItemsForPlayer(entityManager, gameState.getCurrentRound(), playerId)

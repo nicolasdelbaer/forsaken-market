@@ -7,7 +7,7 @@
     <persistence-unit name="forsakenPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
-        <class>be.nicolasdelbaer.forsakenmarket.entities.BoughtItem</class>
+        <class>be.nicolasdelbaer.forsakenmarket.entities.InventoryItem</class>
         <class>be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint</class>
         <class>be.nicolasdelbaer.forsakenmarket.entities.ItemCategory</class>
         <class>be.nicolasdelbaer.forsakenmarket.entities.MarketItem</class>

@@ -1,7 +1,7 @@
 package be.nicolasdelbaer.forsakenmarket.services;
 
 import be.nicolasdelbaer.forsakenmarket.annotations.Transactional;
-import be.nicolasdelbaer.forsakenmarket.entities.BoughtItem;
+import be.nicolasdelbaer.forsakenmarket.entities.InventoryItem;
 import be.nicolasdelbaer.forsakenmarket.enums.MarketItemStatus;
 import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.CannotDiscardItemException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.CannotSellInactiveItemException;
@@ -40,19 +40,19 @@ public class InventoryService {
     public void acquireItem(BuyItemDto buyItemDto){
 
 
-        BoughtItem boughtItem = new BoughtItem();
-        boughtItem.setItemBlueprint(buyItemDto.marketItem().getItemBlueprint());
-        boughtItem.setMarketItemId(buyItemDto.marketItem().getId());
-        boughtItem.setPlayer(buyItemDto.player());
+        InventoryItem inventoryItem = new InventoryItem();
+        inventoryItem.setItemBlueprint(buyItemDto.marketItem().getItemBlueprint());
+        inventoryItem.setMarketItemId(buyItemDto.marketItem().getId());
+        inventoryItem.setPlayer(buyItemDto.player());
 
-        boughtItem.setBoughtPrice(buyItemDto.marketPrice().currentPrice());
-        boughtItem.setBoughtAt(LocalDateTime.now());
-        boughtItem.setStatus(MarketItemStatus.BOUGHT);
+        inventoryItem.setBoughtPrice(buyItemDto.marketPrice().currentPrice());
+        inventoryItem.setBoughtAt(LocalDateTime.now());
+        inventoryItem.setStatus(MarketItemStatus.BOUGHT);
 
-        boughtItem.setDecayNbRounds(getDecayTime());
-        boughtItem.setBoughtRoundId(buyItemDto.roundId());
+        inventoryItem.setDecayNbRounds(getDecayTime());
+        inventoryItem.setBoughtRoundId(buyItemDto.roundId());
 
-        boughtItemRepository.save(entityManager, boughtItem);
+        boughtItemRepository.save(entityManager, inventoryItem);
     }
 
     //TODO calculte right round nb time
@@ -64,13 +64,13 @@ public class InventoryService {
      * Active bought items must be sold to get added value before they get decayed
      */
     @Transactional
-    public void sellItem(BoughtItem boughtItem, Long currentRound) throws CannotSellInactiveItemException {
-        if(boughtItem.getStatus() != MarketItemStatus.BOUGHT)
+    public void sellItem(InventoryItem inventoryItem, Long currentRound) throws CannotSellInactiveItemException {
+        if(inventoryItem.getStatus() != MarketItemStatus.BOUGHT)
             throw new CannotSellInactiveItemException("The item is already decayed, sold or thrown away");
-        boughtItem.setSoldAt(LocalDateTime.now());
-        boughtItem.setStatus(MarketItemStatus.SOLD);
-        boughtItem.setSoldRoundId(currentRound);
-        boughtItemRepository.update(entityManager, boughtItem);
+        inventoryItem.setSoldAt(LocalDateTime.now());
+        inventoryItem.setStatus(MarketItemStatus.SOLD);
+        inventoryItem.setSoldRoundId(currentRound);
+        boughtItemRepository.update(entityManager, inventoryItem);
     }
 
     /*
@@ -82,14 +82,14 @@ public class InventoryService {
         // Idea -> could use a window of tolerance in the future allowing players to get the item even with lags
         Long currentRound = gameState.getCurrentRound();
 
-        BoughtItem boughtItem = boughtItemRepository
+        InventoryItem inventoryItem = boughtItemRepository
                 .getItemFromPlayer(entityManager, itemId, playerId, MarketItemStatus.DECAYED)
                 .orElseThrow(() -> new CannotDiscardItemException("Invalid item or unauthorized access"));
 
-        boughtItem.setDiscardedAt(LocalDateTime.now());
-        boughtItem.setStatus(MarketItemStatus.DISCARDED);
-        boughtItem.setDiscardedRoundId(currentRound);
-        boughtItemRepository.update(entityManager, boughtItem);
+        inventoryItem.setDiscardedAt(LocalDateTime.now());
+        inventoryItem.setStatus(MarketItemStatus.DISCARDED);
+        inventoryItem.setDiscardedRoundId(currentRound);
+        boughtItemRepository.update(entityManager, inventoryItem);
     }
 
     /*

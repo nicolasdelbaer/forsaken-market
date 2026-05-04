@@ -1,6 +1,6 @@
 package be.nicolasdelbaer.forsakenmarket.services.scheduled;
 
-import be.nicolasdelbaer.forsakenmarket.entities.BoughtItem;
+import be.nicolasdelbaer.forsakenmarket.entities.InventoryItem;
 import be.nicolasdelbaer.forsakenmarket.repositories.BoughtItemRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.GameState;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -20,9 +20,9 @@ public class ScheduledInventoryService {
      * Decayed items cannot be sold anymore, updates will occur each round
      */
     public void updateDecay(EntityManager entityManager) {
-        List<BoughtItem> ownedItems = boughtItemRepository.fetchBoughtItems(entityManager);
+        List<InventoryItem> ownedItems = boughtItemRepository.fetchBoughtItems(entityManager);
         Long currentRound = gameState.getCurrentRound();
-        for (BoughtItem ownedItem : ownedItems)
+        for (InventoryItem ownedItem : ownedItems)
             ownedItem.updateExpiration(currentRound);
         boughtItemRepository.updateAll(entityManager, ownedItems);
 

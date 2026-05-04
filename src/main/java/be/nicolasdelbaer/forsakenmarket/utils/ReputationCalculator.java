@@ -4,7 +4,7 @@ import be.nicolasdelbaer.forsakenmarket.models.player.ReputationScoreData;
 
 public class ReputationCalculator {
     public static Integer calculate(ReputationScoreData data) {
-        int boughtPrice = data.boughtItem().getBoughtPrice();
+        int boughtPrice = data.inventoryItem().getBoughtPrice();
         int profit = data.marketPrice().currentPrice() - boughtPrice;
         int result = 0;
         if(boughtPrice != 0)

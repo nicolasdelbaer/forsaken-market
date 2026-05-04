@@ -41,7 +41,7 @@ public class MarketItemRepository extends CrudRepository<MarketItem, Long> {
                       select t from MarketItem t
                       where t.expired = false
                       and not exists (
-                          select bi from BoughtItem bi
+                          select bi from InventoryItem bi
                           where bi.marketItemId = t.id
                           and bi.player.id = :playerId
                       )
