@@ -82,7 +82,10 @@ public class MarketTickerScheduler implements ServletContextListener {
                 System.out.printf("Current round: %s%n", gameState.getCurrentRound());
 
                 if(gameState.getCurrentRound() % GameConfiguration.roundsByCycle == 0) {
-                    scheduledMarketService.recordMarketPriceMovements(entityManager);
+                    scheduledMarketService.recordMarketPriceMovements(entityManager,
+                            (gameState.getCurrentRound()- GameConfiguration.roundsByCycle),
+                            GameConfiguration.roundsByCycle
+                    );
                 }
                 if(gameState.getCurrentRound() % GameConfiguration.roundsBeforeClean == 0) {
                     cleanupData();

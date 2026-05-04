@@ -13,7 +13,7 @@ import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerInsufficientFund
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerNotFoundException;
 import be.nicolasdelbaer.forsakenmarket.models.market.MarketItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItemDto;
-import be.nicolasdelbaer.forsakenmarket.models.market.MarketPriceHistory;
+import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
 import be.nicolasdelbaer.forsakenmarket.models.player.ReputationScoreData;
 import be.nicolasdelbaer.forsakenmarket.repositories.*;
 import be.nicolasdelbaer.forsakenmarket.utils.*;
@@ -80,7 +80,7 @@ public class MarketService {
         MarketItem itemInstance = marketItemRepository
                 .findById(entityManager, itemId)
                 .orElseThrow(() -> new MarketItemDoesNotExistException("Item not found"));
-        MarketPriceHistory marketPrice = gameState.getPriceHistory(itemInstance.getItemBlueprint().getId());
+        PriceMovementByRound marketPrice = gameState.getPriceHistory(itemInstance.getItemBlueprint().getId());
         Player player = playerRepository
                 .findById(entityManager, playerId)
                 .orElseThrow(() -> new PlayerNotFoundException("player not found"));
@@ -103,7 +103,7 @@ public class MarketService {
                 .getItemFromPlayer(entityManager, itemId, playerId, MarketItemStatus.BOUGHT)
                 .orElseThrow(() -> new BadItemOwnershipException(BadResponseUtils.InvalidItemOrUnauthorized));
 
-        MarketPriceHistory marketPrice = gameState.getPriceHistory(itemInstance.getItemBlueprint().getId());
+        PriceMovementByRound marketPrice = gameState.getPriceHistory(itemInstance.getItemBlueprint().getId());
 
         //remove player's money
         Player player = playerRepository
@@ -133,7 +133,7 @@ public class MarketService {
                          marketItem.getItemBlueprint().getDescription(),
                          marketItem.getItemBlueprint().getIcon(),
                          marketItem.getItemBlueprint().getRarity().name(),
-                            MarketPriceUtils.getMarketPriceHistory(gameState, marketItem.getItemBlueprint()).currentPrice()))
+                            MarketPriceUtils.getMarketRoundMovement(gameState, marketItem.getItemBlueprint()).currentPrice()))
                 .toList();
     }
 

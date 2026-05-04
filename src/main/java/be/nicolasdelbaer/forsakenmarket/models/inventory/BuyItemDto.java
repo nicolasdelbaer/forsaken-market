@@ -2,11 +2,11 @@ package be.nicolasdelbaer.forsakenmarket.models.inventory;
 
 import be.nicolasdelbaer.forsakenmarket.entities.MarketItem;
 import be.nicolasdelbaer.forsakenmarket.entities.Player;
-import be.nicolasdelbaer.forsakenmarket.models.market.MarketPriceHistory;
+import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
 
 public record BuyItemDto(
         Player player,
         MarketItem marketItem,
-        MarketPriceHistory marketPrice,
+        PriceMovementByRound marketPrice,
         Long roundId) {
 }

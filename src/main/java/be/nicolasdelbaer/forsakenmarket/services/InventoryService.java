@@ -8,7 +8,7 @@ import be.nicolasdelbaer.forsakenmarket.exceptions.market.CannotSellInactiveItem
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketPriceNotFoundException;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItemDto;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.InventoryItemResponse;
-import be.nicolasdelbaer.forsakenmarket.models.market.MarketPriceHistory;
+import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
 import be.nicolasdelbaer.forsakenmarket.repositories.BoughtItemRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.MarketPriceRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.GameState;
@@ -100,8 +100,8 @@ public class InventoryService {
         return boughtItemRepository.fetchAvailableItemsForPlayer(entityManager, playerId)
                 .stream()
                 .map(boughtItem -> {
-                    MarketPriceHistory marketPriceHistory = Optional
-                            .ofNullable(MarketPriceUtils.getMarketPriceHistory(gameState, boughtItem.getItemBlueprint()))
+                    PriceMovementByRound priceMovementByRound = Optional
+                            .ofNullable(MarketPriceUtils.getMarketRoundMovement(gameState, boughtItem.getItemBlueprint()))
                             .orElseThrow(() -> new MarketPriceNotFoundException("No price found for blueprint"));
 
                     return new InventoryItemResponse(
@@ -111,7 +111,7 @@ public class InventoryService {
                             boughtItem.getItemBlueprint().getIcon(),
                             boughtItem.getItemBlueprint().getRarity().name(),
                             boughtItem.getBoughtPrice(),
-                            marketPriceHistory.currentPrice(),
+                            priceMovementByRound.currentPrice(),
                             boughtItem.isDecayed()
                     );
                 }).toList();

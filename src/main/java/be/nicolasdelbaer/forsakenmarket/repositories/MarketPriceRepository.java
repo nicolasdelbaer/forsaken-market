@@ -2,6 +2,7 @@ package be.nicolasdelbaer.forsakenmarket.repositories;
 
 import be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint;
 import be.nicolasdelbaer.forsakenmarket.entities.MarketPrice;
+import be.nicolasdelbaer.forsakenmarket.models.market.MarketOHCL;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 
@@ -10,17 +11,16 @@ import java.util.Optional;
 
 @ApplicationScoped
 public class MarketPriceRepository extends CrudRepository<MarketPrice, Long> {
+
     public MarketPriceRepository() {
         super(MarketPrice.class);
     }
 
     public Optional<MarketPrice> findByBlueprint(EntityManager entityManager, ItemBlueprint itemBlueprint, Long roundId) {
-        MarketPrice marketPrice = null;
-        marketPrice = entityManager
-                .createQuery("""
-                        select t from MarketPrice t
-                        where t.itemBlueprint.id = :itemBlueprint
-                            and t.roundId = :roundId
+        MarketPrice marketPrice = entityManager.createQuery("""
+                        select mp from MarketPrice mp
+                        where mp.itemBlueprint.id = :itemBlueprint
+                            and mp.roundId = :roundId
                         """, MarketPrice.class)
                 .setParameter("itemBlueprint", itemBlueprint.getId())
                 .setParameter("roundId", roundId)
@@ -30,11 +30,19 @@ public class MarketPriceRepository extends CrudRepository<MarketPrice, Long> {
 
     public List<MarketPrice> findByRoundId(EntityManager entityManager, Long roundId) {
         return entityManager.createQuery("""
-                        select t from MarketPrice t
-                        where t.roundId = :roundId
-                    """, MarketPrice.class)
+                        select mp from MarketPrice mp
+                        where mp.roundId = :roundId
+                        """, MarketPrice.class)
                 .setParameter("roundId", roundId)
                 .getResultList();
 
+    }
+
+    public List<MarketOHCL> getEvolutionData(EntityManager entityManager, long startRoundId, long duration) {
+        return entityManager
+                .createNamedQuery("MarketPrice.ohlc", MarketOHCL.class)
+                .setParameter("startId", startRoundId)
+                .setParameter("endId", startRoundId+duration)
+                .getResultList();
     }
 }

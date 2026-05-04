@@ -3,9 +3,12 @@ package be.nicolasdelbaer.forsakenmarket.services.scheduled;
 import be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint;
 import be.nicolasdelbaer.forsakenmarket.entities.MarketItem;
 import be.nicolasdelbaer.forsakenmarket.entities.MarketPrice;
+import be.nicolasdelbaer.forsakenmarket.entities.MarketPriceEvolution;
 import be.nicolasdelbaer.forsakenmarket.enums.MarketTrend;
+import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
 import be.nicolasdelbaer.forsakenmarket.repositories.ItemBlueprintRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.MarketItemRepository;
+import be.nicolasdelbaer.forsakenmarket.repositories.MarketPriceEvolutionRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.MarketPriceRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
 import be.nicolasdelbaer.forsakenmarket.utils.GameState;
@@ -17,9 +20,10 @@ import jakarta.persistence.EntityManager;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.random.RandomGenerator;
-import java.util.stream.Collectors;
 
 
 /*
@@ -29,9 +33,11 @@ import java.util.stream.Collectors;
 public class ScheduledMarketService {
 
     @Inject private MarketItemRepository marketItemRepository;
-    @Inject private MarketPriceRepository marketPriceRepository;
+    @Inject private MarketPriceEvolutionRepository marketPriceEvolutionRepository;
     @Inject private GameState gameState;
     @Inject private ItemBlueprintRepository itemBlueprintRepository;
+    @Inject
+    private MarketPriceRepository marketPriceRepository;
 
 
     /*
@@ -70,23 +76,27 @@ public class ScheduledMarketService {
     /*
     * TODO market prices will express a full cycle of rounds
     */
-    public void recordMarketPriceMovements(EntityManager entityManager) {
+    public void recordMarketPriceMovements(EntityManager entityManager, long startRoundId, long duration) {
         //TODO query for getting all info to fill market price properly
-        List<MarketPrice> marketPriceList = new ArrayList<>();
+        List<MarketPriceEvolution> marketPriceEvolutionList = new ArrayList<>();
+        marketPriceRepository.getEvolutionData(entityManager, startRoundId, duration);
+
         List<ItemBlueprint> blueprintList = itemBlueprintRepository.findAll(entityManager);
+
         for (ItemBlueprint itemBlueprint : blueprintList) {
-            MarketPrice marketPrice = new MarketPrice();
-            marketPrice.setOpen(0); //get last
-            marketPrice.setClose(itemBlueprint.getPrice());
-            marketPrice.setHigh(itemBlueprint.getPrice()); //fetch max price
-            marketPrice.setLow(0); //fetch min price
-            marketPrice.setMarketTrend(MarketTrend.STABLE);
-            marketPrice.setItemBlueprint(itemBlueprint);
-            marketPrice.setRoundId(gameState.getCurrentRound());
-            marketPrice.setCreatedAt(LocalDateTime.now());
-            marketPriceList.add(marketPrice);
+            MarketPriceEvolution marketPriceEvolution = new MarketPriceEvolution();
+            marketPriceEvolution.setOpen(0); //get last
+            marketPriceEvolution.setClose(itemBlueprint.getPrice());
+            marketPriceEvolution.setHigh(itemBlueprint.getPrice()); //fetch max price
+            marketPriceEvolution.setLow(0); //fetch min price
+            marketPriceEvolution.setMarketTrend(MarketTrend.STABLE);
+            marketPriceEvolution.setItemBlueprint(itemBlueprint);
+            marketPriceEvolution.setStartRoundId(startRoundId);
+            marketPriceEvolution.setEndRoundId(startRoundId+duration);
+            marketPriceEvolution.setCreatedAt(LocalDateTime.now());
+            marketPriceEvolutionList.add(marketPriceEvolution);
         }
-        marketPriceRepository.saveAll(entityManager, marketPriceList);
+        marketPriceEvolutionRepository.saveAll(entityManager, marketPriceEvolutionList);
     }
 
     /*
@@ -113,13 +123,26 @@ public class ScheduledMarketService {
     public void updateMarketPrices(EntityManager entityManager) {
         List<ItemBlueprint> blueprintList = itemBlueprintRepository.findAll(entityManager);
 
-        gameState.setMarketPriceList(blueprintList.stream()
-                .collect(Collectors.toMap(
-                        ItemBlueprint::getId,
-                        blueprint -> PricesCalculator
-                                .getNextPrice(blueprint, MarketPriceUtils
-                                                .getMarketPriceHistory(gameState, blueprint))
-                )));
+        Map<ItemBlueprint, PriceMovementByRound> updatedPrices = new HashMap<>();
+
+        for (ItemBlueprint blueprint : blueprintList) {
+            PriceMovementByRound priceMovementByRound = MarketPriceUtils.getMarketRoundMovement(gameState, blueprint);
+            PriceMovementByRound nextPrice = PricesCalculator.getNextPrice(blueprint, priceMovementByRound);
+            updatedPrices.put(blueprint, nextPrice);
+        }
+
+        List<MarketPrice> prices = updatedPrices.entrySet().stream()
+                .map(entry -> {
+                    MarketPrice marketPrice = new MarketPrice();
+                    marketPrice.setCurrentPrice(entry.getValue().currentPrice());
+                    marketPrice.setItemBlueprint(entry.getKey());
+                    marketPrice.setRoundId(gameState.getCurrentRound());
+                    marketPrice.setCreatedAt(LocalDateTime.now());
+                    return marketPrice;
+                })
+                .toList();
+
+        marketPriceRepository.saveAll(entityManager, prices);
     }
 
 

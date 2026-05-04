@@ -5,7 +5,7 @@ import be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint;
 import be.nicolasdelbaer.forsakenmarket.entities.ItemCategory;
 import be.nicolasdelbaer.forsakenmarket.entities.Player;
 import be.nicolasdelbaer.forsakenmarket.enums.ItemRarity;
-import be.nicolasdelbaer.forsakenmarket.models.market.MarketPriceHistory;
+import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
 import be.nicolasdelbaer.forsakenmarket.repositories.ItemBlueprintRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.ItemCategoryRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRepository;
@@ -61,7 +61,7 @@ public class DataSeeder {
     }
 
     private void fillMarketWithPrices(EntityManager entityManager) {
-        Map<Long, MarketPriceHistory> marketPriceList = new HashMap<>();
+        Map<Long, PriceMovementByRound> marketPriceList = new HashMap<>();
         List<ItemBlueprint> blueprintList = itemBlueprintRepository.findAll(entityManager);
 
         for (ItemBlueprint blueprint : blueprintList) {

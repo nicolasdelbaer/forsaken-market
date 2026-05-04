@@ -2,7 +2,7 @@ package be.nicolasdelbaer.forsakenmarket.utils;
 
 import be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint;
 import be.nicolasdelbaer.forsakenmarket.enums.ItemRarity;
-import be.nicolasdelbaer.forsakenmarket.models.market.MarketPriceHistory;
+import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
 
 import java.util.Map;
 import java.util.random.RandomGenerator;
@@ -26,7 +26,7 @@ public class PricesCalculator {
      * Shock market will add real chaos on a pure random basis
      * TODO: Other events will impact the price in the future
      */
-    public static MarketPriceHistory getNextPrice(ItemBlueprint itemBlueprint, MarketPriceHistory priceHistory){
+    public static PriceMovementByRound getNextPrice(ItemBlueprint itemBlueprint, PriceMovementByRound priceHistory){
         PriceCoefficients priceCoefficients = priceCoefficientsMap.get(itemBlueprint.getRarity());
         float volatility = priceCoefficients.volatility();
         float momentumCoefficient = priceCoefficients.momentum();
@@ -40,16 +40,16 @@ public class PricesCalculator {
         current = priceHistory.currentPrice() + momentum + reversion + noise;
         current += getMarketShockValue(baseSell);
 
-        return new MarketPriceHistory(current, priceHistory.currentPrice());
+        return new PriceMovementByRound(current, priceHistory.currentPrice());
     }
 
     /*
      * Make prices progress and simulate a scattered price start
      */
-    public static MarketPriceHistory warmupPrice(ItemBlueprint itemBlueprint) {
+    public static PriceMovementByRound warmupPrice(ItemBlueprint itemBlueprint) {
         int warmupRounds = RandomGenerator.getDefault().nextInt(MIN_WARMUP, MAX_WARMUP);
         int baseSell = itemBlueprint.getPrice();
-        MarketPriceHistory current = new MarketPriceHistory(baseSell, baseSell);
+        PriceMovementByRound current = new PriceMovementByRound(baseSell, baseSell);
 
         for (int i = 0; i < warmupRounds; i++) {
             current = getNextPrice(itemBlueprint, current);
