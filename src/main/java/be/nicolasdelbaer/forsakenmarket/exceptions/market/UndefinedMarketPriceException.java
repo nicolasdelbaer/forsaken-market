@@ -1,8 +1,8 @@
 package be.nicolasdelbaer.forsakenmarket.exceptions.market;
 
-import be.nicolasdelbaer.forsakenmarket.exceptions.core.ForsakenException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.core.ForsakenRuntimeException;
 
-public class UndefinedMarketPriceException extends ForsakenException {
+public class UndefinedMarketPriceException extends ForsakenRuntimeException {
     public UndefinedMarketPriceException(String msg) {
         super(msg);
     }

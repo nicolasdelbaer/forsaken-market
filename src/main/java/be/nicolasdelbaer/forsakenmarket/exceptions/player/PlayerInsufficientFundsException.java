@@ -1,8 +1,8 @@
 package be.nicolasdelbaer.forsakenmarket.exceptions.player;
 
-import be.nicolasdelbaer.forsakenmarket.exceptions.core.ForsakenException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.core.ForsakenRuntimeException;
 
-public class PlayerInsufficientFundsException extends ForsakenException {
+public class PlayerInsufficientFundsException extends ForsakenRuntimeException {
     public PlayerInsufficientFundsException(String message) {
         super(message);
     }
