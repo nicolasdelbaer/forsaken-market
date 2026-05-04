@@ -1,6 +1,7 @@
 package be.nicolasdelbaer.forsakenmarket.repositories;
 
 import be.nicolasdelbaer.forsakenmarket.entities.MarketItem;
+import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 
@@ -49,9 +50,11 @@ public class MarketItemRepository extends CrudRepository<MarketItem, Long> {
                           where ri.marketItem.id = t.id
                           and ri.player.id = :playerId
                       )
+                      order by createdAt limit :itemLimit
                       """,
                         MarketItem.class)
                 .setParameter("playerId", playerId)
+                .setParameter("itemLimit", GameConfiguration.marketVisibleLimit)
                 .getResultList();
     }
 }
