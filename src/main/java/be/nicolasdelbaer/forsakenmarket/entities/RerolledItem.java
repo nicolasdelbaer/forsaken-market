@@ -3,6 +3,7 @@ package be.nicolasdelbaer.forsakenmarket.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -12,7 +13,8 @@ public class RerolledItem {
     @Setter @Id @GeneratedValue Long id;
     @Getter @Setter @ManyToOne Player player;
     @Getter @Setter @ManyToOne MarketItem marketItem;
-    @Getter @Setter LocalDateTime rerolledAt;
+
+    @Getter @CreationTimestamp LocalDateTime rerolledAt;
 
     //Used for limiting the amount or reroll per round
     @Getter @Setter Long roundId;

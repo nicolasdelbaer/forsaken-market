@@ -1,27 +1,28 @@
 package be.nicolasdelbaer.forsakenmarket.services;
 
 import be.nicolasdelbaer.forsakenmarket.annotations.Transactional;
-import be.nicolasdelbaer.forsakenmarket.entities.*;
+import be.nicolasdelbaer.forsakenmarket.entities.InventoryItem;
+import be.nicolasdelbaer.forsakenmarket.entities.MarketItem;
+import be.nicolasdelbaer.forsakenmarket.entities.Player;
+import be.nicolasdelbaer.forsakenmarket.entities.RerolledItem;
 import be.nicolasdelbaer.forsakenmarket.enums.MarketItemStatus;
-import be.nicolasdelbaer.forsakenmarket.exceptions.market.UndefinedMarketPriceException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.BadItemOwnershipException;
-import be.nicolasdelbaer.forsakenmarket.exceptions.market.CannotSellInactiveItemException;
-import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketItemDoesNotExistException;
-import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketPriceNotFoundException;
-import be.nicolasdelbaer.forsakenmarket.exceptions.market.MaxRerollReachedException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.market.*;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerInsufficientFundsException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerNotFoundException;
-import be.nicolasdelbaer.forsakenmarket.models.market.MarketItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItemDto;
+import be.nicolasdelbaer.forsakenmarket.models.market.MarketItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
 import be.nicolasdelbaer.forsakenmarket.models.player.ReputationScoreData;
-import be.nicolasdelbaer.forsakenmarket.repositories.*;
+import be.nicolasdelbaer.forsakenmarket.repositories.BoughtItemRepository;
+import be.nicolasdelbaer.forsakenmarket.repositories.MarketItemRepository;
+import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRepository;
+import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRerollRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @ApplicationScoped
@@ -29,7 +30,6 @@ public class MarketService {
 
     @Inject private BoughtItemRepository boughtItemRepository;
     @Inject private MarketItemRepository marketItemRepository;
-    @Inject private MarketPriceRepository marketPriceRepository;
     @Inject private PlayerRerollRepository playerRerollRepository;
 
     @Inject private InventoryService inventoryService;
@@ -37,9 +37,6 @@ public class MarketService {
     @Inject private PlayerRepository playerRepository;
 
     @Inject private EntityManager entityManager;
-    @Inject private ItemBlueprintRepository itemBlueprintRepository;
-    @Inject
-    private PlayerService playerService;
 
     @Transactional
     public void rerollItem(Integer playerId, Long itemId)
@@ -65,7 +62,6 @@ public class MarketService {
         RerolledItem rerolledItem = new RerolledItem();
         rerolledItem.setMarketItem(itemInstance);
         rerolledItem.setPlayer(player);
-        rerolledItem.setRerolledAt(LocalDateTime.now());
         rerolledItem.setRoundId(currentRound);
         playerRerollRepository.save(entityManager, rerolledItem);
     }

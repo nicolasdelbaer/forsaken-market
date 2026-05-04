@@ -37,8 +37,6 @@ public class InventoryService {
      */
     @Transactional
     public void acquireItem(BuyItemDto buyItemDto){
-
-
         InventoryItem inventoryItem = new InventoryItem();
         inventoryItem.setItemBlueprint(buyItemDto.marketItem().getItemBlueprint());
         inventoryItem.setMarketItemId(buyItemDto.marketItem().getId());
@@ -103,10 +101,6 @@ public class InventoryService {
                             .ofNullable(gameState.getPriceHistory(inventoryItem.getItemBlueprint().getId()))
                             .orElseThrow(() -> new MarketPriceNotFoundException("No price found for blueprint"));
 
-                    System.out.printf("price on bought %s/%s%n",
-                            inventoryItem.getBoughtPrice(),
-                            priceMovementByRound.currentPrice()
-                    );
                     return new InventoryItemResponse(
                             inventoryItem.getId(),
                             inventoryItem.getItemBlueprint().getTitle(),

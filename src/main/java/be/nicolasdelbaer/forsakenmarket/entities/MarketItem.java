@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -33,7 +34,8 @@ public class MarketItem {
     @Getter @Setter private Long createdRoundId;
 
 
-    @Getter @Setter private LocalDateTime createdAt;
+
+    @Getter @CreationTimestamp private LocalDateTime createdAt;
     @Getter @Setter private LocalDateTime expiredAt;
 
     @Getter @Setter private boolean expired;

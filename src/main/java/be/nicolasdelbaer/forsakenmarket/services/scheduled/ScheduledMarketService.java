@@ -20,7 +20,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -63,7 +62,6 @@ public class ScheduledMarketService {
      */
     private void createNewItem(EntityManager entityManager, ItemBlueprint itemBlueprint) {
         MarketItem marketItem = new MarketItem();
-        marketItem.setCreatedAt(LocalDateTime.now());
         marketItem.setItemBlueprint(itemBlueprint);
         marketItem.setCreatedRoundId(gameState.getCurrentRound());
         marketItem.setTimeToLive(getTimeToLive());
@@ -94,7 +92,6 @@ public class ScheduledMarketService {
             marketPriceEvolution.setItemBlueprint(bp);
             marketPriceEvolution.setStartRoundId(startRoundId);
             marketPriceEvolution.setEndRoundId(startRoundId+duration);
-            marketPriceEvolution.setCreatedAt(LocalDateTime.now());
             marketPriceEvolutionList.add(marketPriceEvolution);
         }
         marketPriceEvolutionRepository.saveAll(entityManager, marketPriceEvolutionList);
@@ -148,7 +145,6 @@ public class ScheduledMarketService {
                     marketPrice.setCurrentPrice(newPrice);
                     marketPrice.setItemBlueprint(entry.getKey());
                     marketPrice.setRoundId(gameState.getCurrentRound());
-                    marketPrice.setCreatedAt(LocalDateTime.now());
                     return marketPrice;
                 })
                 .toList();

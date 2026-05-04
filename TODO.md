@@ -19,18 +19,11 @@
 - [x] items will get out of market
 - [x] update market OCHL after a cycle of rounds
 
-### Track items price movement
-- [x] update prices for the current round
-- [ ] store movements (player buy, sell, ... actions)
-- [ ] retrieve movements (player buy, sell, ... actions)
-
-
 
 
 ## TO DO NEXT
 
 ### Market
-- Clean old MarketPrice references & change name for OCHL
 
 ### Meta
 - Sync server & client (send date for auto refresh + data)
@@ -56,7 +49,6 @@ Pk sur marketPrice: bp_id + round_id (no need for generatedId ?)
 - Clean InventoryItem responsibility cf player movements?
 
 ### DTO
-- Check if needs of DTO for requests & queries
 - Add validations via annotations @NotBlank, length etc. from incoming data
 
 ### Game State
@@ -68,4 +60,5 @@ Pk sur marketPrice: bp_id + round_id (no need for generatedId ?)
 ### Update theory & must known
 
 ### Optimisation
+- Clean data based on round id (market evolution, market price)
 - Review db accesses & server cached data ()
