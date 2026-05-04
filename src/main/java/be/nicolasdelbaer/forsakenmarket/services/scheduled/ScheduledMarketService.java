@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.random.RandomGenerator;
+import java.util.stream.Collectors;
 
 
 /*
@@ -123,7 +124,8 @@ public class ScheduledMarketService {
     }
 
     /*
-     * Update prices in server cache based on previous price
+     * Populate prices movement into db
+     * Update prices in server cache for getting current prices
      */
     public void updateMarketPrices(EntityManager entityManager) {
         List<ItemBlueprint> blueprintList = itemBlueprintRepository.findAll(entityManager);
@@ -138,8 +140,12 @@ public class ScheduledMarketService {
 
         List<MarketPrice> prices = updatedPrices.entrySet().stream()
                 .map(entry -> {
+                    Integer newPrice = PricesCalculator.getNextPrice(
+                            entry.getKey(),
+                            entry.getValue()).currentPrice();
+
                     MarketPrice marketPrice = new MarketPrice();
-                    marketPrice.setCurrentPrice(entry.getValue().currentPrice());
+                    marketPrice.setCurrentPrice(newPrice);
                     marketPrice.setItemBlueprint(entry.getKey());
                     marketPrice.setRoundId(gameState.getCurrentRound());
                     marketPrice.setCreatedAt(LocalDateTime.now());
@@ -148,6 +154,12 @@ public class ScheduledMarketService {
                 .toList();
 
         marketPriceRepository.saveAll(entityManager, prices);
+
+        //Refresh cached server data
+        gameState.setMarketPriceList(updatedPrices.entrySet().stream().collect(Collectors.toMap(
+        entry -> entry.getKey().getId(),
+        Map.Entry::getValue
+        )));
     }
 
 

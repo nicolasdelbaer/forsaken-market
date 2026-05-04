@@ -12,7 +12,6 @@ import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
 import be.nicolasdelbaer.forsakenmarket.repositories.BoughtItemRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.MarketPriceRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.GameState;
-import be.nicolasdelbaer.forsakenmarket.utils.MarketPriceUtils;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -99,20 +98,24 @@ public class InventoryService {
     public List<InventoryItemResponse> fetchItems(Integer playerId) throws MarketPriceNotFoundException {
         return boughtItemRepository.fetchAvailableItemsForPlayer(entityManager, playerId)
                 .stream()
-                .map(boughtItem -> {
+                .map(inventoryItem -> {
                     PriceMovementByRound priceMovementByRound = Optional
-                            .ofNullable(MarketPriceUtils.getMarketRoundMovement(gameState, boughtItem.getItemBlueprint()))
+                            .ofNullable(gameState.getPriceHistory(inventoryItem.getItemBlueprint().getId()))
                             .orElseThrow(() -> new MarketPriceNotFoundException("No price found for blueprint"));
 
+                    System.out.printf("price on bought %s/%s%n",
+                            inventoryItem.getBoughtPrice(),
+                            priceMovementByRound.currentPrice()
+                    );
                     return new InventoryItemResponse(
-                            boughtItem.getId(),
-                            boughtItem.getItemBlueprint().getTitle(),
-                            boughtItem.getItemBlueprint().getDescription(),
-                            boughtItem.getItemBlueprint().getIcon(),
-                            boughtItem.getItemBlueprint().getRarity().name(),
-                            boughtItem.getBoughtPrice(),
+                            inventoryItem.getId(),
+                            inventoryItem.getItemBlueprint().getTitle(),
+                            inventoryItem.getItemBlueprint().getDescription(),
+                            inventoryItem.getItemBlueprint().getIcon(),
+                            inventoryItem.getItemBlueprint().getRarity().name(),
+                            inventoryItem.getBoughtPrice(),
                             priceMovementByRound.currentPrice(),
-                            boughtItem.isDecayed()
+                            inventoryItem.isDecayed()
                     );
                 }).toList();
     }

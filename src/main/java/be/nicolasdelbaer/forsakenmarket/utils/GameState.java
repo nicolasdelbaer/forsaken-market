@@ -13,8 +13,14 @@ import java.util.*;
 @ApplicationScoped
 public class GameState {
 
+    /*
+     * Long param: Blueprint id
+     */
     @Setter
     private Map<Long, PriceMovementByRound> marketPriceList = new HashMap<>();
+    /*
+     * Long param: Blueprint id
+     */
     @Setter
     private Map<Long, ItemBlueprint> itemBlueprintList = new HashMap<>();
 

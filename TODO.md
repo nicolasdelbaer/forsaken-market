@@ -46,6 +46,9 @@
 
 
 
+## ideas
+Pk sur marketPrice: bp_id + round_id (no need for generatedId ?)
+
 
 ## TO KEEP IN MIND
 ### Refacto
