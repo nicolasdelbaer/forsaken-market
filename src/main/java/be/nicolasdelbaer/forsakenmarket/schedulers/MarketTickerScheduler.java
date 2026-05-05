@@ -19,7 +19,6 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
-import jakarta.servlet.ServletContextListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
-public class MarketTickerScheduler implements ServletContextListener {
+public class MarketTickerScheduler{
 
     private static final Logger log = LoggerFactory.getLogger(MarketTickerScheduler.class);
     private ScheduledExecutorService scheduler;
