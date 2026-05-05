@@ -25,7 +25,7 @@ public class CollectionItemRepository extends CrudRepository<CollectionItem, Lon
                             ELSE TRUE END as isCollected
                          from ItemBlueprint ib
                          left join fetch CollectionItem ci on ci.itemBlueprint = ib
-                        where ci.player.id = :playerId or ci.player IS null
+                         and ci.player.id = :playerId
                         """, CollectionItemResponse.class)
                 .setParameter("playerId", playerId)
                 .getResultList();
