@@ -15,4 +15,5 @@ public class BadResponseUtils {
     public static String InvalidItemOrUnauthorized = "Invalid item or unauthorized access";
     public static String PlayerNotFound = "Player not found";
     public static String MissingEnvConfiguration = "Configuration is missing";
+    public static String CannotFindGameState = "Cannot find game state";
 }

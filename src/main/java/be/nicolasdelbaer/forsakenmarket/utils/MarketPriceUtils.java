@@ -11,9 +11,9 @@ public class MarketPriceUtils {
 
     private static final Logger log = LoggerFactory.getLogger(MarketPriceUtils.class);
 
-    public static PriceMovementByRound getMarketRoundMovement(GameState gameState, ItemBlueprint itemBlueprint) {
+    public static PriceMovementByRound getMarketRoundMovement(GameStateManager gameStateManager, ItemBlueprint itemBlueprint) {
         try {
-            return gameState.getPriceHistory(itemBlueprint.getId());
+            return gameStateManager.getPriceHistory(itemBlueprint.getId());
         } catch (UndefinedMarketPriceException e) {
             log.error("Cannot find market price with blueprint id %s: ".formatted(itemBlueprint.getId()));
             throw new ForsakenRuntimeException(e.getMessage());

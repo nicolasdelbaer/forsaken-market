@@ -13,7 +13,7 @@ import be.nicolasdelbaer.forsakenmarket.repositories.MarketItemRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.MarketPriceEvolutionRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.MarketPriceRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
-import be.nicolasdelbaer.forsakenmarket.utils.GameState;
+import be.nicolasdelbaer.forsakenmarket.utils.GameStateManager;
 import be.nicolasdelbaer.forsakenmarket.utils.MarketPriceUtils;
 import be.nicolasdelbaer.forsakenmarket.utils.PricesCalculator;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -36,7 +36,7 @@ public class ScheduledMarketService {
 
     @Inject private MarketItemRepository marketItemRepository;
     @Inject private MarketPriceEvolutionRepository marketPriceEvolutionRepository;
-    @Inject private GameState gameState;
+    @Inject private GameStateManager gameStateManager;
     @Inject private ItemBlueprintRepository itemBlueprintRepository;
     @Inject
     private MarketPriceRepository marketPriceRepository;
@@ -63,7 +63,7 @@ public class ScheduledMarketService {
     private void createNewItem(EntityManager entityManager, ItemBlueprint itemBlueprint) {
         MarketItem marketItem = new MarketItem();
         marketItem.setItemBlueprint(itemBlueprint);
-        marketItem.setCreatedRoundId(gameState.getCurrentRound());
+        marketItem.setCreatedRoundId(gameStateManager.getCurrentRound());
         marketItem.setTimeToLive(getTimeToLive());
 
         marketItemRepository.save(entityManager, marketItem);
@@ -83,7 +83,7 @@ public class ScheduledMarketService {
         List<MarketOHLC> priceEvolutionList = marketPriceRepository.getEvolutionData(entityManager, startRoundId, duration);
 
         for (MarketOHLC ohcl : priceEvolutionList) {
-            ItemBlueprint bp = gameState.getItemBlueprint(ohcl.item_blueprint_id());
+            ItemBlueprint bp = gameStateManager.getItemBlueprint(ohcl.item_blueprint_id());
             MarketPriceEvolution marketPriceEvolution = new MarketPriceEvolution();
             marketPriceEvolution.setOpen(ohcl.open()); //get last
             marketPriceEvolution.setClose(ohcl.close());
@@ -110,7 +110,7 @@ public class ScheduledMarketService {
         List<MarketItem> marketItemList = marketItemRepository
                 .findAllByRoundId(entityManager);
 
-        Long currentRound = gameState.getCurrentRound();
+        Long currentRound = gameStateManager.getCurrentRound();
         List<MarketItem> expiredList = new ArrayList<>();
         for (MarketItem marketItem : marketItemList) {
             marketItem.updateExpiration(currentRound);
@@ -130,7 +130,7 @@ public class ScheduledMarketService {
         Map<ItemBlueprint, PriceMovementByRound> updatedPrices = new HashMap<>();
 
         for (ItemBlueprint blueprint : blueprintList) {
-            PriceMovementByRound priceMovementByRound = MarketPriceUtils.getMarketRoundMovement(gameState, blueprint);
+            PriceMovementByRound priceMovementByRound = MarketPriceUtils.getMarketRoundMovement(gameStateManager, blueprint);
             PriceMovementByRound nextPrice = PricesCalculator.getNextPrice(blueprint, priceMovementByRound);
             updatedPrices.put(blueprint, nextPrice);
         }
@@ -144,7 +144,7 @@ public class ScheduledMarketService {
                     MarketPrice marketPrice = new MarketPrice();
                     marketPrice.setCurrentPrice(newPrice);
                     marketPrice.setItemBlueprint(entry.getKey());
-                    marketPrice.setRoundId(gameState.getCurrentRound());
+                    marketPrice.setRoundId(gameStateManager.getCurrentRound());
                     return marketPrice;
                 })
                 .toList();
@@ -152,7 +152,7 @@ public class ScheduledMarketService {
         marketPriceRepository.saveAll(entityManager, prices);
 
         //Refresh cached server data
-        gameState.setMarketPriceList(updatedPrices.entrySet().stream().collect(Collectors.toMap(
+        gameStateManager.setMarketPriceList(updatedPrices.entrySet().stream().collect(Collectors.toMap(
         entry -> entry.getKey().getId(),
         Map.Entry::getValue
         )));

@@ -11,7 +11,7 @@ import be.nicolasdelbaer.forsakenmarket.models.inventory.InventoryItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
 import be.nicolasdelbaer.forsakenmarket.repositories.InventoryItemRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.MarketPriceRepository;
-import be.nicolasdelbaer.forsakenmarket.utils.GameState;
+import be.nicolasdelbaer.forsakenmarket.utils.GameStateManager;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -26,7 +26,7 @@ public class InventoryService {
 
     @Inject private InventoryItemRepository inventoryItemRepository;
     @Inject private EntityManager entityManager;
-    @Inject private GameState gameState;
+    @Inject private GameStateManager gameStateManager;
     @Inject
     private MarketPriceRepository marketPriceRepository;
 
@@ -77,7 +77,7 @@ public class InventoryService {
     public void discardItem(Integer playerId, Long itemId) throws CannotDiscardItemException {
         //Note, the current round id is resolved here for keeping coherence
         // Idea -> could use a window of tolerance in the future allowing players to get the item even with lags
-        Long currentRound = gameState.getCurrentRound();
+        Long currentRound = gameStateManager.getCurrentRound();
 
         InventoryItem inventoryItem = inventoryItemRepository
                 .getItemFromPlayer(entityManager, itemId, playerId, MarketItemStatus.DECAYED)
@@ -98,7 +98,7 @@ public class InventoryService {
                 .stream()
                 .map(inventoryItem -> {
                     PriceMovementByRound priceMovementByRound = Optional
-                            .ofNullable(gameState.getPriceHistory(inventoryItem.getItemBlueprint().getId()))
+                            .ofNullable(gameStateManager.getPriceHistory(inventoryItem.getItemBlueprint().getId()))
                             .orElseThrow(() -> new MarketPriceNotFoundException("No price found for blueprint"));
 
                     return new InventoryItemResponse(

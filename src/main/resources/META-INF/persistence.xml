@@ -8,6 +8,7 @@
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <mapping-file>META-INF/orm.xml</mapping-file>
 
+        <class>be.nicolasdelbaer.forsakenmarket.entities.GameState</class>
         <class>be.nicolasdelbaer.forsakenmarket.entities.InventoryItem</class>
         <class>be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint</class>
         <class>be.nicolasdelbaer.forsakenmarket.entities.ItemCategory</class>

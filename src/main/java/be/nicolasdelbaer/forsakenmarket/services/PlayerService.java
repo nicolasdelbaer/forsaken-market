@@ -12,7 +12,7 @@ import be.nicolasdelbaer.forsakenmarket.models.player.RegisterPlayerRequest;
 import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRoleRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
-import be.nicolasdelbaer.forsakenmarket.utils.GameState;
+import be.nicolasdelbaer.forsakenmarket.utils.GameStateManager;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -26,7 +26,7 @@ public class PlayerService {
     @Inject private PlayerRepository playerRepository;
     @Inject private EntityManager entityManager;
     @Inject
-    private GameState gameState;
+    private GameStateManager gameStateManager;
     @Inject
     private PlayerRoleRepository playerRoleRepository;
 

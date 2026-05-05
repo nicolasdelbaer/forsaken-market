@@ -1,18 +1,12 @@
 package be.nicolasdelbaer.forsakenmarket;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
-import be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint;
-import be.nicolasdelbaer.forsakenmarket.entities.ItemCategory;
-import be.nicolasdelbaer.forsakenmarket.entities.Player;
-import be.nicolasdelbaer.forsakenmarket.entities.PlayerRole;
+import be.nicolasdelbaer.forsakenmarket.entities.*;
 import be.nicolasdelbaer.forsakenmarket.enums.ItemRarity;
 import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
-import be.nicolasdelbaer.forsakenmarket.repositories.ItemBlueprintRepository;
-import be.nicolasdelbaer.forsakenmarket.repositories.ItemCategoryRepository;
-import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRepository;
-import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRoleRepository;
+import be.nicolasdelbaer.forsakenmarket.repositories.*;
 import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
-import be.nicolasdelbaer.forsakenmarket.utils.GameState;
+import be.nicolasdelbaer.forsakenmarket.utils.GameStateManager;
 import be.nicolasdelbaer.forsakenmarket.utils.PricesCalculator;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -35,11 +29,11 @@ public class DataSeeder {
 
     @Inject private PlayerRepository playerRepository;
     @Inject private PlayerRoleRepository playerRoleRepository;
-
+    @Inject private GameStateRepository gameStateRepository;
     @Inject private ItemCategoryRepository itemCategoryRepository;
     @Inject private ItemBlueprintRepository itemBlueprintRepository;
     @Inject private EntityManagerFactory entityManagerFactory;
-    @Inject private GameState gameState;
+    @Inject private GameStateManager gameStateManager;
 
     private static final Logger log = Logger.getLogger(DataSeeder.class.getName());
 
@@ -49,6 +43,7 @@ public class DataSeeder {
             EntityTransaction entityTransaction = entityManager.getTransaction();
             entityTransaction.begin();
             try {
+                createGameState(entityManager);
                 createPlayers(entityManager);
                 createCategories(entityManager);
                 fillMarketWithPrices(entityManager);
@@ -63,6 +58,10 @@ public class DataSeeder {
         }
     }
 
+    private void createGameState(EntityManager entityManager) {
+        gameStateRepository.save(entityManager, new GameState(1L));
+    }
+
     private void fillMarketWithPrices(EntityManager entityManager) {
         Map<Long, PriceMovementByRound> marketPriceList = new HashMap<>();
         List<ItemBlueprint> blueprintList = itemBlueprintRepository.findAll(entityManager);
@@ -74,14 +73,13 @@ public class DataSeeder {
             );
         }
 
-        gameState.setMarketPriceList(marketPriceList);
+        gameStateManager.setMarketPriceList(marketPriceList);
     }
 
     private void createPlayers(EntityManager entityManager) {
         PlayerRole playerRoleAdmin = playerRoleRepository.save(entityManager, new PlayerRole("Admin"));
         PlayerRole playerRoleMerchant = playerRoleRepository.save(entityManager, new PlayerRole("Merchant"));
         PlayerRole playerRoleNoble = playerRoleRepository.save(entityManager, new PlayerRole("Noble"));
-
 
         Player player;
         String envCost = System.getenv("BCRYPT_COST");

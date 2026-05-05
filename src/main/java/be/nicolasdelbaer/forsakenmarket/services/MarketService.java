@@ -33,7 +33,7 @@ public class MarketService {
     @Inject private PlayerRerollRepository playerRerollRepository;
 
     @Inject private InventoryService inventoryService;
-    @Inject private GameState gameState;
+    @Inject private GameStateManager gameStateManager;
     @Inject private PlayerRepository playerRepository;
 
     @Inject private EntityManager entityManager;
@@ -42,7 +42,7 @@ public class MarketService {
     public void rerollItem(Integer playerId, Long itemId)
             throws PlayerInsufficientFundsException, MaxRerollReachedException, MarketItemDoesNotExistException, PlayerNotFoundException {
         //Note, the current round id is resolved here for keeping coherence
-        Long currentRound = gameState.getCurrentRound();
+        Long currentRound = gameStateManager.getCurrentRound();
         MarketItem itemInstance = marketItemRepository.
                 findById(entityManager, itemId)
                 .orElseThrow(() -> new MarketItemDoesNotExistException("Item not found"));
@@ -70,13 +70,13 @@ public class MarketService {
     public void buyItem(Integer playerId, Long itemId)
             throws PlayerInsufficientFundsException, MarketItemDoesNotExistException, PlayerNotFoundException, MarketPriceNotFoundException, UndefinedMarketPriceException {
         //Note, the current round id is resolved here for keeping coherence
-        Long currentRound = gameState.getCurrentRound();
+        Long currentRound = gameStateManager.getCurrentRound();
 
         //Retrieving items
         MarketItem itemInstance = marketItemRepository
                 .findById(entityManager, itemId)
                 .orElseThrow(() -> new MarketItemDoesNotExistException("Item not found"));
-        PriceMovementByRound marketPrice = gameState.getPriceHistory(itemInstance.getItemBlueprint().getId());
+        PriceMovementByRound marketPrice = gameStateManager.getPriceHistory(itemInstance.getItemBlueprint().getId());
         Player player = playerRepository
                 .findById(entityManager, playerId)
                 .orElseThrow(() -> new PlayerNotFoundException("player not found"));
@@ -93,13 +93,13 @@ public class MarketService {
     public void sellItem(Integer playerId, Long itemId)
             throws BadItemOwnershipException, CannotSellInactiveItemException, MarketPriceNotFoundException, PlayerNotFoundException, UndefinedMarketPriceException {
         //Note, the current round id is resolved here for keeping coherence
-        Long currentRound = gameState.getCurrentRound();
+        Long currentRound = gameStateManager.getCurrentRound();
 
         InventoryItem itemInstance = inventoryItemRepository
                 .getItemFromPlayer(entityManager, itemId, playerId, MarketItemStatus.BOUGHT)
                 .orElseThrow(() -> new BadItemOwnershipException(BadResponseUtils.InvalidItemOrUnauthorized));
 
-        PriceMovementByRound marketPrice = gameState.getPriceHistory(itemInstance.getItemBlueprint().getId());
+        PriceMovementByRound marketPrice = gameStateManager.getPriceHistory(itemInstance.getItemBlueprint().getId());
 
         //remove player's money
         Player player = playerRepository
@@ -121,7 +121,7 @@ public class MarketService {
      */
     public List<MarketItemResponse> fetchAvailableItems(Integer playerId){
         return marketItemRepository
-                .findAllValidItemsForPlayer(entityManager, gameState.getCurrentRound(), playerId)
+                .findAllValidItemsForPlayer(entityManager, gameStateManager.getCurrentRound(), playerId)
                 .stream().map(
                     marketItem -> new MarketItemResponse(
                          marketItem.getId(),
@@ -129,7 +129,7 @@ public class MarketService {
                          marketItem.getItemBlueprint().getDescription(),
                          marketItem.getItemBlueprint().getIcon(),
                          marketItem.getItemBlueprint().getRarity().name(),
-                            MarketPriceUtils.getMarketRoundMovement(gameState, marketItem.getItemBlueprint()).currentPrice()))
+                            MarketPriceUtils.getMarketRoundMovement(gameStateManager, marketItem.getItemBlueprint()).currentPrice()))
                 .toList();
     }
 

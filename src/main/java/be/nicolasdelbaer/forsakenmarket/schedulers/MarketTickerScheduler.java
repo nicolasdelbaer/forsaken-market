@@ -1,11 +1,12 @@
 package be.nicolasdelbaer.forsakenmarket.schedulers;
 
 import be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint;
+import be.nicolasdelbaer.forsakenmarket.repositories.GameStateRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.ItemBlueprintRepository;
 import be.nicolasdelbaer.forsakenmarket.services.scheduled.ScheduledInventoryService;
 import be.nicolasdelbaer.forsakenmarket.services.scheduled.ScheduledMarketService;
 import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
-import be.nicolasdelbaer.forsakenmarket.utils.GameState;
+import be.nicolasdelbaer.forsakenmarket.utils.GameStateManager;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.Destroyed;
@@ -33,11 +34,13 @@ public class MarketTickerScheduler implements ServletContextListener {
     @Inject private ScheduledMarketService scheduledMarketService;
     @Inject private ScheduledInventoryService scheduledInventoryService;
     @Inject private ItemBlueprintRepository itemBlueprintRepository;
-    @Inject private GameState gameState;
+    @Inject private GameStateRepository gameStateRepository;
+    @Inject private GameStateManager gameStateManager;
 
     public void onStart(@Observes @Priority(GameConfiguration.SchedulerPriority) @Initialized(ApplicationScoped.class) Object obj) {
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
-            gameState.setItemBlueprintList(itemBlueprintRepository
+            gameStateManager.setGameStateEntity(gameStateRepository.getData(entityManager));
+            gameStateManager.setItemBlueprintList(itemBlueprintRepository
                     .findAll(entityManager).stream()
                     .collect(Collectors.toMap(
                             ItemBlueprint::getId,
@@ -71,7 +74,7 @@ public class MarketTickerScheduler implements ServletContextListener {
             transaction.begin();
             try {
                 //Change cycle
-                gameState.nextRound();
+                gameStateManager.nextRound();
 
                 //Prices will change towards their trends. Trends will be updated.
                 scheduledMarketService.updateMarketPrices(entityManager);
@@ -83,18 +86,19 @@ public class MarketTickerScheduler implements ServletContextListener {
                 //Populate new items if some slots are missing,
                 //using gameConfiguration to setup a pool of max available items
                 //shared for all players (- bought or rerolled items)
-                scheduledMarketService.refreshMarket(entityManager, gameState.getItemBlueprintList());
-                System.out.printf("Current round: %s%n", gameState.getCurrentRound());
+                scheduledMarketService.refreshMarket(entityManager, gameStateManager.getItemBlueprintList());
+                System.out.printf("Current round: %s%n", gameStateManager.getCurrentRound());
 
-                if(gameState.getCurrentRound() % GameConfiguration.roundsByCycle == 0) {
+                if(gameStateManager.getCurrentRound() % GameConfiguration.roundsByCycle == 0) {
                     scheduledMarketService.recordMarketPriceMovements(entityManager,
-                            (gameState.getCurrentRound()- GameConfiguration.roundsByCycle),
+                            (gameStateManager.getCurrentRound()- GameConfiguration.roundsByCycle),
                             GameConfiguration.roundsByCycle
                     );
                 }
-                if(gameState.getCurrentRound() % GameConfiguration.roundsBeforeClean == 0) {
+                if(gameStateManager.getCurrentRound() % GameConfiguration.roundsBeforeClean == 0) {
                     cleanupData();
                 }
+                gameStateRepository.update(entityManager, gameStateManager.getGameStateEntity());
                 transaction.commit();
             } catch (Exception e) {
                 transaction.rollback();
