@@ -43,4 +43,12 @@ public class PlayerRepository extends CrudRepository<Player, Integer> {
                 .setMaxResults(limit)
                 .getResultList();
     }
+
+    public void addSalaryToPlayers(EntityManager entityManager, int paydayAmount) {
+        entityManager.createQuery("""
+                    UPDATE Player t SET t.wallet = t.wallet + :paydayAmount
+                    """)
+                .setParameter("paydayAmount", paydayAmount)
+                .executeUpdate();
+    }
 }

@@ -11,6 +11,7 @@ public class GameConfiguration {
     public static final int startingWallet = 500;
     public static final int roundsByCycle = 5; //5 for testing, 20 by design
     public static final int roundsBeforeClean = 100;
+    public static final int paydayAmount = 10;
 
     //Market rules
     public static final int marketPoolSize = 20;

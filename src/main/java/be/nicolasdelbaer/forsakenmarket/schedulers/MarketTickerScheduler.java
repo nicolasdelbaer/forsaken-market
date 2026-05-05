@@ -6,6 +6,7 @@ import be.nicolasdelbaer.forsakenmarket.repositories.GameStateRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.ItemBlueprintRepository;
 import be.nicolasdelbaer.forsakenmarket.services.scheduled.ScheduledInventoryService;
 import be.nicolasdelbaer.forsakenmarket.services.scheduled.ScheduledMarketService;
+import be.nicolasdelbaer.forsakenmarket.services.scheduled.ScheduledPlayerService;
 import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
 import be.nicolasdelbaer.forsakenmarket.utils.GameStateManager;
 import be.nicolasdelbaer.forsakenmarket.utils.PricesCalculator;
@@ -41,6 +42,8 @@ public class MarketTickerScheduler implements ServletContextListener {
     @Inject private ItemBlueprintRepository itemBlueprintRepository;
     @Inject private GameStateRepository gameStateRepository;
     @Inject private GameStateManager gameStateManager;
+    @Inject
+    private ScheduledPlayerService scheduledPlayerService;
 
     public void onStart(@Observes @Priority(GameConfiguration.SchedulerPriority) @Initialized(ApplicationScoped.class) Object obj) {
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
@@ -114,6 +117,8 @@ public class MarketTickerScheduler implements ServletContextListener {
                             (gameStateManager.getCurrentRound() - GameConfiguration.roundsByCycle),
                             GameConfiguration.roundsByCycle
                     );
+                    //Give 50 bucks salary to players
+                    scheduledPlayerService.itsPayday(entityManager);
                 }
                 if(gameStateManager.getCurrentRound() % GameConfiguration.roundsBeforeClean == 0) {
                     cleanupData();
