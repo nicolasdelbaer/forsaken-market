@@ -14,8 +14,7 @@ import jakarta.persistence.EntityTransaction;
 @Priority(Interceptor.Priority.APPLICATION)
 public class TransactionalInterceptor {
 
-    @Inject
-    private EntityManager entityManager;
+    @Inject private EntityManager entityManager;
 
     @AroundInvoke
     public Object manageTransaction(InvocationContext context) throws Exception {

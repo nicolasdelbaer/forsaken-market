@@ -38,8 +38,7 @@ public class ScheduledMarketService {
     @Inject private MarketPriceEvolutionRepository marketPriceEvolutionRepository;
     @Inject private GameStateManager gameStateManager;
     @Inject private ItemBlueprintRepository itemBlueprintRepository;
-    @Inject
-    private MarketPriceRepository marketPriceRepository;
+    @Inject private MarketPriceRepository marketPriceRepository;
 
 
     /*

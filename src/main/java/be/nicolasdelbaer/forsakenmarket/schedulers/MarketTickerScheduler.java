@@ -41,8 +41,7 @@ public class MarketTickerScheduler{
     @Inject private ItemBlueprintRepository itemBlueprintRepository;
     @Inject private GameStateRepository gameStateRepository;
     @Inject private GameStateManager gameStateManager;
-    @Inject
-    private ScheduledPlayerService scheduledPlayerService;
+    @Inject private ScheduledPlayerService scheduledPlayerService;
 
     public void onStart(@Observes @Priority(GameConfiguration.SchedulerPriority) @Initialized(ApplicationScoped.class) Object obj) {
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
@@ -109,7 +108,7 @@ public class MarketTickerScheduler{
                 //using gameConfiguration to setup a pool of max available items
                 //shared for all players (- bought or rerolled items)
                 scheduledMarketService.refreshMarket(entityManager, gameStateManager.getItemBlueprintList());
-                System.out.printf("Current round: %s%n", gameStateManager.getCurrentRound());
+                log.info("Current round: %s".formatted(gameStateManager.getCurrentRound()));
 
                 if(gameStateManager.getCurrentRound() % GameConfiguration.roundsByCycle == 0) {
                     scheduledMarketService.recordMarketPriceMovements(entityManager,

@@ -24,7 +24,6 @@ class ReputationCalculatorTest {
 
         // Act
         Integer result = ReputationCalculator.calculate(data);
-        log.debug("Result: {}",result);
 
         // Assert
         assertTrue(result > 0);
@@ -40,7 +39,6 @@ class ReputationCalculatorTest {
         ReputationScoreData data = new ReputationScoreData(inventoryItem, marketPrice);
 
         Integer result = ReputationCalculator.calculate(data);
-        log.debug("Result: {}",result);
 
         assertEquals(0, result);
     }
@@ -55,7 +53,6 @@ class ReputationCalculatorTest {
         ReputationScoreData data = new ReputationScoreData(inventoryItem, marketPrice);
 
         Integer result = ReputationCalculator.calculate(data);
-        log.debug("Result: {}",result);
 
         assertEquals(0, result);
     }

@@ -1,6 +1,6 @@
 package be.nicolasdelbaer.forsakenmarket.models.player;
 
-public record LeaderboardRepsonse(
+public record LeaderboardResponse(
         int playerId,
         int score,
         int wallet,

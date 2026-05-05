@@ -6,7 +6,7 @@ import be.nicolasdelbaer.forsakenmarket.entities.Player;
 import be.nicolasdelbaer.forsakenmarket.exceptions.auth.EmailAlreadyUsedException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.core.MissingEnvConfigurationException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerLoginException;
-import be.nicolasdelbaer.forsakenmarket.models.player.LeaderboardRepsonse;
+import be.nicolasdelbaer.forsakenmarket.models.player.LeaderboardResponse;
 import be.nicolasdelbaer.forsakenmarket.models.player.LoginRequestDto;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.models.player.RegisterPlayerRequest;
@@ -69,7 +69,7 @@ public class PlayerService {
         return playerRepository.getWallet(entityManager, playerId);
     }
 
-    public List<LeaderboardRepsonse> fetchLeaderboard(int limit) {
+    public List<LeaderboardResponse> fetchLeaderboard(int limit) {
         return playerRepository
                 .fetchPlayerScores(entityManager, limit);
     }

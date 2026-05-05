@@ -1,7 +1,7 @@
 package be.nicolasdelbaer.forsakenmarket.resources;
 
 import be.nicolasdelbaer.forsakenmarket.annotations.Authenticated;
-import be.nicolasdelbaer.forsakenmarket.models.player.LeaderboardRepsonse;
+import be.nicolasdelbaer.forsakenmarket.models.player.LeaderboardResponse;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.services.PlayerService;
 import be.nicolasdelbaer.forsakenmarket.utils.BadResponseUtils;
@@ -42,7 +42,7 @@ public class HallOfInfamyResource {
         Response response;
         PlayerSession playerSession = (PlayerSession) securityContext.getUserPrincipal();
         try {
-            List<LeaderboardRepsonse> entries = playerService.fetchLeaderboard(25);
+            List<LeaderboardResponse> entries = playerService.fetchLeaderboard(25);
             response = Response.ok(entries).build();
         } catch (Exception e) {
             response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), BadResponseUtils.CannotRetrievePlayers).build();
