@@ -11,10 +11,10 @@ import java.util.random.RandomGenerator;
 public class PricesCalculator {
 
     private static final Map<ItemRarity, PriceCoefficients> priceCoefficientsMap = Map.ofEntries(
-        Map.entry(ItemRarity.MUNDANE, new PriceCoefficients(.10f, .15f, 0.05f)),
-        Map.entry(ItemRarity.TAINTED, new PriceCoefficients(.15f, .10f, 0.15f)),
-        Map.entry(ItemRarity.CURSED, new PriceCoefficients(.20f, .07f, 0.3f)),
-        Map.entry(ItemRarity.FORSAKEN, new PriceCoefficients(.20f, .05f, 0.6f))
+        Map.entry(ItemRarity.MUNDANE, new PriceCoefficients(.10f, .15f, 0.5f, 0.2f)),
+        Map.entry(ItemRarity.TAINTED, new PriceCoefficients(.15f, .10f, 0.3f, 0.3f)),
+        Map.entry(ItemRarity.CURSED, new PriceCoefficients(.20f, .07f, 0.175f, 0.2f)),
+        Map.entry(ItemRarity.FORSAKEN, new PriceCoefficients(.20f, .05f, 0.15f, 0.1f))
     );
     private static final int MIN_WARMUP = 5;
     private static final int MAX_WARMUP = 15;
@@ -39,6 +39,9 @@ public class PricesCalculator {
         int noise     = (int) ((Math.random() * 2 - 1) * volatility * baseSell);
         current = priceHistory.currentPrice() + momentum + reversion + noise;
         current += getMarketShockValue(baseSell);
+
+        int floor = (int) (baseSell * priceCoefficients.minPriceRatio());
+        current = Math.max(floor, current);
 
         return new PriceMovementByRound(itemBlueprint.getId(), current, priceHistory.currentPrice());
     }

@@ -5,6 +5,7 @@ import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketItemDoesNotExist
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.MaxRerollReachedException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerInsufficientFundsException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerNotFoundException;
+import be.nicolasdelbaer.forsakenmarket.models.market.MarketBlueprintResponse;
 import be.nicolasdelbaer.forsakenmarket.models.market.MarketItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.services.MarketService;
@@ -39,32 +40,31 @@ public class MarketResource {
     @Context private SecurityContext securityContext;
     @Inject private GameStateManager gameStateManager;
 
-    @GET
-    @Path("/pricelist")
-    @Operation(summary = "Market prices for items", description = "Prices with current trend and their values")
-    public Response getPriceList() {
-        Response response;
-        try {
-            //TODO use service rather than gameStateManager
-            response = Response.ok(gameStateManager.getPricesHistory()).build(); //TODO send back data with results
-        } catch (Exception e) {
-            response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(),
-                    BadResponseUtils.CannotBuyItem).build();
-            log.warn(e.getMessage(), e);
-        }
-        return response;
-    }
+//    @GET
+//    @Path("/pricelist")
+//    @Operation(summary = "Market prices for items", description = "Prices with current trend and their values")
+//    public Response getPriceList() {
+//        Response response;
+//        try {
+//            //TODO use service rather than gameStateManager
+//            response = Response.ok(gameStateManager.getPricesHistory()).build(); //TODO send back data with results
+//        } catch (Exception e) {
+//            response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(),
+//                    BadResponseUtils.CannotBuyItem).build();
+//            log.warn(e.getMessage(), e);
+//        }
+//        return response;
+//    }
 
     @GET
-    @Path("/market-evolution/{id}")
+    @Path("/history/{id}")
     @Operation(summary = "Market prices for items", description = "Prices with current trend and their values")
     public Response getMarketEvolution(@PathParam("id") Long itemId) {
         Response response;
         try {
             response = Response.ok(marketService.getMarketEvolution(itemId)).build(); //TODO send back data with results
         } catch (Exception e) {
-            response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(),
-                    BadResponseUtils.CannotBuyItem).build();
+            response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), "oups").build();
             log.warn(e.getMessage(), e);
         }
         return response;
@@ -117,6 +117,23 @@ public class MarketResource {
         try {
             List<MarketItemResponse> itemList = marketService
                     .fetchAvailableItems(playerSession.id());
+            response = Response.ok(itemList).build();
+        } catch (Exception e) {
+            response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(),
+                    BadResponseUtils.CannotRetrieveItems).build();
+            log.warn(e.getMessage(), e);
+        }
+        return response;
+    }
+
+    @GET
+    @Path("/blueprints")
+    @Operation(summary = "Get market item blueprints", description = "Fetch all item blueprint data")
+    public Response allBlueprints(){
+        Response response;
+        try {
+            List<MarketBlueprintResponse> itemList = marketService
+                    .fetchAvailableBlueprints();
             response = Response.ok(itemList).build();
         } catch (Exception e) {
             response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(),

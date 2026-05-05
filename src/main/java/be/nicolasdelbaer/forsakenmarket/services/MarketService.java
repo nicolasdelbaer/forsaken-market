@@ -11,6 +11,7 @@ import be.nicolasdelbaer.forsakenmarket.exceptions.market.*;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerInsufficientFundsException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerNotFoundException;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItemDto;
+import be.nicolasdelbaer.forsakenmarket.models.market.MarketBlueprintResponse;
 import be.nicolasdelbaer.forsakenmarket.models.market.MarketItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.market.MarketOHLCResponse;
 import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
@@ -36,6 +37,8 @@ public class MarketService {
     @Inject private PlayerRepository playerRepository;
 
     @Inject private EntityManager entityManager;
+    @Inject
+    private ItemBlueprintRepository itemBlueprintRepository;
 
     @Transactional
     public void rerollItem(Integer playerId, Long itemId)
@@ -146,6 +149,19 @@ public class MarketService {
                         marketPriceEvolution.getLow(),
                         marketPriceEvolution.getClose()
                 ))
+                .toList();
+    }
+
+    public List<MarketBlueprintResponse> fetchAvailableBlueprints() {
+        return itemBlueprintRepository
+                .findAll(entityManager)
+                .stream().map(
+                        blueprint -> new MarketBlueprintResponse(
+                                blueprint.getId(),
+                                blueprint.getTitle(),
+                                blueprint.getDescription(),
+                                blueprint.getIcon(),
+                                blueprint.getRarity().name()))
                 .toList();
     }
 }

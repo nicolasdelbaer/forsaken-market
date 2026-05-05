@@ -47,12 +47,12 @@ Pk sur marketPrice: bp_id + round_id (no need for generatedId ?)
 ### Refacto
 - Code & project review
 - Clean InventoryItem responsibility cf player movements?
+- Clean GameStateManager
 
 ### DTO
 - Add validations via annotations @NotBlank, length etc. from incoming data
 
 ### Game State
-- Add Persistence ->table with 1 id and store current round & stuff
 
 ### Testing
 - Add new test cases
@@ -62,3 +62,4 @@ Pk sur marketPrice: bp_id + round_id (no need for generatedId ?)
 ### Optimisation
 - Clean data based on round id (market evolution, market price)
 - Review db accesses & server cached data ()
+- MarketOHLC -> Use an interface for getting cached data or db request?

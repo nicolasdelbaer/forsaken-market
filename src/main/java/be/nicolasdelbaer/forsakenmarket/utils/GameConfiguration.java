@@ -7,7 +7,7 @@ public class GameConfiguration {
     public static final int SchedulerPriority = 10;
 
     //Meta rules
-    public static final int roundDurationSeconds = 10;
+    public static final int roundDurationSeconds = 1;
     public static final int startingWallet = 500;
     public static final int roundsByCycle = 5; //5 for testing, 20 by design
     public static final int roundsBeforeClean = 100;

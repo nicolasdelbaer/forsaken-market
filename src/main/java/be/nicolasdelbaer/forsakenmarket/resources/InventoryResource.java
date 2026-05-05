@@ -1,11 +1,11 @@
 package be.nicolasdelbaer.forsakenmarket.resources;
 
 import be.nicolasdelbaer.forsakenmarket.annotations.Authenticated;
-import be.nicolasdelbaer.forsakenmarket.exceptions.market.UndefinedMarketPriceException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.BadItemOwnershipException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.CannotDiscardItemException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.CannotSellInactiveItemException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketPriceNotFoundException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.market.UndefinedMarketPriceException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerNotFoundException;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.InventoryItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
@@ -30,6 +30,8 @@ import java.util.List;
 @Authenticated
 @RolesAllowed("Merchant")
 @Tag(name = "Inventory", description = "Manage inventory")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class InventoryResource {
 
     private static final Logger log = LoggerFactory.getLogger(InventoryResource.class);
@@ -38,7 +40,6 @@ public class InventoryResource {
     @Context private SecurityContext securityContext;
 
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/discard/{id}")
     @Operation(summary = "Discard an item", description = "Discard an item from their inventory")
     public Response discardItem(@PathParam("id") Long itemId) {
@@ -55,7 +56,6 @@ public class InventoryResource {
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/sell/{id}")
     @Operation(summary = "Sell an item", description = "Sell an item from their inventory")
     public Response sellItem(@PathParam("id") Long itemId) {
@@ -72,7 +72,6 @@ public class InventoryResource {
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/items")
     @Operation(summary = "Get inventory items", description = "Fetch all item data available in a player's inventory")
     public Response getItems(){

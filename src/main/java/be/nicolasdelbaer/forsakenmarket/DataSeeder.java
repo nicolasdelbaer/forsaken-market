@@ -3,11 +3,9 @@ package be.nicolasdelbaer.forsakenmarket;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import be.nicolasdelbaer.forsakenmarket.entities.*;
 import be.nicolasdelbaer.forsakenmarket.enums.ItemRarity;
-import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
+import be.nicolasdelbaer.forsakenmarket.exceptions.core.CannotFindGameState;
 import be.nicolasdelbaer.forsakenmarket.repositories.*;
 import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
-import be.nicolasdelbaer.forsakenmarket.utils.GameStateManager;
-import be.nicolasdelbaer.forsakenmarket.utils.PricesCalculator;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.Initialized;
@@ -17,9 +15,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,12 +29,16 @@ public class DataSeeder {
     @Inject private ItemCategoryRepository itemCategoryRepository;
     @Inject private ItemBlueprintRepository itemBlueprintRepository;
     @Inject private EntityManagerFactory entityManagerFactory;
-    @Inject private GameStateManager gameStateManager;
 
     private static final Logger log = Logger.getLogger(DataSeeder.class.getName());
 
     public void seed(@Observes @Priority(GameConfiguration.DataFeedPriority) @Initialized(ApplicationScoped.class) Object init) {
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
+
+            try {
+                gameStateRepository.getData(entityManager);
+                return;
+            } catch (CannotFindGameState ignored) {}
 
             EntityTransaction entityTransaction = entityManager.getTransaction();
             entityTransaction.begin();
@@ -46,7 +46,6 @@ public class DataSeeder {
                 createGameState(entityManager);
                 createPlayers(entityManager);
                 createCategories(entityManager);
-                fillMarketWithPrices(entityManager);
 
                 log.info("DataSeeder : Done");
                 entityTransaction.commit();
@@ -60,20 +59,6 @@ public class DataSeeder {
 
     private void createGameState(EntityManager entityManager) {
         gameStateRepository.save(entityManager, new GameState(1L));
-    }
-
-    private void fillMarketWithPrices(EntityManager entityManager) {
-        Map<Long, PriceMovementByRound> marketPriceList = new HashMap<>();
-        List<ItemBlueprint> blueprintList = itemBlueprintRepository.findAll(entityManager);
-
-        for (ItemBlueprint blueprint : blueprintList) {
-            marketPriceList.put(
-                    blueprint.getId(),
-                    PricesCalculator.warmupPrice(blueprint)
-            );
-        }
-
-        gameStateManager.setMarketPriceList(marketPriceList);
     }
 
     private void createPlayers(EntityManager entityManager) {

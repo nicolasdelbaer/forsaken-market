@@ -36,7 +36,6 @@ public class InventoryItem {
     @Getter @Setter
     @Enumerated(EnumType.STRING) private MarketItemStatus status;
 
-
     //TODO use table for action history avoiding redundance
     @Column(nullable = false)
     @Getter @Setter private Long boughtRoundId;

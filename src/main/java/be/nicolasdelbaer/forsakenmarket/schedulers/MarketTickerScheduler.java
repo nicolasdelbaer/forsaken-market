@@ -1,12 +1,14 @@
 package be.nicolasdelbaer.forsakenmarket.schedulers;
 
 import be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint;
+import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
 import be.nicolasdelbaer.forsakenmarket.repositories.GameStateRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.ItemBlueprintRepository;
 import be.nicolasdelbaer.forsakenmarket.services.scheduled.ScheduledInventoryService;
 import be.nicolasdelbaer.forsakenmarket.services.scheduled.ScheduledMarketService;
 import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
 import be.nicolasdelbaer.forsakenmarket.utils.GameStateManager;
+import be.nicolasdelbaer.forsakenmarket.utils.PricesCalculator;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.Destroyed;
@@ -20,6 +22,9 @@ import jakarta.servlet.ServletContextListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -40,6 +45,7 @@ public class MarketTickerScheduler implements ServletContextListener {
     public void onStart(@Observes @Priority(GameConfiguration.SchedulerPriority) @Initialized(ApplicationScoped.class) Object obj) {
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
             gameStateManager.setGameStateEntity(gameStateRepository.getData(entityManager));
+            fillMarketWithPrices(entityManager);
             gameStateManager.setItemBlueprintList(itemBlueprintRepository
                     .findAll(entityManager).stream()
                     .collect(Collectors.toMap(
@@ -51,6 +57,20 @@ public class MarketTickerScheduler implements ServletContextListener {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
+    }
+
+
+    private void fillMarketWithPrices(EntityManager entityManager) {
+        Map<Long, PriceMovementByRound> marketPriceList = new HashMap<>();
+        List<ItemBlueprint> blueprintList = itemBlueprintRepository.findAll(entityManager);
+
+        for (ItemBlueprint blueprint : blueprintList) {
+            marketPriceList.put(
+                    blueprint.getId(),
+                    PricesCalculator.warmupPrice(blueprint)
+            );
+        }
+        gameStateManager.setMarketPriceList(marketPriceList);
     }
 
     private void startScheduler() {
@@ -91,7 +111,7 @@ public class MarketTickerScheduler implements ServletContextListener {
 
                 if(gameStateManager.getCurrentRound() % GameConfiguration.roundsByCycle == 0) {
                     scheduledMarketService.recordMarketPriceMovements(entityManager,
-                            (gameStateManager.getCurrentRound()- GameConfiguration.roundsByCycle),
+                            (gameStateManager.getCurrentRound() - GameConfiguration.roundsByCycle),
                             GameConfiguration.roundsByCycle
                     );
                 }
