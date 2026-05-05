@@ -13,7 +13,6 @@ import be.nicolasdelbaer.forsakenmarket.models.inventory.InventoryItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
 import be.nicolasdelbaer.forsakenmarket.repositories.CollectionItemRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.InventoryItemRepository;
-import be.nicolasdelbaer.forsakenmarket.repositories.MarketPriceRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.GameStateManager;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -30,10 +29,7 @@ public class InventoryService {
     @Inject private InventoryItemRepository inventoryItemRepository;
     @Inject private EntityManager entityManager;
     @Inject private GameStateManager gameStateManager;
-    @Inject
-    private MarketPriceRepository marketPriceRepository;
-    @Inject
-    private CollectionItemRepository collectionItemRepository;
+    @Inject private CollectionItemRepository collectionItemRepository;
 
     /*
      * Buy action from the market and add the item to a player's inventory

@@ -11,7 +11,7 @@ import be.nicolasdelbaer.forsakenmarket.models.inventory.CollectionItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.InventoryItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.services.InventoryService;
-import be.nicolasdelbaer.forsakenmarket.services.MarketService;
+import be.nicolasdelbaer.forsakenmarket.services.TradeService;
 import be.nicolasdelbaer.forsakenmarket.utils.BadResponseUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,7 +37,7 @@ public class InventoryResource {
 
     private static final Logger log = LoggerFactory.getLogger(InventoryResource.class);
     @Inject private InventoryService inventoryService;
-    @Inject private MarketService marketService;
+    @Inject private TradeService tradeService;
     @Context private SecurityContext securityContext;
 
     @POST
@@ -63,7 +63,7 @@ public class InventoryResource {
         Response response;
         PlayerSession playerSession = (PlayerSession) securityContext.getUserPrincipal();
         try {
-            marketService.sellItem(playerSession.id(), itemId);
+            tradeService.sellItem(playerSession.id(), itemId);
             response = Response.ok().build(); //TODO send back data with results
         } catch (UndefinedMarketPriceException | PlayerNotFoundException | BadItemOwnershipException | CannotSellInactiveItemException | MarketPriceNotFoundException e) {
             response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), BadResponseUtils.CannotSellItem).build();

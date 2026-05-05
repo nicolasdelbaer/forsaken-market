@@ -1,43 +1,39 @@
 package be.nicolasdelbaer.forsakenmarket.services;
 
 import be.nicolasdelbaer.forsakenmarket.annotations.Transactional;
-import be.nicolasdelbaer.forsakenmarket.entities.*;
-import be.nicolasdelbaer.forsakenmarket.enums.MarketItemStatus;
-import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.BadItemOwnershipException;
-import be.nicolasdelbaer.forsakenmarket.exceptions.market.*;
+import be.nicolasdelbaer.forsakenmarket.entities.MarketItem;
+import be.nicolasdelbaer.forsakenmarket.entities.Player;
+import be.nicolasdelbaer.forsakenmarket.entities.RerolledItem;
+import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketItemDoesNotExistException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.market.MaxRerollReachedException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.market.UndefinedBlueprintException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerInsufficientFundsException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerNotFoundException;
-import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItemDto;
 import be.nicolasdelbaer.forsakenmarket.models.market.MarketBlueprintResponse;
 import be.nicolasdelbaer.forsakenmarket.models.market.MarketItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.market.MarketOHLCResponse;
-import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
-import be.nicolasdelbaer.forsakenmarket.models.player.ReputationScoreData;
 import be.nicolasdelbaer.forsakenmarket.repositories.*;
-import be.nicolasdelbaer.forsakenmarket.utils.*;
+import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
+import be.nicolasdelbaer.forsakenmarket.utils.GameStateManager;
+import be.nicolasdelbaer.forsakenmarket.utils.MarketPriceUtils;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @ApplicationScoped
 public class MarketService {
 
-    @Inject private InventoryItemRepository inventoryItemRepository;
     @Inject private MarketItemRepository marketItemRepository;
     @Inject private MarketPriceEvolutionRepository marketPriceEvolutionRepository;
     @Inject private PlayerRerollRepository playerRerollRepository;
 
-    @Inject private InventoryService inventoryService;
     @Inject private GameStateManager gameStateManager;
     @Inject private PlayerRepository playerRepository;
 
     @Inject private EntityManager entityManager;
     @Inject private ItemBlueprintRepository itemBlueprintRepository;
-    @Inject
-    private CollectionItemRepository collectionItemRepository;
 
     @Transactional
     public void rerollItem(Integer playerId, Long itemId)
@@ -66,66 +62,6 @@ public class MarketService {
         rerolledItem.setRoundId(currentRound);
         playerRerollRepository.save(entityManager, rerolledItem);
     }
-
-    @Transactional
-    public void buyItem(Integer playerId, Long itemId)
-            throws PlayerInsufficientFundsException, MarketItemDoesNotExistException, PlayerNotFoundException, MarketPriceNotFoundException, UndefinedMarketPriceException {
-        //Note, the current round id is resolved here for keeping coherence
-        Long currentRound = gameStateManager.getCurrentRound();
-
-        //Retrieving items
-        MarketItem itemInstance = marketItemRepository
-                .findById(entityManager, itemId)
-                .orElseThrow(() -> new MarketItemDoesNotExistException("Item not found"));
-        PriceMovementByRound marketPrice = gameStateManager.getPriceHistory(itemInstance.getItemBlueprint().getId());
-        Player player = playerRepository
-                .findById(entityManager, playerId)
-                .orElseThrow(() -> new PlayerNotFoundException("player not found"));
-
-        //remove player's money
-        player.debit(marketPrice.currentPrice());
-        playerRepository.save(entityManager, player);
-
-        //add item to inventory
-        inventoryService.acquireItem(new BuyItemDto(player, itemInstance, marketPrice, currentRound));
-
-
-        if(!collectionItemRepository.isCollected(entityManager, playerId, itemInstance.getItemBlueprint().getId())) {
-            CollectionItem collectionItem = new CollectionItem();
-            collectionItem.setItemBlueprint(itemInstance.getItemBlueprint());
-            collectionItem.setPlayer(player);
-            collectionItem.setFoundAt(LocalDateTime.now());
-            collectionItem.setFoundRoundId(gameStateManager.getCurrentRound());
-            collectionItemRepository.save(entityManager, collectionItem);
-        }
-    }
-
-    @Transactional
-    public void sellItem(Integer playerId, Long itemId)
-            throws BadItemOwnershipException, CannotSellInactiveItemException, MarketPriceNotFoundException, PlayerNotFoundException, UndefinedMarketPriceException {
-        //Note, the current round id is resolved here for keeping coherence
-        Long currentRound = gameStateManager.getCurrentRound();
-
-        InventoryItem itemInstance = inventoryItemRepository
-                .getItemFromPlayer(entityManager, itemId, playerId, MarketItemStatus.BOUGHT)
-                .orElseThrow(() -> new BadItemOwnershipException(BadResponseUtils.InvalidItemOrUnauthorized));
-
-        PriceMovementByRound marketPrice = gameStateManager.getPriceHistory(itemInstance.getItemBlueprint().getId());
-
-        //remove player's money
-        Player player = playerRepository
-                .findById(entityManager, playerId)
-                .orElseThrow(() -> new PlayerNotFoundException(BadResponseUtils.PlayerNotFound));
-        player.credit(marketPrice.currentPrice());
-        player.addReputation(ReputationCalculator.calculate(new ReputationScoreData(
-                itemInstance, marketPrice
-        )));
-        playerRepository.save(entityManager, player);
-
-        //add item to inventory
-        inventoryService.sellItem(itemInstance, currentRound);
-    }
-
 
     /*
      * Based on a player id, returns their available items excluding already rerolled or bought items from the available market list.

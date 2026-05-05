@@ -9,8 +9,8 @@ import be.nicolasdelbaer.forsakenmarket.models.market.MarketBlueprintResponse;
 import be.nicolasdelbaer.forsakenmarket.models.market.MarketItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.services.MarketService;
+import be.nicolasdelbaer.forsakenmarket.services.TradeService;
 import be.nicolasdelbaer.forsakenmarket.utils.BadResponseUtils;
-import be.nicolasdelbaer.forsakenmarket.utils.GameStateManager;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
@@ -37,24 +37,8 @@ public class MarketResource {
 
     private static final Logger log = LoggerFactory.getLogger(MarketResource.class);
     @Inject private MarketService marketService;
+    @Inject private TradeService tradeService;
     @Context private SecurityContext securityContext;
-    @Inject private GameStateManager gameStateManager;
-
-//    @GET
-//    @Path("/pricelist")
-//    @Operation(summary = "Market prices for items", description = "Prices with current trend and their values")
-//    public Response getPriceList() {
-//        Response response;
-//        try {
-//            //TODO use service rather than gameStateManager
-//            response = Response.ok(gameStateManager.getPricesHistory()).build(); //TODO send back data with results
-//        } catch (Exception e) {
-//            response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(),
-//                    BadResponseUtils.CannotBuyItem).build();
-//            log.warn(e.getMessage(), e);
-//        }
-//        return response;
-//    }
 
     @GET
     @Path("/history/{id}")
@@ -77,7 +61,7 @@ public class MarketResource {
         Response response;
         PlayerSession playerSession = (PlayerSession) securityContext.getUserPrincipal();
         try {
-            marketService.buyItem(playerSession.id(), itemId);
+            tradeService.buyItem(playerSession.id(), itemId);
             response = Response.ok().build(); //TODO send back data with results
         } catch (PlayerInsufficientFundsException e) {
             response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(),
