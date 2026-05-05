@@ -433,8 +433,7 @@ function draw() {
   }
 
   candles.forEach((c, i) => {
-    //const cx      = PAD_L + i * slotW + slotW / 2;
-    const cx = PAD_L + (candles.length - 1 - i) * slotW + slotW / 2;
+    const cx      = PAD_L + i * slotW + slotW / 2;
     const bull    = c.close >= c.open;
     const doji    = c.open  === c.close;
     const isHover = i === hoveredIdx;
@@ -481,8 +480,7 @@ function draw() {
     // x-axis label every 5 slots
     if (i % 5 === 0 || i === candles.length - 1) {
       mc.fillStyle = TEXT_COLOR; mc.font = '9px Courier New'; mc.textAlign = 'center';
-      //mc.fillText(i + 1, Math.round(cx), H - 6);
-      mc.fillText(candles.length - i, Math.round(cx), H - 6);
+      mc.fillText(i + 1, Math.round(cx), H - 6);
     }
   });
 
@@ -503,7 +501,7 @@ mainCanvas.addEventListener('mousemove', e => {
   const rect = mainCanvas.getBoundingClientRect();
   const mx   = e.clientX - rect.left;
   const my   = e.clientY - rect.top;
-  const W    = mainCanvas.width;
+  const W     = mainCanvas.clientWidth;
   const PAD_L = 10;
   const candleGap = (W - PAD_L * 2) / TOTAL_SLOTS;
   const idx = Math.round((mx - PAD_L) / candleGap - .5);
@@ -547,7 +545,6 @@ window.addEventListener('load', () => {
   observer.observe(document.getElementById('chart-container'));
 
   if (!localStorage.getItem('token')) {
-
   } else {
     loadItems();
   }
