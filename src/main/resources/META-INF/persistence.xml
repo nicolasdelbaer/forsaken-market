@@ -18,6 +18,7 @@
         <class>be.nicolasdelbaer.forsakenmarket.entities.Player</class>
         <class>be.nicolasdelbaer.forsakenmarket.entities.PlayerRole</class>
         <class>be.nicolasdelbaer.forsakenmarket.entities.RerolledItem</class>
+        <class>be.nicolasdelbaer.forsakenmarket.entities.CollectionItem</class>
         <properties>
             <!-- Connexion -->
             <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>

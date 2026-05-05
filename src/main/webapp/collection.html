@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Collection</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:         #08080b;
+    --surface:    #0f0f14;
+    --surface2:   #141419;
+    --border:     #2a2530;
+    --border2:    #3a2f45;
+    --gold:       #c9a55a;
+    --gold-dim:   #7a6035;
+    --crimson:    #8b2d3a;
+    --crimson-hi: #b03a4a;
+    --stone:      #a09898;
+    --muted:      #524850;
+    --text:       #ccc4b8;
+    --ff-title:   'Cinzel', serif;
+    --ff-body:    'Crimson Text', serif;
+
+    --r-mundane:  #524850;
+    --r-common:   #524850;
+    --r-uncommon: #3a7850;
+    --r-rare:     #6a48a0;
+    --r-epic:     #9a6820;
+    --r-legendary:#b03a4a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: var(--ff-body); font-size: 15px; min-height: 100vh;
+    display: flex; flex-direction: column;
+    background-image: radial-gradient(ellipse 70% 40% at 50% 0%, rgba(80,40,100,.07) 0%, transparent 65%);
+  }
+
+  /* ── TOPBAR ── */
+  #topbar {
+    display: flex; align-items: center; gap: 14px;
+    padding: 0 24px; height: 46px; flex-shrink: 0;
+    background: var(--surface); position: relative; z-index: 10;
+  }
+  #topbar::after {
+    content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+  }
+  .logo { font-family: var(--ff-title); font-size: 12px; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; white-space: nowrap; }
+  .logo span { color: var(--muted); font-size: 9px; letter-spacing: 2px; }
+  #base-url-input {
+    margin-left: auto; background: var(--bg); border: 1px solid var(--border);
+    color: var(--stone); padding: 4px 8px; font-family: monospace; font-size: 11px; width: 200px;
+  }
+  #base-url-input:focus { outline: none; border-color: var(--gold-dim); }
+
+  /* ── CONTROLS ── */
+  #controls {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 14px 24px; background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  #progress-wrap { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 200px; }
+  #progress-bar-track {
+    flex: 1; height: 3px; background: var(--border2); position: relative; max-width: 260px;
+  }
+  #progress-bar-fill {
+    position: absolute; left: 0; top: 0; height: 100%;
+    background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+    transition: width .5s ease;
+  }
+  #progress-label { font-family: var(--ff-title); font-size: 10px; letter-spacing: 1px; color: var(--gold); white-space: nowrap; }
+
+  .filter-group { display: flex; gap: 4px; flex-wrap: wrap; margin-left: auto; }
+  .filter-btn {
+    background: none; border: 1px solid var(--border); color: var(--muted);
+    padding: 4px 10px; cursor: pointer; font-family: var(--ff-title);
+    font-size: 8px; letter-spacing: 2px; text-transform: uppercase;
+    transition: all .12s;
+  }
+  .filter-btn:hover { border-color: var(--border2); color: var(--stone); }
+  .filter-btn.active { border-color: var(--gold-dim); color: var(--gold); background: rgba(201,165,90,.06); }
+  .filter-btn.f-collected.active { border-color: var(--gold); color: var(--gold); }
+  .filter-btn.f-missing.active   { border-color: var(--muted); color: var(--stone); }
+
+  /* ── GRID ── */
+  #collection-grid {
+    padding: 24px; display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 1px; background: var(--border);
+    flex: 1;
+  }
+
+  /* ── CARD ── */
+  .coll-card {
+    background: var(--surface); padding: 18px 16px;
+    display: flex; flex-direction: column; gap: 8px;
+    position: relative; transition: background .12s;
+    cursor: default;
+  }
+  .coll-card.collected { background: var(--surface); }
+  .coll-card.missing   { background: #090909; }
+  .coll-card.missing:hover { background: var(--surface); }
+  .coll-card.collected:hover { background: var(--surface2); }
+
+  /* rarity accent line */
+  .coll-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    opacity: 0; transition: opacity .2s;
+  }
+  .coll-card.collected::before { opacity: 1; }
+  .coll-card.r-MUNDANE::before,
+  .coll-card.r-COMMON::before   { background: var(--r-mundane); }
+  .coll-card.r-UNCOMMON::before { background: var(--r-uncommon); }
+  .coll-card.r-RARE::before     { background: var(--r-rare); }
+  .coll-card.r-EPIC::before     { background: var(--r-epic); }
+  .coll-card.r-LEGENDARY::before{ background: var(--r-legendary); }
+
+  .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 6px; }
+  .card-icon { font-size: 26px; line-height: 1; transition: opacity .2s; }
+  .missing .card-icon { opacity: .2; filter: grayscale(1); }
+
+  .rarity-badge {
+    font-family: var(--ff-title); font-size: 7px; letter-spacing: 2px;
+    text-transform: uppercase; padding: 2px 6px; border: 1px solid; flex-shrink: 0;
+  }
+  .r-MUNDANE  .rarity-badge, .r-COMMON .rarity-badge { color: var(--r-mundane);  border-color: var(--r-mundane);  }
+  .r-UNCOMMON .rarity-badge { color: var(--r-uncommon); border-color: var(--r-uncommon); }
+  .r-RARE     .rarity-badge { color: var(--r-rare);     border-color: var(--r-rare);     }
+  .r-EPIC     .rarity-badge { color: var(--r-epic);     border-color: var(--r-epic);     }
+  .r-LEGENDARY .rarity-badge{ color: var(--r-legendary);border-color: var(--r-legendary);}
+
+  .card-title {
+    font-family: var(--ff-title); font-size: 11px; letter-spacing: .5px; color: var(--text);
+    line-height: 1.4;
+  }
+  .missing .card-title { color: var(--muted); }
+
+  .card-desc {
+    font-size: 12px; color: var(--muted); font-style: italic; line-height: 1.5; flex: 1;
+  }
+  .missing .card-desc { opacity: 0; }
+
+  .card-status {
+    font-family: var(--ff-title); font-size: 8px; letter-spacing: 2px;
+    text-transform: uppercase; margin-top: 4px;
+  }
+  .collected .card-status { color: var(--gold-dim); }
+  .missing   .card-status { color: var(--muted); }
+
+  /* missing overlay hint */
+  .missing .card-desc-missing {
+    display: block; font-size: 12px; color: var(--muted); font-style: italic;
+    opacity: .4;
+  }
+  .card-desc-missing { display: none; }
+
+  /* ── EMPTY ── */
+  #empty-state {
+    display: none; text-align: center; padding: 60px 20px;
+    font-family: var(--ff-body); font-size: 16px; color: var(--muted); font-style: italic;
+    grid-column: 1 / -1;
+  }
+
+  /* ── SORT/RARITY FILTERS ── */
+  .rarity-filter {
+    font-family: var(--ff-title); font-size: 8px; letter-spacing: 2px;
+    text-transform: uppercase; padding: 4px 8px;
+    background: none; cursor: pointer; border: 1px solid transparent;
+    transition: all .12s;
+  }
+  .rarity-filter.active { border-color: currentColor; }
+  .rarity-filter.rf-MUNDANE  { color: var(--r-mundane);  }
+  .rarity-filter.rf-UNCOMMON { color: var(--r-uncommon); }
+  .rarity-filter.rf-RARE     { color: var(--r-rare);     }
+  .rarity-filter.rf-EPIC     { color: var(--r-epic);     }
+  .rarity-filter.rf-LEGENDARY{ color: var(--r-legendary);}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="logo">⚔ Arcane Market <span>/ collection</span></div>
+  <input id="base-url-input" type="text" value="http://localhost:8080" />
+</div>
+
+<div id="controls">
+  <div id="progress-wrap">
+    <div id="progress-label">0 / 0</div>
+    <div id="progress-bar-track"><div id="progress-bar-fill" style="width:0%"></div></div>
+  </div>
+
+  <div class="filter-group">
+    <button class="filter-btn active" data-filter="all"       onclick="setFilter('all',this)">Tout</button>
+    <button class="filter-btn f-collected" data-filter="collected" onclick="setFilter('collected',this)">Obtenu</button>
+    <button class="filter-btn f-missing"   data-filter="missing"   onclick="setFilter('missing',this)">Manquant</button>
+  </div>
+
+  <div class="filter-group" id="rarity-filters"></div>
+</div>
+
+<div id="collection-grid">
+  <div id="empty-state">Aucun item à afficher.</div>
+</div>
+
+<script>
+const base = () => document.getElementById('base-url-input').value.replace(/\/$/, '');
+
+const RARITY_ORDER = ['MUNDANE','COMMON','UNCOMMON','RARE','EPIC','LEGENDARY'];
+
+let allItems  = [];
+let curFilter = 'all';
+let curRarity = null;
+
+// ── Fetch ─────────────────────────────────────────────────────────
+async function loadCollection() {
+  try {
+    const token = localStorage.getItem('token');
+    const res   = await fetch(base() + '/api/inventory/collection', {
+      headers: token ? { 'Authorization': 'Bearer ' + token } : {}
+    });
+    if (!res.ok) throw new Error(res.statusText);
+    allItems = await res.json();
+    init();
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+// ── Init ──────────────────────────────────────────────────────────
+function init() {
+  // sort: collected first, then rarity, then title
+  allItems.sort((a, b) => {
+    if (b.isCollected !== a.isCollected) return b.isCollected - a.isCollected;
+    const ri = RARITY_ORDER.indexOf(b.rarity) - RARITY_ORDER.indexOf(a.rarity);
+    if (ri !== 0) return ri;
+    return a.title.localeCompare(b.title);
+  });
+
+  buildRarityFilters();
+  updateProgress();
+  render();
+}
+
+// ── Rarity filter buttons ─────────────────────────────────────────
+function buildRarityFilters() {
+  const rarities = [...new Set(allItems.map(i => i.rarity))]
+    .sort((a, b) => RARITY_ORDER.indexOf(b) - RARITY_ORDER.indexOf(a));
+  const wrap = document.getElementById('rarity-filters');
+  wrap.innerHTML = '';
+  rarities.forEach(r => {
+    const btn = document.createElement('button');
+    btn.className = `rarity-filter rf-${r}`;
+    btn.textContent = r;
+    btn.onclick = () => toggleRarity(r, btn);
+    wrap.appendChild(btn);
+  });
+}
+
+function toggleRarity(r, btn) {
+  if (curRarity === r) {
+    curRarity = null;
+    btn.classList.remove('active');
+  } else {
+    curRarity = r;
+    document.querySelectorAll('.rarity-filter').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  render();
+}
+
+// ── Filters ───────────────────────────────────────────────────────
+function setFilter(f, btn) {
+  curFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function filtered() {
+  return allItems.filter(item => {
+    if (curFilter === 'collected' && !item.isCollected) return false;
+    if (curFilter === 'missing'   &&  item.isCollected) return false;
+    if (curRarity && item.rarity !== curRarity) return false;
+    return true;
+  });
+}
+
+// ── Progress ──────────────────────────────────────────────────────
+function updateProgress() {
+  const total     = allItems.length;
+  const collected = allItems.filter(i => i.isCollected).length;
+  const pct       = total ? Math.round(collected / total * 100) : 0;
+  document.getElementById('progress-label').textContent = `${collected} / ${total}`;
+  document.getElementById('progress-bar-fill').style.width = pct + '%';
+}
+
+// ── Render ────────────────────────────────────────────────────────
+function render() {
+  const grid  = document.getElementById('collection-grid');
+  const empty = document.getElementById('empty-state');
+  const items = filtered();
+
+  // remove old cards
+  grid.querySelectorAll('.coll-card').forEach(el => el.remove());
+
+  if (!items.length) { empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  items.forEach((item, i) => {
+    const el = document.createElement('div');
+    const cls = item.isCollected ? 'collected' : 'missing';
+    el.className = `coll-card ${cls} r-${item.rarity}`;
+    el.style.animationDelay = (i * 20) + 'ms';
+    el.innerHTML = `
+      <div class="card-top">
+        <div class="card-icon">${item.icon || '🗡️'}</div>
+        <div class="rarity-badge">${item.rarity}</div>
+      </div>
+      <div class="card-title">${item.title}</div>
+      <div class="card-desc">${item.description || ''}</div>
+      <div class="card-desc-missing">???</div>
+      <div class="card-status">${item.isCollected ? '✦ Obtenu' : '· Manquant'}</div>
+    `;
+    grid.appendChild(el);
+  });
+}
+
+// ── Init ──────────────────────────────────────────────────────────
+if (!localStorage.getItem('token')) {
+  allItems = [
+    { blueprintId:28, title:'Rusted Iron Key',     description:'The lock it belongs to is either lost or very well hidden.', icon:'🗝️', rarity:'MUNDANE',  isCollected:true  },
+    { blueprintId:3,  title:'Snapped Sickle Blade',description:'The handle is missing. The blade still holds an edge no one sharpened.', icon:'⚔️', rarity:'MUNDANE',  isCollected:false },
+    { blueprintId:7,  title:'Obsidian Shard',      description:'Cuts silence as well as flesh.',                            icon:'💎', rarity:'RARE',    isCollected:true  },
+    { blueprintId:12, title:'Crow Feather Quill',  description:'The ink it was used with has long since dried to black.',  icon:'🪶', rarity:'UNCOMMON', isCollected:true  },
+    { blueprintId:15, title:'Voidbound Tome',       description:'Pages that rewrite themselves when no one is watching.',   icon:'📖', rarity:'EPIC',    isCollected:false },
+    { blueprintId:19, title:'Ashen Coin',           description:'Currency from a kingdom that no longer exists.',          icon:'🪙', rarity:'UNCOMMON', isCollected:false },
+    { blueprintId:22, title:'Hollow Bone Whistle',  description:'It summons nothing. It has always summoned nothing.',     icon:'🦴', rarity:'MUNDANE',  isCollected:true  },
+    { blueprintId:31, title:'Bloodstained Cloth',   description:'Origin unknown. The stain does not fade.',               icon:'🩸', rarity:'COMMON',   isCollected:false },
+  ];
+  init();
+} else {
+  loadCollection();
+}
+</script>
+</body>
+</html>

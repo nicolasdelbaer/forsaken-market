@@ -1,10 +1,7 @@
 package be.nicolasdelbaer.forsakenmarket.services;
 
 import be.nicolasdelbaer.forsakenmarket.annotations.Transactional;
-import be.nicolasdelbaer.forsakenmarket.entities.InventoryItem;
-import be.nicolasdelbaer.forsakenmarket.entities.MarketItem;
-import be.nicolasdelbaer.forsakenmarket.entities.Player;
-import be.nicolasdelbaer.forsakenmarket.entities.RerolledItem;
+import be.nicolasdelbaer.forsakenmarket.entities.*;
 import be.nicolasdelbaer.forsakenmarket.enums.MarketItemStatus;
 import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.BadItemOwnershipException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.*;
@@ -22,6 +19,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @ApplicationScoped
@@ -37,8 +35,9 @@ public class MarketService {
     @Inject private PlayerRepository playerRepository;
 
     @Inject private EntityManager entityManager;
+    @Inject private ItemBlueprintRepository itemBlueprintRepository;
     @Inject
-    private ItemBlueprintRepository itemBlueprintRepository;
+    private CollectionItemRepository collectionItemRepository;
 
     @Transactional
     public void rerollItem(Integer playerId, Long itemId)
@@ -89,6 +88,16 @@ public class MarketService {
 
         //add item to inventory
         inventoryService.acquireItem(new BuyItemDto(player, itemInstance, marketPrice, currentRound));
+
+
+        if(!collectionItemRepository.isCollected(entityManager, playerId, itemInstance.getItemBlueprint().getId())) {
+            CollectionItem collectionItem = new CollectionItem();
+            collectionItem.setItemBlueprint(itemInstance.getItemBlueprint());
+            collectionItem.setPlayer(player);
+            collectionItem.setFoundAt(LocalDateTime.now());
+            collectionItem.setFoundRoundId(gameStateManager.getCurrentRound());
+            collectionItemRepository.save(entityManager, collectionItem);
+        }
     }
 
     @Transactional

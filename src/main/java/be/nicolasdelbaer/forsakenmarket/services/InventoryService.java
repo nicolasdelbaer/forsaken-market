@@ -4,11 +4,14 @@ import be.nicolasdelbaer.forsakenmarket.annotations.Transactional;
 import be.nicolasdelbaer.forsakenmarket.entities.InventoryItem;
 import be.nicolasdelbaer.forsakenmarket.enums.MarketItemStatus;
 import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.CannotDiscardItemException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.CollectionNotFoundException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.CannotSellInactiveItemException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketPriceNotFoundException;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItemDto;
+import be.nicolasdelbaer.forsakenmarket.models.inventory.CollectionItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.InventoryItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
+import be.nicolasdelbaer.forsakenmarket.repositories.CollectionItemRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.InventoryItemRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.MarketPriceRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.GameStateManager;
@@ -29,6 +32,8 @@ public class InventoryService {
     @Inject private GameStateManager gameStateManager;
     @Inject
     private MarketPriceRepository marketPriceRepository;
+    @Inject
+    private CollectionItemRepository collectionItemRepository;
 
     /*
      * Buy action from the market and add the item to a player's inventory
@@ -112,5 +117,14 @@ public class InventoryService {
                             inventoryItem.isDecayed()
                     );
                 }).toList();
+    }
+
+    /*
+     * Fetch Collection status
+     * Get all blueprints data + if they've been find or not
+     */
+    @Transactional
+    public List<CollectionItemResponse> fetchCollection(Integer playerId) throws CollectionNotFoundException {
+        return collectionItemRepository.findAllForPlayer(entityManager, playerId);
     }
 }
