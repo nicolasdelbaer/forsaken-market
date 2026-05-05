@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Hall of Infamy</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:         #08080b;
+    --surface:    #0f0f14;
+    --surface2:   #141419;
+    --border:     #2a2530;
+    --border2:    #3a2f45;
+    --gold:       #c9a55a;
+    --gold-dim:   #7a6035;
+    --crimson:    #8b2d3a;
+    --crimson-hi: #b03a4a;
+    --stone:      #a09898;
+    --muted:      #524850;
+    --text:       #ccc4b8;
+    --silver:     #8a9aaa;
+    --bronze:     #8a5a3a;
+    --ff-title:   'Cinzel', serif;
+    --ff-body:    'Crimson Text', serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: var(--ff-body); font-size: 15px; min-height: 100vh;
+    display: flex; flex-direction: column;
+    background-image:
+      radial-gradient(ellipse 60% 50% at 50% 0%, rgba(139,45,58,.12) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 30% at 50% 100%, rgba(80,30,40,.08) 0%, transparent 60%);
+  }
+
+  /* ── TOPBAR ── */
+  #topbar {
+    display: flex; align-items: center; gap: 14px;
+    padding: 0 24px; height: 46px; flex-shrink: 0;
+    background: var(--surface); position: relative;
+  }
+  #topbar::after {
+    content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+  }
+  .logo { font-family: var(--ff-title); font-size: 12px; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; }
+  .logo span { color: var(--muted); font-size: 9px; letter-spacing: 2px; }
+  #base-url-input {
+    margin-left: auto; background: var(--bg); border: 1px solid var(--border);
+    color: var(--stone); padding: 4px 8px; font-family: monospace; font-size: 11px; width: 200px;
+  }
+  #base-url-input:focus { outline: none; border-color: var(--gold-dim); }
+  .btn-sm {
+    background: none; border: 1px solid var(--border2); color: var(--muted);
+    padding: 4px 12px; cursor: pointer; font-family: var(--ff-title);
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+    transition: border-color .15s, color .15s;
+  }
+  .btn-sm:hover { border-color: var(--gold-dim); color: var(--gold); }
+
+  /* ── HERO HEADER ── */
+  #hero {
+    text-align: center; padding: 48px 20px 32px;
+    position: relative;
+  }
+  #hero::after {
+    content: ''; position: absolute; bottom: 0; left: 10%; right: 10%; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--crimson), transparent);
+  }
+  .hero-skull { font-size: 36px; line-height: 1; margin-bottom: 14px; opacity: .7; }
+  #hero h1 {
+    font-family: var(--ff-title); font-size: 28px; letter-spacing: 8px;
+    text-transform: uppercase; color: var(--crimson-hi); font-weight: 900;
+    text-shadow: 0 0 40px rgba(139,45,58,.4);
+  }
+  #hero .subtitle {
+    font-family: var(--ff-body); font-size: 14px; color: var(--muted);
+    font-style: italic; margin-top: 8px; letter-spacing: 1px;
+  }
+  #hero .season-tag {
+    display: inline-block; margin-top: 14px;
+    font-family: var(--ff-title); font-size: 9px; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--gold-dim);
+    border: 1px solid var(--gold-dim); padding: 3px 14px;
+  }
+
+  /* ── LEADERBOARD ── */
+  #board-wrap {
+    max-width: 760px; width: 100%; margin: 40px auto 60px;
+    padding: 0 20px; display: flex; flex-direction: column; gap: 0;
+  }
+
+  /* header row */
+  .board-header {
+    display: grid; grid-template-columns: 52px 1fr 140px 140px;
+    padding: 0 20px 10px; gap: 0;
+    font-family: var(--ff-title); font-size: 8px; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+  .board-header .col-score, .board-header .col-wallet { text-align: right; }
+
+  /* rows */
+  .board-row {
+    display: grid; grid-template-columns: 52px 1fr 140px 140px;
+    padding: 14px 20px; gap: 0; align-items: center;
+    border-bottom: 1px solid var(--border);
+    transition: background .12s; position: relative;
+    animation: rowIn .3s ease both;
+  }
+  .board-row:hover { background: var(--surface2); }
+
+  @keyframes rowIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  /* rank */
+  .rank {
+    font-family: var(--ff-title); font-size: 18px; font-weight: 600;
+    text-align: center; line-height: 1;
+  }
+  .rank-1 { color: var(--gold); text-shadow: 0 0 12px rgba(201,165,90,.3); }
+  .rank-2 { color: var(--silver); }
+  .rank-3 { color: var(--bronze); }
+  .rank-n { color: var(--muted); font-size: 14px; }
+
+  /* name */
+  .player-name {
+    font-family: var(--ff-title); font-size: 14px; letter-spacing: 1px; color: var(--text);
+  }
+  .player-id { font-family: var(--ff-body); font-size: 11px; color: var(--muted); font-style: italic; margin-top: 2px; }
+
+  /* score */
+  .col-score {
+    text-align: right;
+    font-family: var(--ff-title); font-size: 16px; color: var(--text);
+  }
+  .score-zero { color: var(--muted); font-size: 13px; font-style: italic; font-family: var(--ff-body); }
+
+  /* wallet */
+  .col-wallet {
+    text-align: right;
+    font-family: var(--ff-title); font-size: 14px; color: var(--gold-dim);
+  }
+  .col-wallet span { font-size: 11px; margin-left: 2px; }
+
+  /* top 3 row styles */
+  .board-row.top-1 { background: rgba(201,165,90,.04); }
+  .board-row.top-1::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+    background: var(--gold);
+  }
+  .board-row.top-2::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+    background: var(--silver);
+  }
+  .board-row.top-3::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+    background: var(--bronze);
+  }
+  .board-row.top-1 .player-name { color: var(--gold); }
+
+  /* medals */
+  .medal { font-size: 16px; line-height: 1; }
+
+  /* empty / error */
+  #board-empty {
+    text-align: center; padding: 60px 20px;
+    font-family: var(--ff-body); font-size: 16px; color: var(--muted); font-style: italic;
+  }
+
+  /* footer */
+  #board-footer {
+    text-align: center; padding-top: 20px;
+    font-family: var(--ff-body); font-size: 12px; color: var(--muted); font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="logo">⚔ Arcane Market <span>/ hall of infamy</span></div>
+  <button class="btn-sm" onclick="loadBoard()">↻ Actualiser</button>
+  <input id="base-url-input" type="text" value="http://localhost:8080" />
+</div>
+
+<div id="hero">
+  <div class="hero-skull">💀</div>
+  <h1>Hall of Infamy</h1>
+  <div class="subtitle">Ceux dont les noms seront gravés dans la pierre… ou l'oubli.</div>
+  <div class="season-tag">Saison en cours</div>
+</div>
+
+<div id="board-wrap">
+  <div class="board-header">
+    <div></div>
+    <div>Marchand</div>
+    <div class="col-score">Score</div>
+    <div class="col-wallet">Bourse</div>
+  </div>
+  <div id="board-rows"></div>
+  <div id="board-footer"></div>
+</div>
+
+<script>
+const base = () => document.getElementById('base-url-input').value.replace(/\/$/, '');
+
+const MEDALS = ['', '☩', '✦', '✧'];
+
+function rankClass(i) {
+  if (i === 0) return 'top-1';
+  if (i === 1) return 'top-2';
+  if (i === 2) return 'top-3';
+  return '';
+}
+function rankDisplay(i) {
+  if (i === 0) return `<div class="rank rank-1">${MEDALS[1]}</div>`;
+  if (i === 1) return `<div class="rank rank-2">${MEDALS[2]}</div>`;
+  if (i === 2) return `<div class="rank rank-3">${MEDALS[3]}</div>`;
+  return `<div class="rank rank-n">${i + 1}</div>`;
+}
+
+function renderBoard(data) {
+  const container = document.getElementById('board-rows');
+  container.innerHTML = '';
+
+  // sort by score desc, wallet desc as tiebreak
+  const sorted = [...data].sort((a, b) => b.score - a.score || b.wallet - a.wallet);
+
+  sorted.forEach((p, i) => {
+    const row = document.createElement('div');
+    row.className = 'board-row ' + rankClass(i);
+    row.style.animationDelay = (i * 60) + 'ms';
+    row.innerHTML = `
+      ${rankDisplay(i)}
+      <div>
+        <div class="player-name">${p.name}</div>
+        <div class="player-id">#${p.playerId}</div>
+      </div>
+      <div class="col-score">
+        ${p.score > 0
+          ? p.score.toLocaleString('fr-FR')
+          : '<span class="score-zero">—</span>'}
+      </div>
+      <div class="col-wallet">${p.wallet.toLocaleString('fr-FR')} <span>◆</span></div>
+    `;
+    container.appendChild(row);
+  });
+
+  document.getElementById('board-footer').textContent =
+    sorted.length + ' marchands inscrits';
+}
+
+async function loadBoard() {
+  const container = document.getElementById('board-rows');
+  container.innerHTML = '<div id="board-empty">Consultation des archives…</div>';
+  try {
+    const token = localStorage.getItem('token');
+    const res   = await fetch(base() + '/api/hall-of-infamy/top25', {
+      headers: token ? { 'Authorization': 'Bearer ' + token } : {}
+    });
+    if (!res.ok) throw new Error(res.statusText);
+    const data = await res.json();
+    renderBoard(data);
+  } catch(e) {
+    container.innerHTML = `<div id="board-empty">${e.message}</div>`;
+  }
+}
+
+// Demo si pas de token
+if (!localStorage.getItem('token')) {
+  renderBoard([
+    { playerId: 1, score: 0, wallet: 500, name: 'Nidel'  },
+    { playerId: 2, score: 0, wallet: 500, name: 'Foo'    },
+    { playerId: 3, score: 0, wallet: 500, name: 'Bar'    },
+  ]);
+} else {
+  loadBoard();
+}
+</script>
+</body>
+</html>

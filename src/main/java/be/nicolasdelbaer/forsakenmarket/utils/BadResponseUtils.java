@@ -3,6 +3,7 @@ package be.nicolasdelbaer.forsakenmarket.utils;
 public class BadResponseUtils {
     public static String AlreadyUsedEmail = "already used email";
 
+    public static String CannotRetrievePlayers = "cannot retrieve players";
     public static String CannotRetrieveItems = "cannot retrieve items";
     public static String CannotBuyItem = "cannot buy item";
     public static String CannotSellItem = "cannot sell item";

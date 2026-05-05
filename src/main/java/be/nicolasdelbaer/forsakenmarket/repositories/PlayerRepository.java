@@ -1,8 +1,11 @@
 package be.nicolasdelbaer.forsakenmarket.repositories;
 
 import be.nicolasdelbaer.forsakenmarket.entities.Player;
+import be.nicolasdelbaer.forsakenmarket.models.player.LeaderboardRepsonse;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
+
+import java.util.List;
 
 @ApplicationScoped
 public class PlayerRepository extends CrudRepository<Player, Integer> {
@@ -30,5 +33,14 @@ public class PlayerRepository extends CrudRepository<Player, Integer> {
                         """, Integer.class)
                 .setParameter("playerId", playerId)
                 .getSingleResult();
+    }
+
+    public List<LeaderboardRepsonse> fetchPlayerScores(EntityManager entityManager, int limit) {
+        return entityManager.createQuery("""
+                        select t.id, t.totReput as score, t.wallet, t.name from Player t
+                        order by t.totReput DESC, t.id ASC
+                        """, LeaderboardRepsonse.class)
+                .setMaxResults(limit)
+                .getResultList();
     }
 }
