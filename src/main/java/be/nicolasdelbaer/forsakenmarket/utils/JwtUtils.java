@@ -5,14 +5,12 @@ import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import jakarta.enterprise.context.ApplicationScoped;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-@ApplicationScoped
 public class JwtUtils {
     //15min -> 15*60*1000
     private static final long expiration = 900_000;
