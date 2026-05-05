@@ -78,9 +78,9 @@ public class ScheduledMarketService {
     * Calculate Open/High/close/Low prices for stock market display
     * Each @duration rounds, a new MarketPriceEvolution list by blueprints will be created
     */
-    public void recordMarketPriceMovements(EntityManager entityManager, long startRoundId, long duration) throws UndefinedBlueprintException {
+    public void recordMarketPriceMovements(EntityManager entityManager, long startRoundId, int duration) throws UndefinedBlueprintException {
         List<MarketPriceEvolution> marketPriceEvolutionList = new ArrayList<>();
-        List<MarketOHLC> priceEvolutionList = marketPriceRepository.getEvolutionData(entityManager, startRoundId, duration);
+        List<MarketOHLC> priceEvolutionList = marketPriceRepository.getAllEvolutionData(entityManager, startRoundId, duration);
 
         for (MarketOHLC ohcl : priceEvolutionList) {
             ItemBlueprint bp = gameStateManager.getItemBlueprint(ohcl.item_blueprint_id());

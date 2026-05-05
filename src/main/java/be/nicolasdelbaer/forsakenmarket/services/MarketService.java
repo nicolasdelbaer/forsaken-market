@@ -12,12 +12,10 @@ import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerInsufficientFund
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerNotFoundException;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItemDto;
 import be.nicolasdelbaer.forsakenmarket.models.market.MarketItemResponse;
+import be.nicolasdelbaer.forsakenmarket.models.market.MarketOHLCResponse;
 import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
 import be.nicolasdelbaer.forsakenmarket.models.player.ReputationScoreData;
-import be.nicolasdelbaer.forsakenmarket.repositories.InventoryItemRepository;
-import be.nicolasdelbaer.forsakenmarket.repositories.MarketItemRepository;
-import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRepository;
-import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRerollRepository;
+import be.nicolasdelbaer.forsakenmarket.repositories.*;
 import be.nicolasdelbaer.forsakenmarket.utils.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -30,6 +28,7 @@ public class MarketService {
 
     @Inject private InventoryItemRepository inventoryItemRepository;
     @Inject private MarketItemRepository marketItemRepository;
+    @Inject private MarketPriceEvolutionRepository marketPriceEvolutionRepository;
     @Inject private PlayerRerollRepository playerRerollRepository;
 
     @Inject private InventoryService inventoryService;
@@ -133,4 +132,20 @@ public class MarketService {
                 .toList();
     }
 
+    /*
+     * Based on an itemblueprint id, returns the predefined amount of last OHLC prices.
+     */
+    public List<MarketOHLCResponse> getMarketEvolution(Long itemId) throws UndefinedBlueprintException {
+        return marketPriceEvolutionRepository
+                .findByBlueprint(entityManager, itemId, GameConfiguration.OHLC_range)
+                .stream()
+                .map(marketPriceEvolution ->
+                    new MarketOHLCResponse(
+                        marketPriceEvolution.getOpen(),
+                        marketPriceEvolution.getHigh(),
+                        marketPriceEvolution.getLow(),
+                        marketPriceEvolution.getClose()
+                ))
+                .toList();
+    }
 }

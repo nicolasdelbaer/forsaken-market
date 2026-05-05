@@ -18,7 +18,7 @@ class ReputationCalculatorTest {
         InventoryItem inventoryItem = new InventoryItem();
         inventoryItem.setBoughtPrice(50);
 
-        PriceMovementByRound marketPrice = new PriceMovementByRound(100,100);
+        PriceMovementByRound marketPrice = new PriceMovementByRound(1, 100,100);
 
         ReputationScoreData data = new ReputationScoreData(inventoryItem, marketPrice);
 
@@ -35,7 +35,7 @@ class ReputationCalculatorTest {
         InventoryItem inventoryItem = new InventoryItem();
         inventoryItem.setBoughtPrice(100);
 
-        PriceMovementByRound marketPrice = new PriceMovementByRound(100,100);
+        PriceMovementByRound marketPrice = new PriceMovementByRound(1, 100,100);
 
         ReputationScoreData data = new ReputationScoreData(inventoryItem, marketPrice);
 
@@ -50,7 +50,7 @@ class ReputationCalculatorTest {
         InventoryItem inventoryItem = new InventoryItem();
         inventoryItem.setBoughtPrice(100);
 
-        PriceMovementByRound marketPrice = new PriceMovementByRound(50,50);
+        PriceMovementByRound marketPrice = new PriceMovementByRound(1, 50,50);
 
         ReputationScoreData data = new ReputationScoreData(inventoryItem, marketPrice);
 
@@ -65,7 +65,7 @@ class ReputationCalculatorTest {
         InventoryItem inventoryItem = new InventoryItem();
         inventoryItem.setBoughtPrice(0);
 
-        PriceMovementByRound marketPrice = new PriceMovementByRound(50,50);
+        PriceMovementByRound marketPrice = new PriceMovementByRound(1, 50,50);
         ReputationScoreData data = new ReputationScoreData(inventoryItem, marketPrice);
 
         assertDoesNotThrow(() -> ReputationCalculator.calculate(data));
@@ -76,7 +76,7 @@ class ReputationCalculatorTest {
         InventoryItem inventoryItem = new InventoryItem();
         inventoryItem.setBoughtPrice(100);
 
-        PriceMovementByRound marketPrice = new PriceMovementByRound(110,110);
+        PriceMovementByRound marketPrice = new PriceMovementByRound(1, 110,110);
         ReputationScoreData data = new ReputationScoreData(inventoryItem, marketPrice);
 
         Integer result = ReputationCalculator.calculate(data);

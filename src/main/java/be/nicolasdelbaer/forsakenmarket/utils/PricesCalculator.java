@@ -40,7 +40,7 @@ public class PricesCalculator {
         current = priceHistory.currentPrice() + momentum + reversion + noise;
         current += getMarketShockValue(baseSell);
 
-        return new PriceMovementByRound(current, priceHistory.currentPrice());
+        return new PriceMovementByRound(itemBlueprint.getId(), current, priceHistory.currentPrice());
     }
 
     /*
@@ -49,7 +49,7 @@ public class PricesCalculator {
     public static PriceMovementByRound warmupPrice(ItemBlueprint itemBlueprint) {
         int warmupRounds = RandomGenerator.getDefault().nextInt(MIN_WARMUP, MAX_WARMUP);
         int baseSell = itemBlueprint.getPrice();
-        PriceMovementByRound current = new PriceMovementByRound(baseSell, baseSell);
+        PriceMovementByRound current = new PriceMovementByRound(itemBlueprint.getId(), baseSell, baseSell);
 
         for (int i = 0; i < warmupRounds; i++) {
             current = getNextPrice(itemBlueprint, current);

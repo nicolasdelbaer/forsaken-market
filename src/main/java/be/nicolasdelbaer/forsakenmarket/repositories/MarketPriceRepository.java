@@ -38,9 +38,9 @@ public class MarketPriceRepository extends CrudRepository<MarketPrice, Long> {
 
     }
 
-    public List<MarketOHLC> getEvolutionData(EntityManager entityManager, long startRoundId, long duration) {
+    public List<MarketOHLC> getAllEvolutionData(EntityManager entityManager, long startRoundId, int duration) {
         return entityManager
-                .createNamedQuery("MarketPrice.ohcl", MarketOHLC.class)
+                .createNamedQuery("MarketPrice.ohlc", MarketOHLC.class)
                 .setParameter("startId", startRoundId)
                 .setParameter("endId", startRoundId+duration)
                 .getResultList();

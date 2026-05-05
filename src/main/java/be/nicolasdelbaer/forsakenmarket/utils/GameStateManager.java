@@ -9,7 +9,9 @@ import jakarta.enterprise.context.ApplicationScoped;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @ApplicationScoped
 public class GameStateManager {
@@ -39,6 +41,10 @@ public class GameStateManager {
         if(!marketPriceList.containsKey(itemBlueprintId))
             throw new UndefinedMarketPriceException("Market Price not found, missing init?");
         return marketPriceList.get(itemBlueprintId);
+    }
+
+    public List<PriceMovementByRound> getPricesHistory() throws UndefinedMarketPriceException {
+        return marketPriceList.values().stream().toList();
     }
 
     public List<ItemBlueprint> getItemBlueprintList() {

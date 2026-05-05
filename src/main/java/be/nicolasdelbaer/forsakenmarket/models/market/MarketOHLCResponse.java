@@ -1,10 +1,9 @@
 package be.nicolasdelbaer.forsakenmarket.models.market;
 
 /*
- * Used for internal calculations and creating MarketPriceEvolution
+ * Used for sending data to usersy
  */
-public record MarketOHLC(
-        Long item_blueprint_id,
+public record MarketOHLCResponse(
         Integer open,
         Integer high,
         Integer low,

@@ -18,4 +18,5 @@ public class GameConfiguration {
     public static final int rerollCost = 20;
     public static final int marketVisibleLimit = 8;
 
+    public static final int OHLC_range = 50;
 }
