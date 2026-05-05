@@ -124,14 +124,13 @@
 
   /* ── CHART AREA ── */
   #chart-wrap {
-    position: relative; padding: 12px 0 0 0;
-    display: flex;
+    display: flex; align-items: stretch;
     height: 420px; min-height: 180px; max-height: calc(100vh - 120px);
     flex-shrink: 0;
   }
   #y-axis-canvas { width: 58px; flex-shrink: 0; }
   #chart-container { flex: 1; position: relative; overflow: hidden; }
-  canvas { display: block; }
+  #main-canvas { position: absolute; top: 0; left: 0; }
 
   /* drag handle */
   #resize-handle {
@@ -271,10 +270,10 @@ document.addEventListener('mouseup', () => {
 function resize() {
   const wrap = document.getElementById('chart-container');
   const dpr  = window.devicePixelRatio || 1;
-  const W    = wrap.clientWidth;
-  const H    = wrap.clientHeight;
-  mainCanvas.width  = W * dpr;
-  mainCanvas.height = H * dpr;
+  const W = wrap.clientWidth;
+  const H = wrap.clientHeight;
+  mainCanvas.width        = W * dpr;
+  mainCanvas.height       = H * dpr;
   mainCanvas.style.width  = W + 'px';
   mainCanvas.style.height = H + 'px';
   mc.setTransform(1, 0, 0, 1, 0, 0);
@@ -305,7 +304,7 @@ async function loadItems() {
     items.forEach(item => {
       const el = document.createElement('div');
       el.className = 'item-entry';
-      el.dataset.id = item.marketId;
+      el.dataset.id = item.blueprintId;
       el.innerHTML = `
         <div class="ie-icon">${item.icon || '🗡️'}</div>
         <div>
@@ -316,7 +315,7 @@ async function loadItems() {
       list.appendChild(el);
     });
     // auto-select first
-    if (items.length) selectItem(items[0].blueprintId, items[0].title, items[0].icon);
+    if (items.length) selectItem(items[0].marketId, items[0].title, items[0].icon);
   } catch(e) {
     list.innerHTML = '<div id="sidebar-empty">Erreur de chargement.</div>';
     console.warn(e);
@@ -374,10 +373,10 @@ const TOTAL_SLOTS = 50;
 
 function draw() {
   const dpr = window.devicePixelRatio || 1;
-  const W   = mainCanvas.width;
-  const H   = mainCanvas.height;
+  const W   = mainCanvas.width  / dpr;   // CSS pixels
+  const H   = mainCanvas.height / dpr;   // CSS pixels
   mc.clearRect(0, 0, W, H);
-  yc.clearRect(0, 0, yCanvas.width, yCanvas.height);
+  yc.clearRect(0, 0, yCanvas.width / dpr, yCanvas.height / dpr);
 
   if (!candles.length) return;
 
@@ -501,10 +500,12 @@ mainCanvas.addEventListener('mousemove', e => {
   const rect = mainCanvas.getBoundingClientRect();
   const mx   = e.clientX - rect.left;
   const my   = e.clientY - rect.top;
-  const W     = mainCanvas.clientWidth;
-  const PAD_L = 10;
-  const candleGap = (W - PAD_L * 2) / TOTAL_SLOTS;
-  const idx = Math.round((mx - PAD_L) / candleGap - .5);
+  const container = document.getElementById('chart-container');
+  const W      = container.clientWidth;
+  const PAD_L  = 8;
+  const PAD_R  = 16;
+  const slotW  = (W - PAD_L - PAD_R) / TOTAL_SLOTS;
+  const idx    = Math.floor((mx - PAD_L) / slotW);
 
   // crosshairs
   document.getElementById('crosshair-v').style.cssText = `display:block;left:${mx}px;top:0;bottom:0;width:1px`;
@@ -545,6 +546,41 @@ window.addEventListener('load', () => {
   observer.observe(document.getElementById('chart-container'));
 
   if (!localStorage.getItem('token')) {
+    // Demo mode: inject fake items in sidebar
+    const fakeItems = [
+      { marketId: 1, title: 'Épée maudite',   icon: '⚔️',  rarity: 'RARE'   },
+      { marketId: 2, title: 'Anneau du néant', icon: '💍',  rarity: 'EPIC'   },
+      { marketId: 3, title: 'Potion trouble',  icon: '🧪',  rarity: 'COMMON' },
+    ];
+    const list = document.getElementById('item-list');
+    list.innerHTML = '';
+    fakeItems.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'item-entry';
+      el.dataset.id = item.marketId;
+      el.innerHTML = `<div class="ie-icon">${item.icon}</div><div><div class="ie-name">${item.title}</div><div class="ie-rarity r-${item.rarity}">${item.rarity}</div></div>`;
+      el.onclick = () => {
+        document.querySelectorAll('.item-entry').forEach(e => e.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById('ct-icon').textContent = item.icon + ' ';
+        document.getElementById('ct-name').textContent = item.title;
+        // generate demo candles
+        candles = Array.from({length: 18 + Math.floor(Math.random() * 20)}, (_, i) => {
+          const b = 40 + item.marketId * 15 + Math.sin(i / 3 + item.marketId) * 18 + Math.random() * 8;
+          const open  = Math.round(b);
+          const close = Math.round(b + (Math.random() - .45) * 14);
+          const high  = Math.round(Math.max(open, close) + Math.random() * 7);
+          const low   = Math.round(Math.min(open, close) - Math.random() * 7);
+          return { open, high, low, close };
+        });
+        updateStats(candles);
+        document.getElementById('empty-state').style.display = 'none';
+        draw();
+      };
+      list.appendChild(el);
+    });
+    // auto-click first
+    list.firstChild.click();
   } else {
     loadItems();
   }

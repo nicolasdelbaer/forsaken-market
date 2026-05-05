@@ -16,7 +16,7 @@ public class MarketPriceEvolutionRepository extends CrudRepository<MarketPriceEv
         return entityManager.createQuery("""
                         select t from MarketPriceEvolution t
                         where t.itemBlueprint.id = :itemBlueprintId
-                        order by t.endRoundId DESC
+                        order by t.endRoundId ASC
                         limit :limitMax
                         """, MarketPriceEvolution.class)
                 .setParameter("itemBlueprintId", itemBlueprintId)
