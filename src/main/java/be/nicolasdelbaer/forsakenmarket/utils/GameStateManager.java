@@ -52,7 +52,7 @@ public class GameStateManager {
     }
 
     public ItemBlueprint getItemBlueprint(Long itemBlueprintId) throws UndefinedBlueprintException {
-        if(!marketPriceList.containsKey(itemBlueprintId))
+        if(!itemBlueprintList.containsKey(itemBlueprintId))
             throw new UndefinedBlueprintException("Blueprint not found, missing init?");
         return itemBlueprintList.get(itemBlueprintId);
     }
