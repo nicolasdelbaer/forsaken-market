@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.random.RandomGenerator;
-import java.util.stream.Collectors;
 
 
 /*
@@ -39,6 +38,8 @@ public class ScheduledMarketService {
     @Inject private GameStateManager gameStateManager;
     @Inject private ItemBlueprintRepository itemBlueprintRepository;
     @Inject private MarketPriceRepository marketPriceRepository;
+    @Inject
+    private EntityManager entityManager;
 
 
     /*
@@ -106,8 +107,7 @@ public class ScheduledMarketService {
      * When over they'll disappear from the available list and will have the expired status.
      */
     public void updateTimeToLive(EntityManager entityManager) {
-        List<MarketItem> marketItemList = marketItemRepository
-                .findAllByRoundId(entityManager);
+        List<MarketItem> marketItemList = marketItemRepository.findAllValid(entityManager);
 
         Long currentRound = gameStateManager.getCurrentRound();
         List<MarketItem> expiredList = new ArrayList<>();
@@ -116,7 +116,6 @@ public class ScheduledMarketService {
             if(marketItem.isExpired()) expiredList.add(marketItem);
         }
         marketItemRepository.updateAll(entityManager, expiredList);
-
     }
 
     /*
@@ -126,35 +125,23 @@ public class ScheduledMarketService {
     public void updateMarketPrices(EntityManager entityManager) {
         List<ItemBlueprint> blueprintList = itemBlueprintRepository.findAll(entityManager);
 
-        Map<ItemBlueprint, PriceMovementByRound> updatedPrices = new HashMap<>();
+        List<MarketPrice> updatedPrices = new ArrayList<>();
+        Map<Long, PriceMovementByRound> marketPrices = new HashMap<>();
 
         for (ItemBlueprint blueprint : blueprintList) {
             PriceMovementByRound priceMovementByRound = MarketPriceUtils.getMarketRoundMovement(gameStateManager, blueprint);
             PriceMovementByRound nextPrice = PricesCalculator.getNextPrice(blueprint, priceMovementByRound);
-            updatedPrices.put(blueprint, nextPrice);
+
+            MarketPrice marketPrice = new MarketPrice();
+            marketPrice.setCurrentPrice(nextPrice.currentPrice());
+            marketPrice.setItemBlueprint(blueprint);
+            marketPrice.setRoundId(gameStateManager.getCurrentRound());
+            marketPrices.put(blueprint.getId(), nextPrice);
+            updatedPrices.add(marketPrice);
         }
 
-        List<MarketPrice> prices = updatedPrices.entrySet().stream()
-                .map(entry -> {
-                    Integer newPrice = PricesCalculator.getNextPrice(
-                            entry.getKey(),
-                            entry.getValue()).currentPrice();
-
-                    MarketPrice marketPrice = new MarketPrice();
-                    marketPrice.setCurrentPrice(newPrice);
-                    marketPrice.setItemBlueprint(entry.getKey());
-                    marketPrice.setRoundId(gameStateManager.getCurrentRound());
-                    return marketPrice;
-                })
-                .toList();
-
-        marketPriceRepository.saveAll(entityManager, prices);
-
-        //Refresh cached server data
-        gameStateManager.setMarketPriceList(updatedPrices.entrySet().stream().collect(Collectors.toMap(
-        entry -> entry.getKey().getId(),
-        Map.Entry::getValue
-        )));
+        marketPriceRepository.saveAll(entityManager, updatedPrices);
+        gameStateManager.setMarketPriceList(marketPrices);
     }
 
 
