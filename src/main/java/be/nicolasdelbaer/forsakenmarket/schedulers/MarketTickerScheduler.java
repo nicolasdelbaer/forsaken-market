@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class MarketTickerScheduler{
-
     private static final Logger log = LoggerFactory.getLogger(MarketTickerScheduler.class);
     private ScheduledExecutorService scheduler;
     @Inject private EntityManagerFactory entityManagerFactory;

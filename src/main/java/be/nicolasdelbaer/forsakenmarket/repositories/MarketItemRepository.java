@@ -13,12 +13,12 @@ public class MarketItemRepository extends CrudRepository<MarketItem, Long> {
         super(MarketItem.class);
     }
 
-    public List<MarketItem> findAllByRoundId(EntityManager entityManager) {
+    public List<MarketItem> findAllValid(EntityManager entityManager) {
         return entityManager
                 .createQuery("""
                         select t from MarketItem t
                         where t.expired = false
-                       \s""",
+                       """,
                         MarketItem.class)
                 .getResultList();
     }
