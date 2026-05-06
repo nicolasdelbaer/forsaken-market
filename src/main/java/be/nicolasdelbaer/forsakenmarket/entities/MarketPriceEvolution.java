@@ -1,6 +1,8 @@
 package be.nicolasdelbaer.forsakenmarket.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,15 +23,23 @@ public class MarketPriceEvolution {
     private Long id;
 
     @Getter @Setter
+    @Min(0)
+    @Max(1_000_000)
     private Integer open;
 
     @Getter @Setter
+    @Min(0)
+    @Max(1_000_000)
     private Integer close;
 
     @Getter @Setter
+    @Min(0)
+    @Max(1_000_000)
     private Integer high;
 
     @Getter @Setter
+    @Min(0)
+    @Max(1_000_000)
     private Integer low;
 
 

@@ -2,15 +2,20 @@ package be.nicolasdelbaer.forsakenmarket.entities;
 
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerInsufficientFundsException;
 import jakarta.persistence.*;
-import lombok.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
 public class Player {
     private static final int[] LEVEL_THRESHOLDS = {0, 100, 250, 500, 1000};
 
@@ -34,8 +39,11 @@ public class Player {
     /*
      * Current money that player can use to buy new item
      * User debit & credit for managing the wallet
+     * Design shouldn't allow billionaires -> so Integer
      */
     @Getter
+    @Min(0)
+    @Max(1_000_000_000)
     private Integer wallet;
 
     /*
@@ -52,6 +60,8 @@ public class Player {
      * All won reputation points from the account creation
      */
     @Getter @Setter
+    @Min(0)
+    @Max(1_000_000_000)
     private Integer totReput;
 
     /*
@@ -60,6 +70,7 @@ public class Player {
     * used to persist the progression
     */
     @Getter @Setter
+    @Min(0)
     private Integer currentReput;
 
     @Getter @Setter
