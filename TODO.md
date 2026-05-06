@@ -22,6 +22,9 @@
 
 
 ## TO DO NEXT
+### Critical
+GameStateManager (singleton @ApplicationScoped) (marketPriceList et currentRound) mutables without synchronisation. 
+-> Data race between schedulers & requesters
 
 ### Market
 
@@ -38,13 +41,13 @@
 
 
 
-## ideas
-Pk sur marketPrice: bp_id + round_id (no need for generatedId ?)
+## IDEAS
 
 
 
 ## TO KEEP IN MIND
 ### Refacto
+- Refacto Inventory items with proper entries for each action
 - Code & project review
 - Clean InventoryItem responsibility cf player movements?
 - Clean GameStateManager
@@ -63,3 +66,4 @@ Pk sur marketPrice: bp_id + round_id (no need for generatedId ?)
 - Clean data based on round id (market evolution, market price)
 - Review db accesses & server cached data ()
 - MarketOHLC -> Use an interface for getting cached data or db request?
+  Pk sur marketPrice: bp_id + round_id (no need for generatedId ?)
