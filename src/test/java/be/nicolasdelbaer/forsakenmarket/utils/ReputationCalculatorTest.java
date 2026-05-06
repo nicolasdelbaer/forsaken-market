@@ -1,7 +1,8 @@
 package be.nicolasdelbaer.forsakenmarket.utils;
 
 import be.nicolasdelbaer.forsakenmarket.entities.InventoryItem;
-import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
+import be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint;
+import be.nicolasdelbaer.forsakenmarket.entities.MarketPrice;
 import be.nicolasdelbaer.forsakenmarket.models.player.ReputationScoreData;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -18,7 +19,7 @@ class ReputationCalculatorTest {
         InventoryItem inventoryItem = new InventoryItem();
         inventoryItem.setBoughtPrice(50);
 
-        PriceMovementByRound marketPrice = new PriceMovementByRound(1, 100,100);
+        MarketPrice marketPrice = new MarketPrice(100,100, new ItemBlueprint(), 1L);
 
         ReputationScoreData data = new ReputationScoreData(inventoryItem, marketPrice);
 
@@ -34,7 +35,7 @@ class ReputationCalculatorTest {
         InventoryItem inventoryItem = new InventoryItem();
         inventoryItem.setBoughtPrice(100);
 
-        PriceMovementByRound marketPrice = new PriceMovementByRound(1, 100,100);
+        MarketPrice marketPrice = new MarketPrice(100,100, new ItemBlueprint(), 1L);
 
         ReputationScoreData data = new ReputationScoreData(inventoryItem, marketPrice);
 
@@ -48,7 +49,7 @@ class ReputationCalculatorTest {
         InventoryItem inventoryItem = new InventoryItem();
         inventoryItem.setBoughtPrice(100);
 
-        PriceMovementByRound marketPrice = new PriceMovementByRound(1, 50,50);
+        MarketPrice marketPrice = new MarketPrice(50,50, new ItemBlueprint(), 1L);
 
         ReputationScoreData data = new ReputationScoreData(inventoryItem, marketPrice);
 
@@ -62,7 +63,7 @@ class ReputationCalculatorTest {
         InventoryItem inventoryItem = new InventoryItem();
         inventoryItem.setBoughtPrice(0);
 
-        PriceMovementByRound marketPrice = new PriceMovementByRound(1, 50,50);
+        MarketPrice marketPrice = new MarketPrice(50,50, new ItemBlueprint(), 1L);
         ReputationScoreData data = new ReputationScoreData(inventoryItem, marketPrice);
 
         assertDoesNotThrow(() -> ReputationCalculator.calculate(data));
@@ -73,7 +74,7 @@ class ReputationCalculatorTest {
         InventoryItem inventoryItem = new InventoryItem();
         inventoryItem.setBoughtPrice(100);
 
-        PriceMovementByRound marketPrice = new PriceMovementByRound(1, 110,110);
+        MarketPrice marketPrice = new MarketPrice(110,110, new ItemBlueprint(), 1L);
         ReputationScoreData data = new ReputationScoreData(inventoryItem, marketPrice);
 
         Integer result = ReputationCalculator.calculate(data);

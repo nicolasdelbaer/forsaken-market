@@ -1,10 +1,7 @@
 package be.nicolasdelbaer.forsakenmarket.services;
 
 import be.nicolasdelbaer.forsakenmarket.annotations.Transactional;
-import be.nicolasdelbaer.forsakenmarket.entities.CollectionItem;
-import be.nicolasdelbaer.forsakenmarket.entities.InventoryItem;
-import be.nicolasdelbaer.forsakenmarket.entities.MarketItem;
-import be.nicolasdelbaer.forsakenmarket.entities.Player;
+import be.nicolasdelbaer.forsakenmarket.entities.*;
 import be.nicolasdelbaer.forsakenmarket.enums.MarketItemStatus;
 import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.BadItemOwnershipException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.CannotSellInactiveItemException;
@@ -14,9 +11,11 @@ import be.nicolasdelbaer.forsakenmarket.exceptions.market.UndefinedMarketPriceEx
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerInsufficientFundsException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerNotFoundException;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItem;
-import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
 import be.nicolasdelbaer.forsakenmarket.models.player.ReputationScoreData;
-import be.nicolasdelbaer.forsakenmarket.repositories.*;
+import be.nicolasdelbaer.forsakenmarket.repositories.CollectionItemRepository;
+import be.nicolasdelbaer.forsakenmarket.repositories.InventoryItemRepository;
+import be.nicolasdelbaer.forsakenmarket.repositories.MarketItemRepository;
+import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.BadResponseUtils;
 import be.nicolasdelbaer.forsakenmarket.utils.GameStateManager;
 import be.nicolasdelbaer.forsakenmarket.utils.ReputationCalculator;
@@ -49,13 +48,13 @@ public class TradeService {
         MarketItem itemInstance = marketItemRepository
                 .findById(entityManager, itemId)
                 .orElseThrow(() -> new MarketItemDoesNotExistException("Item not found"));
-        PriceMovementByRound marketPrice = gameStateManager.getPriceHistory(itemInstance.getItemBlueprint().getId());
+        MarketPrice marketPrice = gameStateManager.getPriceHistory(itemInstance.getItemBlueprint().getId());
         Player player = playerRepository
                 .findById(entityManager, playerId)
                 .orElseThrow(() -> new PlayerNotFoundException("player not found"));
 
         //remove player's money
-        player.debit(marketPrice.currentPrice());
+        player.debit(marketPrice.getCurrentPrice());
         playerRepository.save(entityManager, player);
 
         //add item to inventory
@@ -82,13 +81,13 @@ public class TradeService {
                 .getItemFromPlayer(entityManager, itemId, playerId, MarketItemStatus.BOUGHT)
                 .orElseThrow(() -> new BadItemOwnershipException(BadResponseUtils.InvalidItemOrUnauthorized));
 
-        PriceMovementByRound marketPrice = gameStateManager.getPriceHistory(itemInstance.getItemBlueprint().getId());
+        MarketPrice marketPrice = gameStateManager.getPriceHistory(itemInstance.getItemBlueprint().getId());
 
         //remove player's money
         Player player = playerRepository
                 .findById(entityManager, playerId)
                 .orElseThrow(() -> new PlayerNotFoundException(BadResponseUtils.PlayerNotFound));
-        player.credit(marketPrice.currentPrice());
+        player.credit(marketPrice.getCurrentPrice());
         player.addReputation(ReputationCalculator.calculate(new ReputationScoreData(
                 itemInstance, marketPrice
         )));

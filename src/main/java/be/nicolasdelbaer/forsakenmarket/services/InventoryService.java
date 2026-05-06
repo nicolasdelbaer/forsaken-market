@@ -2,6 +2,7 @@ package be.nicolasdelbaer.forsakenmarket.services;
 
 import be.nicolasdelbaer.forsakenmarket.annotations.Transactional;
 import be.nicolasdelbaer.forsakenmarket.entities.InventoryItem;
+import be.nicolasdelbaer.forsakenmarket.entities.MarketPrice;
 import be.nicolasdelbaer.forsakenmarket.enums.MarketItemStatus;
 import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.CannotDiscardItemException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.CollectionNotFoundException;
@@ -10,7 +11,6 @@ import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketPriceNotFoundExc
 import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItem;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.CollectionItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.InventoryItemResponse;
-import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
 import be.nicolasdelbaer.forsakenmarket.repositories.CollectionItemRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.InventoryItemRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.GameStateManager;
@@ -43,7 +43,7 @@ public class InventoryService {
         inventoryItem.setMarketItemId(buyItem.marketItem().getId());
         inventoryItem.setPlayer(buyItem.player());
 
-        inventoryItem.setBoughtPrice(buyItem.marketPrice().currentPrice());
+        inventoryItem.setBoughtPrice(buyItem.marketPrice().getCurrentPrice());
         inventoryItem.setBoughtAt(LocalDateTime.now());
         inventoryItem.setStatus(MarketItemStatus.BOUGHT);
 
@@ -98,7 +98,7 @@ public class InventoryService {
         return inventoryItemRepository.fetchAvailableItemsForPlayer(entityManager, playerId)
                 .stream()
                 .map(inventoryItem -> {
-                    PriceMovementByRound priceMovementByRound = Optional
+                    MarketPrice marketPrice = Optional
                             .ofNullable(gameStateManager.getPriceHistory(inventoryItem.getItemBlueprint().getId()))
                             .orElseThrow(() -> new MarketPriceNotFoundException("No price found for blueprint"));
 
@@ -109,7 +109,7 @@ public class InventoryService {
                             inventoryItem.getItemBlueprint().getIcon(),
                             inventoryItem.getItemBlueprint().getRarity().name(),
                             inventoryItem.getBoughtPrice(),
-                            priceMovementByRound.currentPrice(),
+                            marketPrice.getCurrentPrice(),
                             inventoryItem.isDecayed()
                     );
                 }).toList();

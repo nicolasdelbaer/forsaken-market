@@ -23,8 +23,9 @@
 
 ## TO DO NEXT
 ### Critical
-GameStateManager (singleton @ApplicationScoped) (marketPriceList et currentRound) mutables without synchronisation. 
--> Data race between schedulers & requesters
+Ecrire de la doc x_x
+
+### Check
 
 ### Market
 
@@ -49,7 +50,6 @@ GameStateManager (singleton @ApplicationScoped) (marketPriceList et currentRound
 ### Refacto
 - Refacto Inventory items with proper entries for each action
 - Code & project review
-- Clean InventoryItem responsibility cf player movements?
 - Clean GameStateManager
 
 ### DTO

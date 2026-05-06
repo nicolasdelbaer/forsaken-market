@@ -15,7 +15,6 @@ import be.nicolasdelbaer.forsakenmarket.models.market.MarketOHLCResponse;
 import be.nicolasdelbaer.forsakenmarket.repositories.*;
 import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
 import be.nicolasdelbaer.forsakenmarket.utils.GameStateManager;
-import be.nicolasdelbaer.forsakenmarket.utils.MarketPriceUtils;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -76,7 +75,9 @@ public class MarketService {
                          marketItem.getItemBlueprint().getDescription(),
                          marketItem.getItemBlueprint().getIcon(),
                          marketItem.getItemBlueprint().getRarity().name(),
-                            MarketPriceUtils.getMarketRoundMovement(gameStateManager, marketItem.getItemBlueprint()).currentPrice()))
+                            gameStateManager.getPriceHistory(
+                                    marketItem.getItemBlueprint().getId()).getCurrentPrice()
+                    ))
                 .toList();
     }
 

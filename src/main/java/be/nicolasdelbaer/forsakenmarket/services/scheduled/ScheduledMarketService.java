@@ -7,7 +7,7 @@ import be.nicolasdelbaer.forsakenmarket.entities.MarketPriceEvolution;
 import be.nicolasdelbaer.forsakenmarket.enums.MarketTrend;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.UndefinedBlueprintException;
 import be.nicolasdelbaer.forsakenmarket.models.market.MarketOHLC;
-import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
+import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovement;
 import be.nicolasdelbaer.forsakenmarket.repositories.ItemBlueprintRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.MarketItemRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.MarketPriceEvolutionRepository;
@@ -19,6 +19,7 @@ import be.nicolasdelbaer.forsakenmarket.utils.PricesCalculator;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -122,29 +123,37 @@ public class ScheduledMarketService {
      * Populate prices movement into db
      * Update prices in server cache for getting current prices
      */
-    public void updateMarketPrices(EntityManager entityManager) {
+    public Map<Long, MarketPrice> updateMarketPrices(EntityManager entityManager, Map<Long, MarketPrice> cachedMarketPrices) {
         List<ItemBlueprint> blueprintList = itemBlueprintRepository.findAll(entityManager);
-
-        List<MarketPrice> updatedPrices = new ArrayList<>();
-        Map<Long, PriceMovementByRound> marketPrices = new HashMap<>();
+        List<MarketPrice> marketPrices = new ArrayList<>();
+        Map<Long, MarketPrice> updatedPrices = new HashMap<>();
 
         for (ItemBlueprint blueprint : blueprintList) {
-            PriceMovementByRound priceMovementByRound = MarketPriceUtils.getMarketRoundMovement(gameStateManager, blueprint);
-            PriceMovementByRound nextPrice = PricesCalculator.getNextPrice(blueprint, priceMovementByRound);
-
-            MarketPrice marketPrice = new MarketPrice();
-            marketPrice.setCurrentPrice(nextPrice.currentPrice());
-            marketPrice.setItemBlueprint(blueprint);
-            marketPrice.setRoundId(gameStateManager.getCurrentRound());
-            marketPrices.put(blueprint.getId(), nextPrice);
-            updatedPrices.add(marketPrice);
+            PriceMovement nextPrice = calculateNextPrice(blueprint, cachedMarketPrices.get(blueprint.getId()));
+            MarketPrice marketPrice = MarketPriceUtils.getMarketPrice(
+                    blueprint,
+                    nextPrice,
+                    gameStateManager.getCurrentRound()
+            );
+            marketPrices.add(marketPrice);
+            updatedPrices.put(
+                    blueprint.getId(),
+                    marketPrice
+            );
         }
 
-        marketPriceRepository.saveAll(entityManager, updatedPrices);
-        gameStateManager.setMarketPriceList(marketPrices);
+        marketPriceRepository.saveAll(entityManager, marketPrices);
+        return updatedPrices;
     }
 
-
+    private PriceMovement calculateNextPrice(ItemBlueprint blueprint, @NotNull MarketPrice marketPrice) {
+        PriceMovement priceMovement = new PriceMovement(
+                marketPrice.getItemBlueprint().getId(),
+                marketPrice.getCurrentPrice(),
+                marketPrice.getPreviousPrice()
+        );
+        return PricesCalculator.getNextPrice(blueprint, priceMovement);
+    }
 
 
 }

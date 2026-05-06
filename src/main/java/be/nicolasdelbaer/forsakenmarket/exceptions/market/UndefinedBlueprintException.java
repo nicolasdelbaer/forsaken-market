@@ -6,4 +6,8 @@ public class UndefinedBlueprintException extends ForsakenException {
     public UndefinedBlueprintException(String msg) {
         super(msg);
     }
+
+    public UndefinedBlueprintException() {
+        super("Blueprint not found, missing init?");
+    }
 }

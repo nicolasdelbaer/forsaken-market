@@ -2,7 +2,7 @@ package be.nicolasdelbaer.forsakenmarket.utils;
 
 import be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint;
 import be.nicolasdelbaer.forsakenmarket.enums.ItemRarity;
-import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
+import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovement;
 
 import java.util.Map;
 import java.util.random.RandomGenerator;
@@ -26,7 +26,7 @@ public class PricesCalculator {
      * Shock market will add real chaos on a pure random basis
      * TODO: Other events will impact the price in the future
      */
-    public static PriceMovementByRound getNextPrice(ItemBlueprint itemBlueprint, PriceMovementByRound priceHistory){
+    public static PriceMovement getNextPrice(ItemBlueprint itemBlueprint, PriceMovement priceHistory){
         PriceCoefficients priceCoefficients = priceCoefficientsMap.get(itemBlueprint.getRarity());
         float volatility = priceCoefficients.volatility();
         float momentumCoefficient = priceCoefficients.momentum();
@@ -43,16 +43,16 @@ public class PricesCalculator {
         int floor = (int) (baseSell * priceCoefficients.minPriceRatio());
         current = Math.max(floor, current);
 
-        return new PriceMovementByRound(itemBlueprint.getId(), current, priceHistory.currentPrice());
+        return new PriceMovement(itemBlueprint.getId(), current, priceHistory.currentPrice());
     }
 
     /*
      * Make prices progress and simulate a scattered price start
      */
-    public static PriceMovementByRound warmupPrice(ItemBlueprint itemBlueprint) {
+    public static PriceMovement warmupPrice(ItemBlueprint itemBlueprint) {
         int warmupRounds = RandomGenerator.getDefault().nextInt(MIN_WARMUP, MAX_WARMUP);
         int baseSell = itemBlueprint.getPrice();
-        PriceMovementByRound current = new PriceMovementByRound(itemBlueprint.getId(), baseSell, baseSell);
+        PriceMovement current = new PriceMovement(itemBlueprint.getId(), baseSell, baseSell);
 
         for (int i = 0; i < warmupRounds; i++) {
             current = getNextPrice(itemBlueprint, current);

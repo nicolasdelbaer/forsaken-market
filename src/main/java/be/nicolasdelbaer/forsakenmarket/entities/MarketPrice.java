@@ -29,6 +29,12 @@ public class MarketPrice {
     private Integer currentPrice;
 
     @Getter @Setter
+    @Min(0)
+    @Max(1_000_000)
+    @Column(name = "previous_price")
+    private Integer previousPrice;
+
+    @Getter @Setter
     @ManyToOne
     @JoinColumn(name = "item_blueprint_id")
     private ItemBlueprint itemBlueprint;
@@ -40,8 +46,9 @@ public class MarketPrice {
     @Getter @CreationTimestamp
     private LocalDateTime createdAt;
 
-    public MarketPrice(Integer currentPrice, ItemBlueprint itemBlueprint, Long roundId) {
+    public MarketPrice(Integer currentPrice, Integer previousPrice, ItemBlueprint itemBlueprint, Long roundId) {
         this.currentPrice = currentPrice;
+        this.previousPrice = currentPrice;
         this.itemBlueprint = itemBlueprint;
         this.roundId = roundId;
     }

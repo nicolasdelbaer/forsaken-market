@@ -2,68 +2,73 @@ package be.nicolasdelbaer.forsakenmarket.utils;
 
 import be.nicolasdelbaer.forsakenmarket.entities.GameState;
 import be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint;
+import be.nicolasdelbaer.forsakenmarket.entities.MarketPrice;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.UndefinedBlueprintException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.UndefinedMarketPriceException;
-import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
+import be.nicolasdelbaer.forsakenmarket.models.GameStateSnapshot;
 import jakarta.enterprise.context.ApplicationScoped;
-import lombok.Getter;
-import lombok.Setter;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 @ApplicationScoped
 public class GameStateManager {
 
-    /*
-     * Cached List of Market prices by BlueprintId
-     * Long param: Blueprint id
-     */
-    @Setter
-    private Map<Long, PriceMovementByRound> marketPriceList = new HashMap<>();
-    /*
-     * Cached List of Item Blueprints by id
-     * Long param: Blueprint id
-     */
-    @Setter
-    private Map<Long, ItemBlueprint> itemBlueprintList = new HashMap<>();
-
-    @Getter
-    private Long currentRound = 0L;
+    private final AtomicReference<GameStateSnapshot> gameStateSnapshot =
+            new AtomicReference<>(new GameStateSnapshot( Map.of(), Map.of(), List.of(), 0L));
 
 
-    public void nextRound(){
-        currentRound++;
+    public void startup(GameState data, Map<Long, MarketPrice> marketPriceList, Map<Long, ItemBlueprint> blueprints) {
+        gameStateSnapshot.updateAndGet (snapshot ->
+                new GameStateSnapshot(
+                        marketPriceList,
+                        blueprints,
+                        blueprints.values().stream().toList(),
+                        data.getCurrentRound())
+        );
     }
 
-    public PriceMovementByRound getPriceHistory(Long itemBlueprintId) throws UndefinedMarketPriceException {
-        if(!marketPriceList.containsKey(itemBlueprintId))
-            throw new UndefinedMarketPriceException("Market Price not found, missing init?");
-        return marketPriceList.get(itemBlueprintId);
+    public void handleNextRound(Map<Long, MarketPrice> marketPriceList){
+        gameStateSnapshot.updateAndGet (snapshot ->
+                new GameStateSnapshot(
+                        marketPriceList,
+                        snapshot.itemBlueprintMap(),
+                        snapshot.itemBlueprintList(),
+                        snapshot.currentRound() +1
+                )
+        );
     }
 
-    public List<PriceMovementByRound> getPricesHistory() throws UndefinedMarketPriceException {
-        return marketPriceList.values().stream().toList();
+
+    public long getCurrentRound(){
+        return gameStateSnapshot.get().currentRound();
     }
 
     public List<ItemBlueprint> getItemBlueprintList() {
-        return itemBlueprintList.values().stream().toList();
+        return gameStateSnapshot.get().itemBlueprintList();
+    }
+    public Map<Long, MarketPrice> getMarketPriceMap() {
+        return gameStateSnapshot.get().marketPriceMap();
+    }
+    public MarketPrice getPriceHistory(Long itemBlueprintId) throws UndefinedMarketPriceException {
+        MarketPrice result = gameStateSnapshot.get().marketPriceMap().get(itemBlueprintId);
+        if(result == null) throw new UndefinedMarketPriceException();
+        return result;
     }
 
     public ItemBlueprint getItemBlueprint(Long itemBlueprintId) throws UndefinedBlueprintException {
-        if(!itemBlueprintList.containsKey(itemBlueprintId))
-            throw new UndefinedBlueprintException("Blueprint not found, missing init?");
-        return itemBlueprintList.get(itemBlueprintId);
+        ItemBlueprint blueprint = gameStateSnapshot.get().itemBlueprintMap().get(itemBlueprintId);
+        if(blueprint == null) throw new UndefinedBlueprintException();
+        return blueprint;
     }
 
-    public GameState getGameStateEntity() {
+
+
+    public GameState toGameStateEntity() {
+        GameStateSnapshot snapshot = gameStateSnapshot.get();
         GameState gameState = new GameState();
-        gameState.setCurrentRound(currentRound);
+        gameState.setCurrentRound(snapshot.currentRound());
         return gameState;
-    }
-
-    public void setGameStateEntity(GameState data) {
-        currentRound = data.getCurrentRound();
     }
 }

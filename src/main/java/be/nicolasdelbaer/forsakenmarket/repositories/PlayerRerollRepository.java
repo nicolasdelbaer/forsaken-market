@@ -24,6 +24,6 @@ public class PlayerRerollRepository extends CrudRepository<RerolledItem, Long> {
                 .setParameter("roundId", roundId)
                 .getSingleResultOrNull();
 
-        return (Objects.isNull(count))? 0: count.intValue();
+        return (count == null)? 0: count.intValue();
     }
 }

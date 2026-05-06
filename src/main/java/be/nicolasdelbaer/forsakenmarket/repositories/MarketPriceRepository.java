@@ -16,17 +16,6 @@ public class MarketPriceRepository extends CrudRepository<MarketPrice, Long> {
         super(MarketPrice.class);
     }
 
-    public Optional<MarketPrice> findByBlueprint(EntityManager entityManager, ItemBlueprint itemBlueprint, Long roundId) {
-        MarketPrice marketPrice = entityManager.createQuery("""
-                        select mp from MarketPrice mp
-                        where mp.itemBlueprint.id = :itemBlueprint
-                            and mp.roundId = :roundId
-                        """, MarketPrice.class)
-                .setParameter("itemBlueprint", itemBlueprint.getId())
-                .setParameter("roundId", roundId)
-                .getSingleResult();
-        return Optional.of(marketPrice);
-    }
 
     public List<MarketPrice> findByRoundId(EntityManager entityManager, Long roundId) {
         return entityManager.createQuery("""
@@ -36,6 +25,18 @@ public class MarketPriceRepository extends CrudRepository<MarketPrice, Long> {
                 .setParameter("roundId", roundId)
                 .getResultList();
 
+    }
+
+    public Optional<MarketPrice> findByBlueprint(EntityManager entityManager, ItemBlueprint itemBlueprint, Long roundId) {
+        MarketPrice marketPrice = entityManager.createQuery("""
+                        select mp from MarketPrice mp
+                        where mp.itemBlueprint = :itemBlueprint
+                            and mp.roundId = :roundId
+                        """, MarketPrice.class)
+                .setParameter("itemBlueprint", itemBlueprint)
+                .setParameter("roundId", roundId)
+                .getSingleResult();
+        return Optional.of(marketPrice);
     }
 
     public List<MarketOHLC> getAllEvolutionData(EntityManager entityManager, long startRoundId, int duration) {

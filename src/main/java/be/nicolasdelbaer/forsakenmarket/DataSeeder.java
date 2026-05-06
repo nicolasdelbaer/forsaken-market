@@ -6,6 +6,8 @@ import be.nicolasdelbaer.forsakenmarket.enums.ItemRarity;
 import be.nicolasdelbaer.forsakenmarket.exceptions.core.CannotFindGameState;
 import be.nicolasdelbaer.forsakenmarket.repositories.*;
 import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
+import be.nicolasdelbaer.forsakenmarket.utils.MarketPriceUtils;
+import be.nicolasdelbaer.forsakenmarket.utils.PricesCalculator;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.Initialized;
@@ -17,8 +19,8 @@ import jakarta.persistence.EntityTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @ApplicationScoped
 public class DataSeeder {
@@ -30,6 +32,8 @@ public class DataSeeder {
     @Inject private ItemCategoryRepository itemCategoryRepository;
     @Inject private ItemBlueprintRepository itemBlueprintRepository;
     @Inject private EntityManagerFactory entityManagerFactory;
+    @Inject
+    private MarketPriceRepository marketPriceRepository;
 
 
     public void seed(@Observes @Priority(GameConfiguration.DataFeedPriority) @Initialized(ApplicationScoped.class) Object init) {
@@ -46,6 +50,7 @@ public class DataSeeder {
                 createGameState(entityManager);
                 createPlayers(entityManager);
                 createCategories(entityManager);
+                warmupMarketPrices(entityManager);
                 log.info("DataSeeder : Done");
                 entityTransaction.commit();
             } catch (Exception e) {
@@ -54,6 +59,20 @@ public class DataSeeder {
 
             }
         }
+    }
+
+    private void warmupMarketPrices(EntityManager entityManager) {
+        List<ItemBlueprint> blueprintList = itemBlueprintRepository.findAll(entityManager);
+        List<MarketPrice> marketPricesList = new ArrayList<>();
+        for (ItemBlueprint blueprint : blueprintList) {
+            marketPricesList.add(MarketPriceUtils.getMarketPrice(
+                        blueprint,
+                PricesCalculator.warmupPrice(blueprint),
+                        1
+            ));
+
+        }
+        marketPriceRepository.saveAll(entityManager, marketPricesList);
     }
 
     private void createGameState(EntityManager entityManager) {
@@ -68,7 +87,7 @@ public class DataSeeder {
         Player player;
         String envCost = System.getenv("BCRYPT_COST");
         String defaultPassword = System.getenv("DEFAULT_USER_PASSWORD");
-        int cost = Objects.nonNull(envCost) ? Integer.parseInt(envCost) : 12;
+        int cost = !(envCost == null) ? Integer.parseInt(envCost) : 12;
         player = new Player(
                 "Nidel",
                 "nidel@gmail.com",

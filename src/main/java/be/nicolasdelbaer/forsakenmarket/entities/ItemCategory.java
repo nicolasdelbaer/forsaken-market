@@ -29,7 +29,6 @@ public class ItemCategory {
 
     public ItemCategory(String name, ItemCategory category) {
         this.name = name;
-        if(Objects.nonNull(category))
-            this.parentCategory = category;
+        if(!(category == null)) this.parentCategory = category;
     }
 }

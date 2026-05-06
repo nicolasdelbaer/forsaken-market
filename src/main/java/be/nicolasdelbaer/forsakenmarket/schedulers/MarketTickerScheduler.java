@@ -1,15 +1,16 @@
 package be.nicolasdelbaer.forsakenmarket.schedulers;
 
+import be.nicolasdelbaer.forsakenmarket.entities.GameState;
 import be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint;
-import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
+import be.nicolasdelbaer.forsakenmarket.entities.MarketPrice;
 import be.nicolasdelbaer.forsakenmarket.repositories.GameStateRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.ItemBlueprintRepository;
+import be.nicolasdelbaer.forsakenmarket.repositories.MarketPriceRepository;
 import be.nicolasdelbaer.forsakenmarket.services.scheduled.ScheduledInventoryService;
 import be.nicolasdelbaer.forsakenmarket.services.scheduled.ScheduledMarketService;
 import be.nicolasdelbaer.forsakenmarket.services.scheduled.ScheduledPlayerService;
 import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
 import be.nicolasdelbaer.forsakenmarket.utils.GameStateManager;
-import be.nicolasdelbaer.forsakenmarket.utils.PricesCalculator;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.Destroyed;
@@ -22,12 +23,12 @@ import jakarta.persistence.EntityTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -41,36 +42,35 @@ public class MarketTickerScheduler{
     @Inject private GameStateRepository gameStateRepository;
     @Inject private GameStateManager gameStateManager;
     @Inject private ScheduledPlayerService scheduledPlayerService;
+    @Inject private MarketPriceRepository marketPriceRepository;
 
     public void onStart(@Observes @Priority(GameConfiguration.SchedulerPriority) @Initialized(ApplicationScoped.class) Object obj) {
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
-            gameStateManager.setGameStateEntity(gameStateRepository.getData(entityManager));
-            fillMarketWithPrices(entityManager);
-            gameStateManager.setItemBlueprintList(itemBlueprintRepository
-                    .findAll(entityManager).stream()
+            List<ItemBlueprint> blueprintList = itemBlueprintRepository.findAll(entityManager);
+
+            GameState data = gameStateRepository.getData(entityManager);
+
+            Map<Long, MarketPrice> marketPriceList = marketPriceRepository.findByRoundId(entityManager, data.getCurrentRound())
+                    .stream()
                     .collect(Collectors.toMap(
-                            ItemBlueprint::getId,
-                            itemBlueprint -> itemBlueprint
-                    )));
+                            marketPrice -> marketPrice.getItemBlueprint().getId(),
+                            Function.identity()
+                    ));
+
+            gameStateManager.startup(
+                    data,
+                    marketPriceList,
+                    blueprintList.stream()
+                        .collect(Collectors.toMap(
+                                ItemBlueprint::getId,
+                                itemBlueprint -> itemBlueprint
+                ))
+            );
 
             startScheduler();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-    }
-
-
-    private void fillMarketWithPrices(EntityManager entityManager) {
-        Map<Long, PriceMovementByRound> marketPriceList = new HashMap<>();
-        List<ItemBlueprint> blueprintList = itemBlueprintRepository.findAll(entityManager);
-
-        for (ItemBlueprint blueprint : blueprintList) {
-            marketPriceList.put(
-                    blueprint.getId(),
-                    PricesCalculator.warmupPrice(blueprint)
-            );
-        }
-        gameStateManager.setMarketPriceList(marketPriceList);
     }
 
     private void startScheduler() {
@@ -93,11 +93,13 @@ public class MarketTickerScheduler{
             EntityTransaction transaction = entityManager.getTransaction();
             transaction.begin();
             try {
-                //Change cycle
-                gameStateManager.nextRound();
-
                 //Prices will change towards their trends. Trends will be updated.
-                scheduledMarketService.updateMarketPrices(entityManager);
+                Map<Long, MarketPrice> updatedPrices = scheduledMarketService.updateMarketPrices(
+                        entityManager, gameStateManager.getMarketPriceMap());
+
+                //Change cycle
+                gameStateManager.handleNextRound(updatedPrices);
+
                 //Check & handle market items expiration
                 scheduledMarketService.updateTimeToLive(entityManager);
                 //Check & handle inventory item decay; they'll lost value once decayed
@@ -120,7 +122,7 @@ public class MarketTickerScheduler{
                 if(gameStateManager.getCurrentRound() % GameConfiguration.roundsBeforeClean == 0) {
                     cleanupData();
                 }
-                gameStateRepository.update(entityManager, gameStateManager.getGameStateEntity());
+                gameStateRepository.update(entityManager, gameStateManager.toGameStateEntity());
                 transaction.commit();
             } catch (Exception e) {
                 transaction.rollback();

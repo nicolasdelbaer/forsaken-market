@@ -14,7 +14,7 @@ import java.util.Objects;
 
 public class JwtUtils {
     //15min -> 15*60*1000
-    private static final long expiration = 900_000;
+    private static final long expiration = 900_000 * 4; //1h
     private static final String jwtSecret = System.getenv("JWT_SECRET");
 
     public static String generateToken(PlayerSession player){
@@ -37,8 +37,7 @@ public class JwtUtils {
 
     public static SecretKey getSecretKey() throws MissingEnvConfigurationException {
 
-        if(Objects.isNull(jwtSecret))
-            throw new MissingEnvConfigurationException("missing Jwt scret conf");
+        if(jwtSecret == null) throw new MissingEnvConfigurationException("missing Jwt scret conf");
         return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 

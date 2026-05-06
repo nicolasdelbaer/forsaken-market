@@ -10,7 +10,7 @@
                 (Select m2.current_price from marketPrice m2
                    where m2.round_id = :startId
                    and m2.item_blueprint_id = m.item_blueprint_id),
-                (array_agg(currentPrice order by round_id ASC))[1]) as open,
+                (array_agg(current_price order by round_id ASC))[1]) as open,
 
             max(current_price) as high,
             min(current_price) as low,

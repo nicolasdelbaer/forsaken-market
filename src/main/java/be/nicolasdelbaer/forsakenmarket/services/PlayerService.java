@@ -18,7 +18,6 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 
 import java.util.List;
-import java.util.Objects;
 
 @ApplicationScoped
 public class PlayerService {
@@ -38,7 +37,7 @@ public class PlayerService {
             throw new EmailAlreadyUsedException("Cannot create this player, the email already exists");
 
         String envCost = System.getenv("BCRYPT_COST");
-        if(Objects.isNull(envCost))
+        if(envCost == null)
             throw new MissingEnvConfigurationException("Cost config is missing");
 
         int cost = Integer.parseInt(envCost);
