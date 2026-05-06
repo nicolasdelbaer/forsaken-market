@@ -7,6 +7,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -14,6 +15,7 @@ import java.util.Objects;
 public class JwtUtils {
     //15min -> 15*60*1000
     private static final long expiration = 900_000;
+    private static final String jwtSecret = System.getenv("JWT_SECRET");
 
     public static String generateToken(PlayerSession player){
         String result;
@@ -34,18 +36,14 @@ public class JwtUtils {
     }
 
     public static SecretKey getSecretKey() throws MissingEnvConfigurationException {
-        String jwtSecret = System.getenv("JWT_SECRET");
+
         if(Objects.isNull(jwtSecret))
             throw new MissingEnvConfigurationException("missing Jwt scret conf");
-        return Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public static Claims getClaims(String token){
-        try {
-            return Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token).getPayload();
-        } catch (MissingEnvConfigurationException e) {
-            throw new RuntimeException(e);
-        }
+    public static Claims getClaims(String token) throws MissingEnvConfigurationException {
+        return Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token).getPayload();
     }
 
     public static Integer getId(Claims claims, String token){
