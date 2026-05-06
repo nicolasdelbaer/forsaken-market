@@ -48,7 +48,7 @@ public class MarketResource {
         try {
             response = Response.ok(marketService.getMarketEvolution(itemId)).build(); //TODO send back data with results
         } catch (Exception e) {
-            response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), "oups").build();
+            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
             log.warn(e.getMessage(), e);
         }
         return response;
@@ -67,8 +67,7 @@ public class MarketResource {
             response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(),
                     BadResponseUtils.InsufficientFunds).build();
         } catch (Exception e) {
-            response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(),
-                    BadResponseUtils.CannotBuyItem).build();
+            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
             log.warn(e.getMessage(), e);
         }
         return response;
@@ -83,11 +82,10 @@ public class MarketResource {
         try {
             marketService.rerollItem(playerSession.id(), itemId);
             response = Response.ok().build(); //TODO send back data with results
-        } catch (PlayerInsufficientFundsException | MaxRerollReachedException | MarketItemDoesNotExistException |
-                 PlayerNotFoundException e) {
-            response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(),
-                    BadResponseUtils.CannotRerollItem).build();
-            log.warn(e.getMessage(), e);
+        } catch (PlayerInsufficientFundsException | MaxRerollReachedException e) {
+            response = Response.status(Response.Status.BAD_REQUEST).build();
+        } catch (MarketItemDoesNotExistException | PlayerNotFoundException e) {
+            response = Response.status(Response.Status.NOT_FOUND).build();
         }
         return response;
     }
@@ -120,8 +118,7 @@ public class MarketResource {
                     .fetchAvailableBlueprints();
             response = Response.ok(itemList).build();
         } catch (Exception e) {
-            response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(),
-                    BadResponseUtils.CannotRetrieveItems).build();
+            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
             log.warn(e.getMessage(), e);
         }
         return response;

@@ -39,7 +39,7 @@ public class AccountResource {
             Integer wallet = playerService.getWallet(playerSession.id());
             response = Response.ok(new PlayerInfoResponse(playerSession.id(), playerSession.email(), playerSession.name(), wallet)).build();
         } catch (Exception e) {
-            response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), "").build();
+            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
             log.warn(e.getMessage(), e);
         }
         return response;

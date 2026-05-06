@@ -32,13 +32,15 @@ public class PlayerService {
 
 
     @Transactional
-    public void register(RegisterPlayerRequest registerPlayerRequest) throws EmailAlreadyUsedException, MissingEnvConfigurationException {
+    public void register(RegisterPlayerRequest registerPlayerRequest)
+            throws EmailAlreadyUsedException, NumberFormatException, MissingEnvConfigurationException {
         if(playerRepository.emailExists(entityManager, registerPlayerRequest.email()))
             throw new EmailAlreadyUsedException("Cannot create this player, the email already exists");
 
         String envCost = System.getenv("BCRYPT_COST");
         if(Objects.isNull(envCost))
             throw new MissingEnvConfigurationException("Cost config is missing");
+
         int cost = Integer.parseInt(envCost);
 
         Player player = new Player(

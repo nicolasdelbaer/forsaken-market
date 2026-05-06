@@ -51,7 +51,6 @@ public class InventoryResource {
             response = Response.ok().build(); //TODO send back data with results
         } catch (CannotDiscardItemException e) {
             response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), BadResponseUtils.CannotDiscardItem).build();
-            log.warn(e.getMessage(), e);
         }
         return response;
     }
@@ -65,9 +64,12 @@ public class InventoryResource {
         try {
             tradeService.sellItem(playerSession.id(), itemId);
             response = Response.ok().build(); //TODO send back data with results
-        } catch (UndefinedMarketPriceException | PlayerNotFoundException | BadItemOwnershipException | CannotSellInactiveItemException | MarketPriceNotFoundException e) {
+        } catch (CannotSellInactiveItemException | BadItemOwnershipException e) {
             response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), BadResponseUtils.CannotSellItem).build();
             log.warn(e.getMessage(), e);
+        } catch (UndefinedMarketPriceException | PlayerNotFoundException | MarketPriceNotFoundException e) {
+            response = Response.status(Response.Status.NOT_FOUND.getStatusCode(), BadResponseUtils.CannotSellItem).build();
+
         }
         return response;
     }
@@ -83,7 +85,7 @@ public class InventoryResource {
                     .fetchItems(playerSession.id());
             response = Response.ok(itemList).build();
         } catch (Exception e) {
-            response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), BadResponseUtils.CannotRetrieveItems).build();
+            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
             log.warn(e.getMessage(), e);
         }
         return response;
@@ -100,7 +102,7 @@ public class InventoryResource {
                     .fetchCollection(playerSession.id());
             response = Response.ok(itemList).build();
         } catch (Exception e) {
-            response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), BadResponseUtils.CannotRetrieveItems).build();
+            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
             log.warn(e.getMessage(), e);
         }
         return response;

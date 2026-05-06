@@ -2,7 +2,6 @@ package be.nicolasdelbaer.forsakenmarket.resources;
 
 import be.nicolasdelbaer.forsakenmarket.annotations.Authenticated;
 import be.nicolasdelbaer.forsakenmarket.models.player.LeaderboardResponse;
-import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.services.PlayerService;
 import be.nicolasdelbaer.forsakenmarket.utils.BadResponseUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,13 +39,11 @@ public class HallOfInfamyResource {
     @Operation(summary = "Get best 25 players", description = "Fetch players info for best 25 totReput score")
     public Response getItems(){
         Response response;
-        PlayerSession playerSession = (PlayerSession) securityContext.getUserPrincipal();
         try {
             List<LeaderboardResponse> entries = playerService.fetchLeaderboard(25);
             response = Response.ok(entries).build();
         } catch (Exception e) {
             response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), BadResponseUtils.CannotRetrievePlayers).build();
-            log.warn(e.getMessage(), e);
         }
         return response;
     }

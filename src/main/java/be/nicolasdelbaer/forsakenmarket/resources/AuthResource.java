@@ -51,8 +51,8 @@ public class AuthResource {
             response = Response.ok().build();
         } catch (EmailAlreadyUsedException e) {
             response = Response.status(400).entity(BadResponseUtils.AlreadyUsedEmail).build();
-        } catch (MissingEnvConfigurationException e) {
-            response = Response.status(400).entity(BadResponseUtils.MissingEnvConfiguration).build();
+        } catch (MissingEnvConfigurationException | NumberFormatException e) {
+            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(BadResponseUtils.MissingEnvConfiguration).build();
         }
 
         return response;
@@ -77,7 +77,6 @@ public class AuthResource {
             response = Response.ok(token).build();
         } catch (PlayerLoginException e) {
             response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), BadResponseUtils.WrongLoginOrPass).build();
-            log.warn(e.getMessage(), e);
         }
 
         return response;
