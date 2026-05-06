@@ -12,7 +12,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"item_blueprint_id", "round_id"}))
 @NoArgsConstructor
 @AllArgsConstructor
 public class MarketPrice {
@@ -28,6 +28,9 @@ public class MarketPrice {
     @Column(name = "current_price")
     private Integer currentPrice;
 
+    /*
+     * Previous is used for price evolution calculation algorithm
+     */
     @Getter @Setter
     @Min(0)
     @Max(1_000_000)
@@ -48,7 +51,7 @@ public class MarketPrice {
 
     public MarketPrice(Integer currentPrice, Integer previousPrice, ItemBlueprint itemBlueprint, Long roundId) {
         this.currentPrice = currentPrice;
-        this.previousPrice = currentPrice;
+        this.previousPrice = previousPrice;
         this.itemBlueprint = itemBlueprint;
         this.roundId = roundId;
     }

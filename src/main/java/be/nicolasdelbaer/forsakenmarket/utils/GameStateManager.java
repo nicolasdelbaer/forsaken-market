@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class GameStateManager {
 
     private final AtomicReference<GameStateSnapshot> gameStateSnapshot =
-            new AtomicReference<>(new GameStateSnapshot( Map.of(), Map.of(), List.of(), 0L));
+            new AtomicReference<>(new GameStateSnapshot( Map.of(), Map.of(), List.of(), 1L));
 
 
     public void startup(GameState data, Map<Long, MarketPrice> marketPriceList, Map<Long, ItemBlueprint> blueprints) {
@@ -46,10 +46,10 @@ public class GameStateManager {
     }
 
     public List<ItemBlueprint> getItemBlueprintList() {
-        return gameStateSnapshot.get().itemBlueprintList();
+        return List.copyOf(gameStateSnapshot.get().itemBlueprintList());
     }
     public Map<Long, MarketPrice> getMarketPriceMap() {
-        return gameStateSnapshot.get().marketPriceMap();
+        return Map.copyOf(gameStateSnapshot.get().marketPriceMap());
     }
     public MarketPrice getPriceHistory(Long itemBlueprintId) throws UndefinedMarketPriceException {
         MarketPrice result = gameStateSnapshot.get().marketPriceMap().get(itemBlueprintId);

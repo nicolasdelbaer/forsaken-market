@@ -6,7 +6,6 @@ import be.nicolasdelbaer.forsakenmarket.entities.Player;
 import be.nicolasdelbaer.forsakenmarket.entities.RerolledItem;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketItemDoesNotExistException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.MaxRerollReachedException;
-import be.nicolasdelbaer.forsakenmarket.exceptions.market.UndefinedBlueprintException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerInsufficientFundsException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerNotFoundException;
 import be.nicolasdelbaer.forsakenmarket.models.market.MarketBlueprintResponse;
@@ -84,7 +83,7 @@ public class MarketService {
     /*
      * Based on an itemblueprint id, returns the predefined amount of last OHLC prices.
      */
-    public List<MarketOHLCResponse> getMarketEvolution(Long itemId) throws UndefinedBlueprintException {
+    public List<MarketOHLCResponse> getMarketEvolution(Long itemId) {
         return marketPriceEvolutionRepository
                 .findByBlueprint(entityManager, itemId, GameConfiguration.OHLC_range)
                 .stream()

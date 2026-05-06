@@ -10,7 +10,7 @@ import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketPriceNotFoundExc
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.UndefinedMarketPriceException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerInsufficientFundsException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerNotFoundException;
-import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItem;
+import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItemRequest;
 import be.nicolasdelbaer.forsakenmarket.models.player.ReputationScoreData;
 import be.nicolasdelbaer.forsakenmarket.repositories.CollectionItemRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.InventoryItemRepository;
@@ -58,7 +58,7 @@ public class TradeService {
         playerRepository.save(entityManager, player);
 
         //add item to inventory
-        inventoryService.acquireItem(new BuyItem(player, itemInstance, marketPrice, currentRound));
+        inventoryService.acquireItem(new BuyItemRequest(player, itemInstance, marketPrice, currentRound));
 
 
         if(!collectionItemRepository.isCollected(entityManager, playerId, itemInstance.getItemBlueprint().getId())) {
@@ -89,7 +89,7 @@ public class TradeService {
                 .orElseThrow(() -> new PlayerNotFoundException(BadResponseUtils.PlayerNotFound));
         player.credit(marketPrice.getCurrentPrice());
         player.addReputation(ReputationCalculator.calculate(new ReputationScoreData(
-                itemInstance, marketPrice
+                itemInstance.getBoughtPrice(), marketPrice.getCurrentPrice()
         )));
         playerRepository.save(entityManager, player);
 

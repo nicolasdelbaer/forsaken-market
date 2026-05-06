@@ -11,6 +11,7 @@ import be.nicolasdelbaer.forsakenmarket.services.scheduled.ScheduledMarketServic
 import be.nicolasdelbaer.forsakenmarket.services.scheduled.ScheduledPlayerService;
 import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
 import be.nicolasdelbaer.forsakenmarket.utils.GameStateManager;
+import be.nicolasdelbaer.forsakenmarket.utils.MarketPriceUtils;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.Destroyed;
@@ -73,6 +74,7 @@ public class MarketTickerScheduler{
         }
     }
 
+
     private void startScheduler() {
         scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(
@@ -93,12 +95,19 @@ public class MarketTickerScheduler{
             EntityTransaction transaction = entityManager.getTransaction();
             transaction.begin();
             try {
-                //Prices will change towards their trends. Trends will be updated.
-                Map<Long, MarketPrice> updatedPrices = scheduledMarketService.updateMarketPrices(
-                        entityManager, gameStateManager.getMarketPriceMap());
 
+                //Prices will change towards their trends. Trends will be updated.
+                Map<Long, MarketPrice> updatedPrices = MarketPriceUtils.updatePrices(
+                        gameStateManager.getItemBlueprintList(),
+                        gameStateManager.getMarketPriceMap(),
+                        gameStateManager.getCurrentRound() +1
+                );
                 //Change cycle
                 gameStateManager.handleNextRound(updatedPrices);
+                scheduledMarketService.updateMarketPrices(
+                        entityManager,
+                        updatedPrices.values().stream().toList()
+                );
 
                 //Check & handle market items expiration
                 scheduledMarketService.updateTimeToLive(entityManager);

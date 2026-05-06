@@ -420,14 +420,14 @@
       <div class="m-desc">${item.description || ''}</div>
       <div class="m-footer"><div class="price">${item.currentPrice} ◆</div></div>
       <div class="card-actions">
-        <button class="btn" onclick="buyItem(${item.marketId})">Acquérir</button>
+        <button class="btn" onclick="buyItemRequest(${item.marketId})">Acquérir</button>
         <button class="btn secondary" onclick="rerollItem(${item.marketId})">Reroll</button>
       </div>
     `;
     return el;
   }
 
-  async function buyItem(id) {
+  async function buyItemRequest(id) {
     try { await api('POST', '/api/market/buy/' + id); toast('Acquis.', 'ok'); refreshAll(); }
     catch(e) { toast(e.message, 'err'); }
   }

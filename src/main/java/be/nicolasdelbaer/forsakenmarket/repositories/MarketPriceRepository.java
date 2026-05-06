@@ -1,13 +1,11 @@
 package be.nicolasdelbaer.forsakenmarket.repositories;
 
-import be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint;
 import be.nicolasdelbaer.forsakenmarket.entities.MarketPrice;
 import be.nicolasdelbaer.forsakenmarket.models.market.MarketOHLC;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 
 import java.util.List;
-import java.util.Optional;
 
 @ApplicationScoped
 public class MarketPriceRepository extends CrudRepository<MarketPrice, Long> {
@@ -25,18 +23,6 @@ public class MarketPriceRepository extends CrudRepository<MarketPrice, Long> {
                 .setParameter("roundId", roundId)
                 .getResultList();
 
-    }
-
-    public Optional<MarketPrice> findByBlueprint(EntityManager entityManager, ItemBlueprint itemBlueprint, Long roundId) {
-        MarketPrice marketPrice = entityManager.createQuery("""
-                        select mp from MarketPrice mp
-                        where mp.itemBlueprint = :itemBlueprint
-                            and mp.roundId = :roundId
-                        """, MarketPrice.class)
-                .setParameter("itemBlueprint", itemBlueprint)
-                .setParameter("roundId", roundId)
-                .getSingleResult();
-        return Optional.of(marketPrice);
     }
 
     public List<MarketOHLC> getAllEvolutionData(EntityManager entityManager, long startRoundId, int duration) {

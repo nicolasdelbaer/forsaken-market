@@ -4,7 +4,7 @@ import be.nicolasdelbaer.forsakenmarket.entities.MarketItem;
 import be.nicolasdelbaer.forsakenmarket.entities.MarketPrice;
 import be.nicolasdelbaer.forsakenmarket.entities.Player;
 
-public record BuyItem(
+public record BuyItemRequest(
         Player player,
         MarketItem marketItem,
         MarketPrice marketPrice,

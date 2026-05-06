@@ -20,31 +20,6 @@ public class PricesCalculator {
     private static final int MAX_WARMUP = 15;
     private static final int SHOCK_PERCENT_CHANCE = 5;
 
-    /*
-     * Calculate next price following price trends
-     * More the price is far from the initial price, more it'll tend to reverse the trend
-     * Shock market will add real chaos on a pure random basis
-     * TODO: Other events will impact the price in the future
-     */
-    public static PriceMovement getNextPrice(ItemBlueprint itemBlueprint, PriceMovement priceHistory){
-        PriceCoefficients priceCoefficients = priceCoefficientsMap.get(itemBlueprint.getRarity());
-        float volatility = priceCoefficients.volatility();
-        float momentumCoefficient = priceCoefficients.momentum();
-        float reversionCoefficient = priceCoefficients.reversion();
-
-        int current;
-        int baseSell = itemBlueprint.getPrice();
-        int momentum  = (int) ((priceHistory.currentPrice() - priceHistory.previousPrice()) * momentumCoefficient);
-        int reversion = (int) ((baseSell - priceHistory.currentPrice()) * reversionCoefficient);
-        int noise     = (int) (RandomGenerator.getDefault().nextInt(-1,1) * volatility * baseSell);
-        current = priceHistory.currentPrice() + momentum + reversion + noise;
-        current += getMarketShockValue(baseSell);
-
-        int floor = (int) (baseSell * priceCoefficients.minPriceRatio());
-        current = Math.max(floor, current);
-
-        return new PriceMovement(itemBlueprint.getId(), current, priceHistory.currentPrice());
-    }
 
     /*
      * Make prices progress and simulate a scattered price start
@@ -58,6 +33,31 @@ public class PricesCalculator {
             current = getNextPrice(itemBlueprint, current);
         }
         return current;
+    }
+
+    /*
+     * Calculate next price following price trends
+     * More the price is far from the initial price, more it'll tend to reverse the trend
+     * Shock market will add real chaos on a pure random basis
+     */
+    public static PriceMovement getNextPrice(ItemBlueprint itemBlueprint, PriceMovement priceHistory){
+        PriceCoefficients priceCoefficients = priceCoefficientsMap.get(itemBlueprint.getRarity());
+        float volatility = priceCoefficients.volatility();
+        float momentumCoefficient = priceCoefficients.momentum();
+        float reversionCoefficient = priceCoefficients.reversion();
+
+        int newPrice;
+        int baseSell = itemBlueprint.getPrice();
+        int momentum  = (int) ((priceHistory.currentPrice() - priceHistory.previousPrice()) * momentumCoefficient);
+        int reversion = (int) ((baseSell - priceHistory.currentPrice()) * reversionCoefficient);
+        int noise     = (int) (RandomGenerator.getDefault().nextInt(-1,1) * volatility * baseSell);
+        newPrice = priceHistory.currentPrice() + momentum + reversion + noise;
+        newPrice += getMarketShockValue(baseSell);
+
+        int floor = (int) (baseSell * priceCoefficients.minPriceRatio());
+        newPrice = Math.max(floor, newPrice);
+
+        return new PriceMovement(itemBlueprint.getId(), newPrice, priceHistory.currentPrice());
     }
 
     /*
