@@ -116,4 +116,16 @@ public class Player {
     public List<String> getRoles() {
         return playerRoles.stream().map(PlayerRole::getName).toList();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Player player = (Player) o;
+        return Objects.equals(id, player.id) && Objects.equals(name, player.name) && Objects.equals(email, player.email) && Objects.equals(level, player.level) && Objects.equals(totReput, player.totReput);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, email, level, totReput);
+    }
 }
