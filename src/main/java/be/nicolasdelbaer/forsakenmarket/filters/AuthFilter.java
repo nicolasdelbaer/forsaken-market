@@ -38,7 +38,7 @@ public class AuthFilter implements ContainerRequestFilter {
         try {
             String token = authHeader.substring(7);
             Claims claims = JwtUtils.getClaims(token);
-            if(!JwtUtils.isValid(claims)) return;
+            if(!JwtUtils.isValid(claims)) throw new Exception();
 
             List<String> roles = JwtUtils.getRoles(claims, token);
             PlayerSession playerSession = getPlayerSession(claims, token);
