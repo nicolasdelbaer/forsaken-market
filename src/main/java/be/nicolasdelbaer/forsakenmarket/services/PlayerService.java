@@ -7,7 +7,7 @@ import be.nicolasdelbaer.forsakenmarket.exceptions.auth.EmailAlreadyUsedExceptio
 import be.nicolasdelbaer.forsakenmarket.exceptions.core.MissingEnvConfigurationException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerLoginException;
 import be.nicolasdelbaer.forsakenmarket.models.player.LeaderboardResponse;
-import be.nicolasdelbaer.forsakenmarket.models.player.LoginRequestDto;
+import be.nicolasdelbaer.forsakenmarket.models.player.LoginRequest;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.models.player.RegisterPlayerRequest;
 import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRepository;
@@ -54,13 +54,13 @@ public class PlayerService {
         playerRepository.save(entityManager, player);
     }
 
-    public PlayerSession login(LoginRequestDto loginRequestDto) throws PlayerLoginException {
-        if(!playerRepository.emailExists(entityManager, loginRequestDto.email()))
+    public PlayerSession login(LoginRequest loginRequest) throws PlayerLoginException {
+        if(!playerRepository.emailExists(entityManager, loginRequest.email()))
             throw new PlayerLoginException("Incorrect password or login");
 
-        Player player = playerRepository.findByEmail(entityManager, loginRequestDto.email());
+        Player player = playerRepository.findByEmail(entityManager, loginRequest.email());
 
-        if(!BCrypt.verifyer().verify(loginRequestDto.password().toCharArray(), player.getPassword()).verified)
+        if(!BCrypt.verifyer().verify(loginRequest.password().toCharArray(), player.getPassword()).verified)
             throw new PlayerLoginException("Incorrect password or login");
 
         return PlayerSession.fromPlayer(player);

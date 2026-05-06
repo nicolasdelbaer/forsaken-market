@@ -3,7 +3,8 @@ package be.nicolasdelbaer.forsakenmarket.resources;
 import be.nicolasdelbaer.forsakenmarket.exceptions.auth.EmailAlreadyUsedException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.core.MissingEnvConfigurationException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerLoginException;
-import be.nicolasdelbaer.forsakenmarket.models.player.LoginRequestDto;
+import be.nicolasdelbaer.forsakenmarket.models.auth.AuthResponse;
+import be.nicolasdelbaer.forsakenmarket.models.player.LoginRequest;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.models.player.RegisterPlayerRequest;
 import be.nicolasdelbaer.forsakenmarket.services.PlayerService;
@@ -28,6 +29,8 @@ import java.util.Set;
 @Path("/auth")
 @RequestScoped
 @Tag(name = "Auth", description = "Manage users")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class AuthResource {
 
     private static final Logger log = LoggerFactory.getLogger(AuthResource.class);
@@ -36,8 +39,6 @@ public class AuthResource {
 
     @POST
     @Path("/register")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response registerPlayer(RegisterPlayerRequest registerPlayerRequest){
         //Input validation
         Set<ConstraintViolation<RegisterPlayerRequest>> violations = validator.validate(registerPlayerRequest);
@@ -61,20 +62,18 @@ public class AuthResource {
 
     @POST
     @Path("/login")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response login(LoginRequestDto loginRequestDto){
+    public Response login(LoginRequest loginRequest){
         //Input validation
-        Set<ConstraintViolation<LoginRequestDto>> violations = validator.validate(loginRequestDto);
+        Set<ConstraintViolation<LoginRequest>> violations = validator.validate(loginRequest);
         if (!violations.isEmpty())
             return Response.status(400).entity(violations).build();
 
         //Data are validated
         Response response;
         try {
-            PlayerSession player = playerService.login(loginRequestDto);
+            PlayerSession player = playerService.login(loginRequest);
             String token = JwtUtils.generateToken(player);
-            response = Response.ok(token).build();
+            response = Response.ok(new AuthResponse(token)).build();
         } catch (PlayerLoginException e) {
             response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), BadResponseUtils.WrongLoginOrPass).build();
         }

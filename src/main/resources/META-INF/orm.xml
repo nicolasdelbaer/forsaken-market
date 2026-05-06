@@ -7,16 +7,16 @@
             item_blueprint_id,
 
             coalesce(
-                (Select m2.currentprice from marketprice m2
-                   where m2.roundId = :startId
+                (Select m2.current_price from marketPrice m2
+                   where m2.round_id = :startId
                    and m2.item_blueprint_id = m.item_blueprint_id),
-                (array_agg(currentPrice order by roundid ASC))[1]) as open,
+                (array_agg(currentPrice order by round_id ASC))[1]) as open,
 
-            max(currentprice) as high,
-            min(currentprice) as low,
-            (array_agg(currentprice order by roundid DESC))[1] as close
-            FROM marketprice m
-            WHERE roundid >= :startId AND roundid <= :endId
+            max(current_price) as high,
+            min(current_price) as low,
+            (array_agg(current_price order by round_id DESC))[1] as close
+            FROM marketPrice m
+            WHERE round_id >= :startId AND round_id <= :endId
             GROUP BY item_blueprint_id
         ]]></query>
     </named-native-query>

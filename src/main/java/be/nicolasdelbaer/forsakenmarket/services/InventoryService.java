@@ -7,7 +7,7 @@ import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.CannotDiscardItemEx
 import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.CollectionNotFoundException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.CannotSellInactiveItemException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketPriceNotFoundException;
-import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItemDto;
+import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItem;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.CollectionItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.InventoryItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.market.PriceMovementByRound;
@@ -37,18 +37,18 @@ public class InventoryService {
      * The market items are shared and non-exclusive for all players
      */
     @Transactional
-    public void acquireItem(BuyItemDto buyItemDto){
+    public void acquireItem(BuyItem buyItem){
         InventoryItem inventoryItem = new InventoryItem();
-        inventoryItem.setItemBlueprint(buyItemDto.marketItem().getItemBlueprint());
-        inventoryItem.setMarketItemId(buyItemDto.marketItem().getId());
-        inventoryItem.setPlayer(buyItemDto.player());
+        inventoryItem.setItemBlueprint(buyItem.marketItem().getItemBlueprint());
+        inventoryItem.setMarketItemId(buyItem.marketItem().getId());
+        inventoryItem.setPlayer(buyItem.player());
 
-        inventoryItem.setBoughtPrice(buyItemDto.marketPrice().currentPrice());
+        inventoryItem.setBoughtPrice(buyItem.marketPrice().currentPrice());
         inventoryItem.setBoughtAt(LocalDateTime.now());
         inventoryItem.setStatus(MarketItemStatus.BOUGHT);
 
         inventoryItem.setDecayNbRounds(getDecayTime());
-        inventoryItem.setBoughtRoundId(buyItemDto.roundId());
+        inventoryItem.setBoughtRoundId(buyItem.roundId());
 
         inventoryItemRepository.save(entityManager, inventoryItem);
     }

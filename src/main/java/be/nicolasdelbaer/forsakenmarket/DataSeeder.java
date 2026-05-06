@@ -14,15 +14,16 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @ApplicationScoped
 public class DataSeeder {
 
+    private static final Logger log = LoggerFactory.getLogger(DataSeeder.class);
     @Inject private PlayerRepository playerRepository;
     @Inject private PlayerRoleRepository playerRoleRepository;
     @Inject private GameStateRepository gameStateRepository;
@@ -30,7 +31,6 @@ public class DataSeeder {
     @Inject private ItemBlueprintRepository itemBlueprintRepository;
     @Inject private EntityManagerFactory entityManagerFactory;
 
-    private static final Logger log = Logger.getLogger(DataSeeder.class.getName());
 
     public void seed(@Observes @Priority(GameConfiguration.DataFeedPriority) @Initialized(ApplicationScoped.class) Object init) {
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
@@ -46,11 +46,10 @@ public class DataSeeder {
                 createGameState(entityManager);
                 createPlayers(entityManager);
                 createCategories(entityManager);
-
                 log.info("DataSeeder : Done");
                 entityTransaction.commit();
             } catch (Exception e) {
-                log.log(Level.SEVERE, "DataSeeder : erreur lors du seed des données.", e);
+                log.error("DataSeeder : erreur lors du seed des données.", e);
                 entityTransaction.rollback();
 
             }
@@ -68,11 +67,12 @@ public class DataSeeder {
 
         Player player;
         String envCost = System.getenv("BCRYPT_COST");
+        String defaultPassword = System.getenv("DEFAULT_USER_PASSWORD");
         int cost = Objects.nonNull(envCost) ? Integer.parseInt(envCost) : 12;
         player = new Player(
                 "Nidel",
                 "nidel@gmail.com",
-                BCrypt.withDefaults().hashToString(cost, "pass".toCharArray()),
+                BCrypt.withDefaults().hashToString(cost, defaultPassword.toCharArray()),
                 GameConfiguration.startingWallet,
                 List.of(playerRoleMerchant, playerRoleAdmin)
         );
@@ -80,7 +80,7 @@ public class DataSeeder {
         player = new Player(
                 "Foo",
                 "foo@gmail.com",
-                BCrypt.withDefaults().hashToString(cost, "pass".toCharArray()),
+                BCrypt.withDefaults().hashToString(cost, defaultPassword.toCharArray()),
                 GameConfiguration.startingWallet,
                 List.of(playerRoleMerchant)
         );
@@ -88,7 +88,7 @@ public class DataSeeder {
         player = new Player(
                 "Bar",
                 "bar@gmail.com",
-                BCrypt.withDefaults().hashToString(cost, "pass".toCharArray()),
+                BCrypt.withDefaults().hashToString(cost, defaultPassword.toCharArray()),
                 GameConfiguration.startingWallet,
                 List.of(playerRoleMerchant, playerRoleNoble)
         );
