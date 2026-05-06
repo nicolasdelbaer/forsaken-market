@@ -48,7 +48,7 @@ Ecrire de la doc x_x
 
 ## TO KEEP IN MIND
 ### Refacto
-- Refacto Inventory items with proper entries for each action
+- Refacto Inventory items with proper entries for each action (boughtAt, soldAt, ...)
 - Code & project review
 - Clean GameStateManager
 
@@ -63,7 +63,4 @@ Ecrire de la doc x_x
 ### Update theory & must known
 
 ### Optimisation
-- Clean data based on round id (market evolution, market price)
-- Review db accesses & server cached data ()
-- MarketOHLC -> Use an interface for getting cached data or db request?
-  Pk sur marketPrice: bp_id + round_id (no need for generatedId ?)
+- Auto Clean data based on round id (market evolution, market price)
