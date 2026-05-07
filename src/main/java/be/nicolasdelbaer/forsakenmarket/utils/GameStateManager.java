@@ -18,7 +18,6 @@ public class GameStateManager {
     private final AtomicReference<GameStateSnapshot> gameStateSnapshot =
             new AtomicReference<>(new GameStateSnapshot( Map.of(), Map.of(), List.of(), 1L));
 
-
     public void startup(GameState data, Map<Long, MarketPrice> marketPriceList, Map<Long, ItemBlueprint> blueprints) {
         gameStateSnapshot.updateAndGet (snapshot ->
                 new GameStateSnapshot(
@@ -39,7 +38,6 @@ public class GameStateManager {
                 )
         );
     }
-
 
     public long getCurrentRound(){
         return gameStateSnapshot.get().currentRound();
@@ -62,8 +60,6 @@ public class GameStateManager {
         if(blueprint == null) throw new UndefinedBlueprintException();
         return blueprint;
     }
-
-
 
     public GameState toGameStateEntity() {
         GameStateSnapshot snapshot = gameStateSnapshot.get();

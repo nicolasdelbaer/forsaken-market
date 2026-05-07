@@ -4,7 +4,6 @@ import be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint;
 import be.nicolasdelbaer.forsakenmarket.entities.MarketItem;
 import be.nicolasdelbaer.forsakenmarket.entities.MarketPrice;
 import be.nicolasdelbaer.forsakenmarket.entities.MarketPriceEvolution;
-import be.nicolasdelbaer.forsakenmarket.enums.MarketTrend;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.UndefinedBlueprintException;
 import be.nicolasdelbaer.forsakenmarket.models.market.MarketOHLC;
 import be.nicolasdelbaer.forsakenmarket.repositories.MarketItemRepository;
@@ -85,11 +84,6 @@ public class ScheduledMarketService {
             marketPriceEvolutionList.add(marketPriceEvolution);
         }
         marketPriceEvolutionRepository.saveAll(entityManager, marketPriceEvolutionList);
-    }
-
-    private static MarketTrend getMarketTrend(MarketOHLC ohlc) {
-        //TODO add logic for market trend - need to evaluate the need for this feature
-        return MarketTrend.STABLE;
     }
 
     /*
