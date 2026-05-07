@@ -308,6 +308,7 @@
     try {
       const res = await api('POST', '/api/auth/login', { email, password: pwd });
       setToken(res);
+      listenServer();
     } catch(e) { toast(e.message, 'err'); }
   }
 
@@ -366,10 +367,14 @@
     } catch {}
     refreshAll();
     startAutoRefresh();
-    listenServer();
   }
 
-  function refreshAll() { loadMarket(); loadInventory(); loadWallet(); }
+  function refreshAll() {
+    if(token!= null) listenServer();
+    loadMarket();
+    loadInventory();
+    loadWallet();
+  }
 
   let autoRefreshTimer = null;
   let countdownTimer   = null;

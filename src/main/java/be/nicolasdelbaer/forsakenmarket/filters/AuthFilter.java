@@ -8,10 +8,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.container.ResourceInfo;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.core.*;
 import jakarta.ws.rs.ext.Provider;
 
 import java.security.Principal;
@@ -30,13 +27,21 @@ public class AuthFilter implements ContainerRequestFilter {
             return;
 
         String authHeader = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        String token = null;
+
+        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+            Cookie cookie = requestContext.getCookies().get("auth_token");
+            if(cookie != null) token = cookie.getValue();
+        }else{
+            token = authHeader.substring(7);
+        }
+
+        if(token == null){
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
             return;
         }
 
         try {
-            String token = authHeader.substring(7);
             Claims claims = JwtUtils.getClaims(token);
             if(!JwtUtils.isValid(claims)) throw new Exception();
 
