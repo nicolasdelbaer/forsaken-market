@@ -49,7 +49,7 @@ public class GameStateManager {
     public Map<Long, MarketPrice> getMarketPriceMap() {
         return Map.copyOf(gameStateSnapshot.get().marketPriceMap());
     }
-    public MarketPrice getPriceHistory(Long itemBlueprintId) throws UndefinedMarketPriceException {
+    public MarketPrice getCurrentMarketPrice(Long itemBlueprintId) throws UndefinedMarketPriceException {
         MarketPrice result = gameStateSnapshot.get().marketPriceMap().get(itemBlueprintId);
         if(result == null) throw new UndefinedMarketPriceException();
         return result;

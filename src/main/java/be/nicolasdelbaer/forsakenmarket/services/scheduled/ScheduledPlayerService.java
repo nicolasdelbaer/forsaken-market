@@ -1,5 +1,8 @@
 package be.nicolasdelbaer.forsakenmarket.services.scheduled;
 
+import be.nicolasdelbaer.forsakenmarket.broadcaster.EventBroadcaster;
+import be.nicolasdelbaer.forsakenmarket.enums.BroadcastEvent;
+import be.nicolasdelbaer.forsakenmarket.models.broadcast.PaydayBroadcast;
 import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.GameConfiguration;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -14,6 +17,7 @@ import jakarta.persistence.EntityManager;
 public class ScheduledPlayerService {
 
     @Inject private PlayerRepository playerRepository;
+    @Inject private EventBroadcaster eventBroadcaster;
 
     /*
      * Player Salary day consists on:
@@ -21,7 +25,7 @@ public class ScheduledPlayerService {
      */
     public void itsPayday(EntityManager entityManager) {
         playerRepository.addSalaryToPlayers(entityManager, GameConfiguration.PAYDAY_AMOUNT);
-
+        eventBroadcaster.broadcastToAll(BroadcastEvent.Payday, new PaydayBroadcast(GameConfiguration.PAYDAY_AMOUNT));
     }
 
 

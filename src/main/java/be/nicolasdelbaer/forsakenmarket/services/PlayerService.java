@@ -2,10 +2,14 @@ package be.nicolasdelbaer.forsakenmarket.services;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import be.nicolasdelbaer.forsakenmarket.annotations.Transactional;
+import be.nicolasdelbaer.forsakenmarket.broadcaster.EventBroadcaster;
 import be.nicolasdelbaer.forsakenmarket.entities.Player;
+import be.nicolasdelbaer.forsakenmarket.enums.BroadcastEvent;
 import be.nicolasdelbaer.forsakenmarket.exceptions.auth.EmailAlreadyUsedException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.core.MissingEnvConfigurationException;
+import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerInsufficientFundsException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerLoginException;
+import be.nicolasdelbaer.forsakenmarket.models.broadcast.ReputationUpdateBroadcast;
 import be.nicolasdelbaer.forsakenmarket.models.player.LeaderboardResponse;
 import be.nicolasdelbaer.forsakenmarket.models.player.LoginRequest;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
@@ -25,6 +29,7 @@ public class PlayerService {
     @Inject private PlayerRepository playerRepository;
     @Inject private EntityManager entityManager;
     @Inject private PlayerRoleRepository playerRoleRepository;
+    @Inject private EventBroadcaster eventBroadcaster;
 
     public PlayerService() {
     }
@@ -65,7 +70,6 @@ public class PlayerService {
         return PlayerSession.fromPlayer(player);
     }
 
-
     public Integer getWallet(Integer playerId) {
         return playerRepository.getWallet(entityManager, playerId);
     }
@@ -74,4 +78,33 @@ public class PlayerService {
         return playerRepository
                 .fetchPlayerScores(entityManager, limit);
     }
+
+    public void addReputation(Player player, Integer reputationScore) {
+        int currentReput = player.getCurrentReput();
+        int currentLevel = player.getLevel();
+
+        player.addReputation(reputationScore);
+
+        eventBroadcaster.broadcastToPlayer(
+                BroadcastEvent.LevelUp,
+                new ReputationUpdateBroadcast(
+                        currentReput,
+                        player.getCurrentReput(),
+                        currentLevel,
+                        player.getLevel()
+                ), player.getId()
+        );
+    }
+
+    public void debit(Player player, Integer amount) throws PlayerInsufficientFundsException {
+        player.debit(amount);
+    }
+    public void credit(Player player, Integer amount){
+        player.credit(amount);
+    }
+
+    public boolean canAfford(Player player, Integer cost){
+        return cost <= player.getWallet();
+    }
+
 }

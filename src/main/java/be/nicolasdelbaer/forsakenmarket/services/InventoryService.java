@@ -37,7 +37,7 @@ public class InventoryService {
      * The market items are shared and non-exclusive for all players
      */
     @Transactional
-    public void acquireItem(BuyItemRequest buyItemRequest){
+    public InventoryItem acquireItem(BuyItemRequest buyItemRequest){
         InventoryItem inventoryItem = new InventoryItem();
         inventoryItem.setItemBlueprint(buyItemRequest.marketItem().getItemBlueprint());
         inventoryItem.setMarketItemId(buyItemRequest.marketItem().getId());
@@ -51,6 +51,7 @@ public class InventoryService {
         inventoryItem.setBoughtRoundId(buyItemRequest.roundId());
 
         inventoryItemRepository.save(entityManager, inventoryItem);
+        return inventoryItem;
     }
 
     //TODO calculte right round nb time
@@ -99,7 +100,7 @@ public class InventoryService {
                 .stream()
                 .map(inventoryItem -> {
                     MarketPrice marketPrice = Optional
-                            .ofNullable(gameStateManager.getPriceHistory(inventoryItem.getItemBlueprint().getId()))
+                            .ofNullable(gameStateManager.getCurrentMarketPrice(inventoryItem.getItemBlueprint().getId()))
                             .orElseThrow(() -> new MarketPriceNotFoundException("No price found for blueprint"));
 
                     return new InventoryItemResponse(
@@ -119,7 +120,6 @@ public class InventoryService {
      * Fetch Collection status
      * Get all blueprints data + if they've been find or not
      */
-    @Transactional
     public List<CollectionItemResponse> fetchCollection(Integer playerId) throws CollectionNotFoundException {
         return collectionItemRepository.findAllForPlayer(entityManager, playerId);
     }

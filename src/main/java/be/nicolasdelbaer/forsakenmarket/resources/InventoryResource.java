@@ -7,7 +7,6 @@ import be.nicolasdelbaer.forsakenmarket.exceptions.market.CannotSellInactiveItem
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketPriceNotFoundException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.UndefinedMarketPriceException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerNotFoundException;
-import be.nicolasdelbaer.forsakenmarket.models.inventory.CollectionItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.InventoryItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.services.InventoryService;
@@ -83,23 +82,6 @@ public class InventoryResource {
         try {
             List<InventoryItemResponse> itemList = inventoryService
                     .fetchItems(playerSession.id());
-            response = Response.ok(itemList).build();
-        } catch (Exception e) {
-            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-            log.warn(e.getMessage(), e);
-        }
-        return response;
-    }
-
-    @GET
-    @Path("/collection")
-    @Operation(summary = "Get collection items", description = "Fetch all blueprint item data available discovered by player")
-    public Response getCollection(){
-        Response response;
-        PlayerSession playerSession = (PlayerSession) securityContext.getUserPrincipal();
-        try {
-            List<CollectionItemResponse> itemList = inventoryService
-                    .fetchCollection(playerSession.id());
             response = Response.ok(itemList).build();
         } catch (Exception e) {
             response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();

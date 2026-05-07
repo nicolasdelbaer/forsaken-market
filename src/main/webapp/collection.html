@@ -217,7 +217,7 @@ let curRarity = null;
 async function loadCollection() {
   try {
     const token = localStorage.getItem('token');
-    const res   = await fetch(base() + '/api/inventory/collection', {
+    const res   = await fetch(base() + '/api/collection', {
       headers: token ? { 'Authorization': 'Bearer ' + token } : {}
     });
     if (!res.ok) throw new Error(res.statusText);

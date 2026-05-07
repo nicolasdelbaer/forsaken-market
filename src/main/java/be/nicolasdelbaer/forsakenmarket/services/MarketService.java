@@ -32,6 +32,8 @@ public class MarketService {
 
     @Inject private EntityManager entityManager;
     @Inject private ItemBlueprintRepository itemBlueprintRepository;
+    @Inject
+    private PlayerService playerService;
 
     @Transactional
     public void rerollItem(Integer playerId, Long itemId)
@@ -51,7 +53,7 @@ public class MarketService {
             throw new MaxRerollReachedException("too many rerolls for this round");
 
         //remove player's money
-        player.debit(GameConfiguration.REROLL_COST); //TODO calculate the reroll price from dedicated static thresolds
+        playerService.debit(player, GameConfiguration.REROLL_COST); //TODO calculate the reroll price from dedicated static thresolds
         playerRepository.update(entityManager, player);
 
         RerolledItem rerolledItem = new RerolledItem();
@@ -74,7 +76,7 @@ public class MarketService {
                          marketItem.getItemBlueprint().getDescription(),
                          marketItem.getItemBlueprint().getIcon(),
                          marketItem.getItemBlueprint().getRarity().name(),
-                            gameStateManager.getPriceHistory(
+                            gameStateManager.getCurrentMarketPrice(
                                     marketItem.getItemBlueprint().getId()).getCurrentPrice()
                     ))
                 .toList();

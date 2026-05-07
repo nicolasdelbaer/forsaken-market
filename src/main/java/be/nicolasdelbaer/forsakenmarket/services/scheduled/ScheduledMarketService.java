@@ -26,9 +26,9 @@ import java.util.random.RandomGenerator;
 @ApplicationScoped
 public class ScheduledMarketService {
 
+    @Inject private GameStateManager gameStateManager;
     @Inject private MarketItemRepository marketItemRepository;
     @Inject private MarketPriceEvolutionRepository marketPriceEvolutionRepository;
-    @Inject private GameStateManager gameStateManager;
     @Inject private MarketPriceRepository marketPriceRepository;
 
     /*

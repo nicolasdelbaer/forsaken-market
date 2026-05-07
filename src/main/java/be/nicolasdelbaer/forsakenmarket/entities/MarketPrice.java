@@ -55,4 +55,5 @@ public class MarketPrice {
         this.itemBlueprint = itemBlueprint;
         this.roundId = roundId;
     }
+
 }

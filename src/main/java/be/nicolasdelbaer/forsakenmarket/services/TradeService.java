@@ -1,7 +1,12 @@
 package be.nicolasdelbaer.forsakenmarket.services;
 
 import be.nicolasdelbaer.forsakenmarket.annotations.Transactional;
-import be.nicolasdelbaer.forsakenmarket.entities.*;
+import be.nicolasdelbaer.forsakenmarket.broadcaster.EventBroadcaster;
+import be.nicolasdelbaer.forsakenmarket.entities.InventoryItem;
+import be.nicolasdelbaer.forsakenmarket.entities.MarketItem;
+import be.nicolasdelbaer.forsakenmarket.entities.MarketPrice;
+import be.nicolasdelbaer.forsakenmarket.entities.Player;
+import be.nicolasdelbaer.forsakenmarket.enums.BroadcastEvent;
 import be.nicolasdelbaer.forsakenmarket.enums.MarketItemStatus;
 import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.BadItemOwnershipException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.CannotSellInactiveItemException;
@@ -10,9 +15,9 @@ import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketPriceNotFoundExc
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.UndefinedMarketPriceException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerInsufficientFundsException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerNotFoundException;
+import be.nicolasdelbaer.forsakenmarket.models.broadcast.TradeBroadcast;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItemRequest;
 import be.nicolasdelbaer.forsakenmarket.models.player.ReputationScoreData;
-import be.nicolasdelbaer.forsakenmarket.repositories.CollectionItemRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.InventoryItemRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.MarketItemRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRepository;
@@ -23,20 +28,20 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 
-import java.time.LocalDateTime;
-
 @ApplicationScoped
 public class TradeService {
 
+    @Inject private GameStateManager gameStateManager;
+    @Inject private EntityManager entityManager;
+    @Inject private EventBroadcaster eventBroadcaster;
+
     @Inject private InventoryItemRepository inventoryItemRepository;
     @Inject private MarketItemRepository marketItemRepository;
+    @Inject private PlayerRepository playerRepository;
 
     @Inject private InventoryService inventoryService;
-    @Inject private GameStateManager gameStateManager;
-    @Inject private PlayerRepository playerRepository;
-    @Inject private CollectionItemRepository collectionItemRepository;
-
-    @Inject private EntityManager entityManager;
+    @Inject private PlayerService playerService;
+    @Inject private CollectionService collectionService;
 
     @Transactional
     public void buyItem(Integer playerId, Long itemId)
@@ -45,30 +50,30 @@ public class TradeService {
         Long currentRound = gameStateManager.getCurrentRound();
 
         //Retrieving items
-        MarketItem itemInstance = marketItemRepository
+        MarketItem marketItem = marketItemRepository
                 .findById(entityManager, itemId)
                 .orElseThrow(() -> new MarketItemDoesNotExistException("Item not found"));
-        MarketPrice marketPrice = gameStateManager.getPriceHistory(itemInstance.getItemBlueprint().getId());
+        MarketPrice marketPrice = gameStateManager.getCurrentMarketPrice(marketItem.getItemBlueprint().getId());
         Player player = playerRepository
                 .findById(entityManager, playerId)
                 .orElseThrow(() -> new PlayerNotFoundException("player not found"));
 
         //remove player's money
-        player.debit(marketPrice.getCurrentPrice());
+        playerService.debit(player, marketPrice.getCurrentPrice());
         playerRepository.update(entityManager, player);
 
         //add item to inventory
-        inventoryService.acquireItem(new BuyItemRequest(player, itemInstance, marketPrice, currentRound));
+        InventoryItem itemInstance = inventoryService.acquireItem(new BuyItemRequest(player, marketItem, marketPrice, currentRound));
 
-
-        if(!collectionItemRepository.isCollected(entityManager, playerId, itemInstance.getItemBlueprint().getId())) {
-            CollectionItem collectionItem = new CollectionItem();
-            collectionItem.setItemBlueprint(itemInstance.getItemBlueprint());
-            collectionItem.setPlayer(player);
-            collectionItem.setFoundAt(LocalDateTime.now());
-            collectionItem.setFoundRoundId(gameStateManager.getCurrentRound());
-            collectionItemRepository.save(entityManager, collectionItem);
+        if(collectionService.hasDiscovered(playerId, marketItem.getItemBlueprint().getId())) {
+            collectionService.addToCollection(player, marketItem);
         }
+        eventBroadcaster.broadcastToPlayer(BroadcastEvent.ItemBought,
+                new TradeBroadcast(
+                        itemInstance.getId(),
+                        marketPrice.getCurrentPrice(),
+                        itemInstance.getPriceDifference()
+                ), playerId);
     }
 
     @Transactional
@@ -81,20 +86,30 @@ public class TradeService {
                 .getItemFromPlayer(entityManager, itemId, playerId, MarketItemStatus.BOUGHT)
                 .orElseThrow(() -> new BadItemOwnershipException(BadResponseUtils.InvalidItemOrUnauthorized));
 
-        MarketPrice marketPrice = gameStateManager.getPriceHistory(itemInstance.getItemBlueprint().getId());
+        MarketPrice marketPrice = gameStateManager.getCurrentMarketPrice(itemInstance.getItemBlueprint().getId());
 
         //remove player's money
         Player player = playerRepository
                 .findById(entityManager, playerId)
                 .orElseThrow(() -> new PlayerNotFoundException(BadResponseUtils.PlayerNotFound));
-        player.credit(marketPrice.getCurrentPrice());
-        player.addReputation(ReputationCalculator.calculate(new ReputationScoreData(
-                itemInstance.getBoughtPrice(), marketPrice.getCurrentPrice()
-        )));
+        playerService.credit(player, marketPrice.getCurrentPrice());
+        playerService.addReputation(
+                player,
+                ReputationCalculator.calculate(new ReputationScoreData(
+                itemInstance.getBoughtPrice(),
+                        marketPrice.getCurrentPrice()))
+        );
         playerRepository.update(entityManager, player);
 
         //add item to inventory
         inventoryService.sellItem(itemInstance, currentRound);
+
+        eventBroadcaster.broadcastToPlayer(BroadcastEvent.ItemSold,
+                new TradeBroadcast(
+                        itemInstance.getId(),
+                        marketPrice.getCurrentPrice(),
+                        itemInstance.getPriceDifference()
+                ), playerId);
     }
 
 

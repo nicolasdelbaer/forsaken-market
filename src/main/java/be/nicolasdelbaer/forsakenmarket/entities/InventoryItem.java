@@ -30,6 +30,7 @@ public class InventoryItem {
     @Getter @Setter private Player player;
 
     @Getter @Setter private Integer boughtPrice;
+    @Getter @Setter private Integer soldPrice;
 
     @Getter @Setter private Integer decayNbRounds;
 
@@ -62,5 +63,11 @@ public class InventoryItem {
 
     public boolean isDecayed(){
         return status.equals(MarketItemStatus.DECAYED);
+    }
+
+    //If bought & sold, return the difference. Positive = player did a good deal
+    public Integer getPriceDifference() {
+        if(boughtPrice == null || soldPrice == null) return 0;
+        return soldPrice - boughtPrice;
     }
 }

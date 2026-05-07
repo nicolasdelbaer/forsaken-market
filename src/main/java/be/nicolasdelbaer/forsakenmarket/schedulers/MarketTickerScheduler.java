@@ -4,6 +4,9 @@ import be.nicolasdelbaer.forsakenmarket.broadcaster.EventBroadcaster;
 import be.nicolasdelbaer.forsakenmarket.entities.GameState;
 import be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint;
 import be.nicolasdelbaer.forsakenmarket.entities.MarketPrice;
+import be.nicolasdelbaer.forsakenmarket.enums.BroadcastEvent;
+import be.nicolasdelbaer.forsakenmarket.models.broadcast.EndOfDayBroadcast;
+import be.nicolasdelbaer.forsakenmarket.models.broadcast.NewRoundBroadcast;
 import be.nicolasdelbaer.forsakenmarket.repositories.GameStateRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.ItemBlueprintRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.MarketPriceRepository;
@@ -128,10 +131,11 @@ public class MarketTickerScheduler{
                     );
                     //Give salary to players
                     scheduledPlayerService.itsPayday(entityManager);
-                    eventBroadcaster.broadcast("end-of-day", "{'is-working':true}");
-                }
-                if(newRoundId % GameConfiguration.ROUNDS_BEFORE_CLEAN == 0) {
-                    cleanupData();
+
+                    //TODO postpose until transaction commited
+                    eventBroadcaster.broadcastToAll(
+                            BroadcastEvent.EndOfDay,
+                            new EndOfDayBroadcast(true));
                 }
                 gameStateRepository.update(entityManager, new GameState(newRoundId));
                 transaction.commit();
@@ -139,16 +143,16 @@ public class MarketTickerScheduler{
                 //handle next round after all db actions avoiding desync state
                 gameStateManager.syncGameStateSnapshot(updatedPrices, newRoundId);
                 log.info("Current round: %s".formatted(newRoundId));
+
+                //TODO postpose until transaction commited
+                eventBroadcaster.broadcastToAll(
+                        BroadcastEvent.NewRound,
+                        new NewRoundBroadcast(newRoundId));
             } catch (Exception e) {
                 transaction.rollback();
                 log.error(e.getMessage(), e);
             }
         }
-
-    }
-
-    private void cleanupData() {
-        //TODO clear unused data
     }
 
 }
