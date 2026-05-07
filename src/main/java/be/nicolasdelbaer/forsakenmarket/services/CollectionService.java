@@ -23,7 +23,7 @@ public class CollectionService {
 
     @Inject private CollectionItemRepository collectionItemRepository;
 
-    public boolean hasDiscovered(Integer playerId, Long id) {
+    public boolean isNewDiscovery(Integer playerId, Long id) {
         return !collectionItemRepository.isCollected(entityManager, playerId, id);
     }
 

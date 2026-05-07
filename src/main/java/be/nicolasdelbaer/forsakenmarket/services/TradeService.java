@@ -65,7 +65,7 @@ public class TradeService {
         //add item to inventory
         InventoryItem itemInstance = inventoryService.acquireItem(new BuyItemRequest(player, marketItem, marketPrice, currentRound));
 
-        if(collectionService.hasDiscovered(playerId, marketItem.getItemBlueprint().getId())) {
+        if(collectionService.isNewDiscovery(playerId, marketItem.getItemBlueprint().getId())) {
             collectionService.addToCollection(player, marketItem);
         }
         eventBroadcaster.broadcastToPlayer(BroadcastEvent.ItemBought,
