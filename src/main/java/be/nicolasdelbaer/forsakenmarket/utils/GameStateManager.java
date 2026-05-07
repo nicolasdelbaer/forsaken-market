@@ -28,7 +28,7 @@ public class GameStateManager {
         );
     }
 
-    public void handleNextRound(Map<Long, MarketPrice> marketPriceList, long newRoundId){
+    public void syncGameStateSnapshot(Map<Long, MarketPrice> marketPriceList, long newRoundId){
         gameStateSnapshot.updateAndGet (snapshot ->
                 new GameStateSnapshot(
                         marketPriceList,

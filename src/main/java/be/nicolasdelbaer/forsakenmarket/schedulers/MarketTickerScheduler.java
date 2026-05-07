@@ -1,5 +1,6 @@
 package be.nicolasdelbaer.forsakenmarket.schedulers;
 
+import be.nicolasdelbaer.forsakenmarket.broadcaster.EventBroadcaster;
 import be.nicolasdelbaer.forsakenmarket.entities.GameState;
 import be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint;
 import be.nicolasdelbaer.forsakenmarket.entities.MarketPrice;
@@ -44,6 +45,7 @@ public class MarketTickerScheduler{
     @Inject private GameStateManager gameStateManager;
     @Inject private ScheduledPlayerService scheduledPlayerService;
     @Inject private MarketPriceRepository marketPriceRepository;
+    @Inject private EventBroadcaster eventBroadcaster;
 
     public void onStart(@Observes @Priority(GameConfiguration.SCHEDULER_PRIORITY) @Initialized(ApplicationScoped.class) Object obj) {
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
@@ -97,28 +99,27 @@ public class MarketTickerScheduler{
             transaction.begin();
             try {
                 long newRoundId = gameStateManager.getCurrentRound() +1;
+
                 //Prices will change towards their trends. Trends will be updated.
                 Map<Long, MarketPrice> updatedPrices = MarketPriceUtils.updatePrices(
                         gameStateManager.getItemBlueprintList(),
                         gameStateManager.getMarketPriceMap(),
                         newRoundId
                 );
-                //Change cycle
+
                 scheduledMarketService.updateMarketPrices(
                         entityManager,
                         updatedPrices.values().stream().toList()
                 );
 
-                //Check & handle market items expiration
+                //Check & handle items expiration
                 scheduledMarketService.updateTimeToLive(entityManager);
-                //Check & handle inventory item decay; they'll lost value once decayed
-                scheduledInventoryService.updateDecay(entityManager);
+                scheduledInventoryService.updateExpirationTime(entityManager);
 
                 //Populate new items if some slots are missing,
                 //using gameConfiguration to setup a pool of max available items
                 //shared for all players (- bought or rerolled items)
                 scheduledMarketService.refreshMarket(entityManager, gameStateManager.getItemBlueprintList());
-                log.info("Current round: %s".formatted(newRoundId));
 
                 if(newRoundId % GameConfiguration.ROUNDS_BY_CYCLE == 0) {
                     scheduledMarketService.recordMarketPriceMovements(entityManager,
@@ -127,15 +128,17 @@ public class MarketTickerScheduler{
                     );
                     //Give salary to players
                     scheduledPlayerService.itsPayday(entityManager);
+                    eventBroadcaster.broadcast("end-of-day", "{'is-working':true}");
                 }
                 if(newRoundId % GameConfiguration.ROUNDS_BEFORE_CLEAN == 0) {
                     cleanupData();
                 }
-                gameStateRepository.update(entityManager, gameStateManager.toGameStateEntity());
+                gameStateRepository.update(entityManager, new GameState(newRoundId));
                 transaction.commit();
 
                 //handle next round after all db actions avoiding desync state
-                gameStateManager.handleNextRound(updatedPrices, newRoundId);
+                gameStateManager.syncGameStateSnapshot(updatedPrices, newRoundId);
+                log.info("Current round: %s".formatted(newRoundId));
             } catch (Exception e) {
                 transaction.rollback();
                 log.error(e.getMessage(), e);

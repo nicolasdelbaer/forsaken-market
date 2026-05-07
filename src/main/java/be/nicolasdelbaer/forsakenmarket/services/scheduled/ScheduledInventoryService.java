@@ -19,7 +19,7 @@ public class ScheduledInventoryService {
      * EntityManager is passed because of the scheduler scope
      * Decayed items cannot be sold anymore, updates will occur each round
      */
-    public void updateDecay(EntityManager entityManager) {
+    public void updateExpirationTime(EntityManager entityManager) {
         List<InventoryItem> ownedItems = inventoryItemRepository.fetchBoughtItems(entityManager);
         Long currentRound = gameStateManager.getCurrentRound();
         for (InventoryItem ownedItem : ownedItems)
