@@ -39,11 +39,15 @@ public abstract class CrudRepository<T, I> {
         int batchSize = 50;
         for (int i = 0; i < itemList.size(); i++) {
             entityManager.persist(itemList.get(i));
-            if (i % batchSize == 0) {
+            if ((i+1) % batchSize == 0) {
                 entityManager.flush();
-                entityManager.detach(itemList.get(i));
+                entityManager.clear();
             }
         }
+        //flush last batch
+        entityManager.flush();
+        entityManager.clear();
+
         return itemList;
     }
 
@@ -55,10 +59,13 @@ public abstract class CrudRepository<T, I> {
         int batchSize = 50;
         for (int i = 0; i < itemList.size(); i++) {
             entityManager.merge(itemList.get(i));
-            if (i % batchSize == 0) {
+            if ((i+1) % batchSize == 0) {
                 entityManager.flush();
-                entityManager.detach(itemList.get(i));
+                entityManager.clear();
             }
+            //flush last batch
+            entityManager.flush();
+            entityManager.clear();
         }
         return itemList;
     }
