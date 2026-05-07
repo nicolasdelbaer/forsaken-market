@@ -18,6 +18,7 @@ import java.util.Objects;
 @AllArgsConstructor
 public class Player {
     private static final int[] LEVEL_THRESHOLDS = {0, 100, 250, 500, 1000};
+    private static final int MAX_REPUT = 1_000_000_000;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,7 +44,7 @@ public class Player {
      */
     @Getter
     @Min(0)
-    @Max(1_000_000_000)
+    @Max(Integer.MAX_VALUE)
     private Integer wallet;
 
     /*
@@ -61,7 +62,7 @@ public class Player {
      */
     @Getter @Setter
     @Min(0)
-    @Max(1_000_000_000)
+    @Max(MAX_REPUT)
     private Integer totReput;
 
     /*
@@ -71,6 +72,7 @@ public class Player {
     */
     @Getter @Setter
     @Min(0)
+    @Max(MAX_REPUT)
     private Integer currentReput;
 
     @Getter @Setter
@@ -103,8 +105,8 @@ public class Player {
     }
 
     public void addReputation(Integer reputationScore) {
-        currentReput += reputationScore;
-        totReput += reputationScore;
+        currentReput = Math.min(currentReput + reputationScore, MAX_REPUT);
+        totReput = Math.min(totReput + reputationScore, MAX_REPUT);
 
         //update level from thresholds table
         while (level < LEVEL_THRESHOLDS.length && currentReput >= LEVEL_THRESHOLDS[level]) {
