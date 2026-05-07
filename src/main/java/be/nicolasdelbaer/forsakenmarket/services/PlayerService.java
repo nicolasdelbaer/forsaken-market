@@ -46,7 +46,7 @@ public class PlayerService {
             registerPlayerRequest.userName(),
             registerPlayerRequest.email(),
             BCrypt.withDefaults().hashToString(cost, registerPlayerRequest.password().toCharArray()),
-            GameConfiguration.startingWallet,
+            GameConfiguration.STARTING_WALLET,
             List.of(playerRoleRepository.findByRoleName(entityManager,"Merchant"))
         );
 

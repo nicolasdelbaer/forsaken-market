@@ -54,7 +54,7 @@ public class MarketItemRepository extends CrudRepository<MarketItem, Long> {
                       """,
                         MarketItem.class)
                 .setParameter("playerId", playerId)
-                .setParameter("itemLimit", GameConfiguration.marketVisibleLimit)
+                .setParameter("itemLimit", GameConfiguration.MARKET_VISIBLE_LIMIT)
                 .getResultList();
     }
 }

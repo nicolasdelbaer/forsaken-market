@@ -45,13 +45,14 @@ public class MarketTickerScheduler{
     @Inject private ScheduledPlayerService scheduledPlayerService;
     @Inject private MarketPriceRepository marketPriceRepository;
 
-    public void onStart(@Observes @Priority(GameConfiguration.SchedulerPriority) @Initialized(ApplicationScoped.class) Object obj) {
+    public void onStart(@Observes @Priority(GameConfiguration.SCHEDULER_PRIORITY) @Initialized(ApplicationScoped.class) Object obj) {
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
             List<ItemBlueprint> blueprintList = itemBlueprintRepository.findAll(entityManager);
 
             GameState data = gameStateRepository.getData(entityManager);
 
-            Map<Long, MarketPrice> marketPriceList = marketPriceRepository.findByRoundId(entityManager, data.getCurrentRound())
+            Map<Long, MarketPrice> marketPriceList = marketPriceRepository
+                    .findByRoundId(entityManager, data.getCurrentRound())
                     .stream()
                     .collect(Collectors.toMap(
                             marketPrice -> marketPrice.getItemBlueprint().getId(),
@@ -80,7 +81,7 @@ public class MarketTickerScheduler{
         scheduler.scheduleAtFixedRate(
                 this::tick,
                 0,
-                GameConfiguration.roundDurationSeconds,
+                GameConfiguration.ROUND_DURATION_SECONDS,
                 TimeUnit.SECONDS
         );
     }
@@ -95,15 +96,14 @@ public class MarketTickerScheduler{
             EntityTransaction transaction = entityManager.getTransaction();
             transaction.begin();
             try {
-
+                long newRoundId = gameStateManager.getCurrentRound() +1;
                 //Prices will change towards their trends. Trends will be updated.
                 Map<Long, MarketPrice> updatedPrices = MarketPriceUtils.updatePrices(
                         gameStateManager.getItemBlueprintList(),
                         gameStateManager.getMarketPriceMap(),
-                        gameStateManager.getCurrentRound() +1
+                        newRoundId
                 );
                 //Change cycle
-                gameStateManager.handleNextRound(updatedPrices);
                 scheduledMarketService.updateMarketPrices(
                         entityManager,
                         updatedPrices.values().stream().toList()
@@ -118,21 +118,24 @@ public class MarketTickerScheduler{
                 //using gameConfiguration to setup a pool of max available items
                 //shared for all players (- bought or rerolled items)
                 scheduledMarketService.refreshMarket(entityManager, gameStateManager.getItemBlueprintList());
-                log.info("Current round: %s".formatted(gameStateManager.getCurrentRound()));
+                log.info("Current round: %s".formatted(newRoundId));
 
-                if(gameStateManager.getCurrentRound() % GameConfiguration.roundsByCycle == 0) {
+                if(newRoundId % GameConfiguration.ROUNDS_BY_CYCLE == 0) {
                     scheduledMarketService.recordMarketPriceMovements(entityManager,
-                            (gameStateManager.getCurrentRound() - GameConfiguration.roundsByCycle),
-                            GameConfiguration.roundsByCycle
+                            (newRoundId - GameConfiguration.ROUNDS_BY_CYCLE),
+                            GameConfiguration.ROUNDS_BY_CYCLE
                     );
-                    //Give 50 bucks salary to players
+                    //Give salary to players
                     scheduledPlayerService.itsPayday(entityManager);
                 }
-                if(gameStateManager.getCurrentRound() % GameConfiguration.roundsBeforeClean == 0) {
+                if(newRoundId % GameConfiguration.ROUNDS_BEFORE_CLEAN == 0) {
                     cleanupData();
                 }
                 gameStateRepository.update(entityManager, gameStateManager.toGameStateEntity());
                 transaction.commit();
+
+                //handle next round after all db actions avoiding desync state
+                gameStateManager.handleNextRound(updatedPrices, newRoundId);
             } catch (Exception e) {
                 transaction.rollback();
                 log.error(e.getMessage(), e);

@@ -7,7 +7,6 @@ import be.nicolasdelbaer.forsakenmarket.entities.MarketPriceEvolution;
 import be.nicolasdelbaer.forsakenmarket.enums.MarketTrend;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.UndefinedBlueprintException;
 import be.nicolasdelbaer.forsakenmarket.models.market.MarketOHLC;
-import be.nicolasdelbaer.forsakenmarket.repositories.ItemBlueprintRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.MarketItemRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.MarketPriceEvolutionRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.MarketPriceRepository;
@@ -31,11 +30,7 @@ public class ScheduledMarketService {
     @Inject private MarketItemRepository marketItemRepository;
     @Inject private MarketPriceEvolutionRepository marketPriceEvolutionRepository;
     @Inject private GameStateManager gameStateManager;
-    @Inject private ItemBlueprintRepository itemBlueprintRepository;
     @Inject private MarketPriceRepository marketPriceRepository;
-    @Inject
-    private EntityManager entityManager;
-
 
     /*
      * Market Refresh consists on:
@@ -44,7 +39,7 @@ public class ScheduledMarketService {
     public void refreshMarket(EntityManager entityManager, List<ItemBlueprint> blueprintRepositoryAll) {
         int randomId;
         int count = marketItemRepository.getValidElementCount(entityManager);
-        int nbItems = GameConfiguration.marketPoolSize - count;
+        int nbItems = GameConfiguration.MARKET_POOL_SIZE - count;
         for (int i = 0; i <nbItems; i++) {
             randomId = RandomGenerator.getDefault().nextInt(blueprintRepositoryAll.size());
             createNewItem(entityManager, blueprintRepositoryAll.get(randomId));
@@ -77,13 +72,13 @@ public class ScheduledMarketService {
         List<MarketPriceEvolution> marketPriceEvolutionList = new ArrayList<>();
         List<MarketOHLC> priceEvolutionList = marketPriceRepository.getAllEvolutionData(entityManager, startRoundId, duration);
 
-        for (MarketOHLC ohcl : priceEvolutionList) {
-            ItemBlueprint bp = gameStateManager.getItemBlueprint(ohcl.item_blueprint_id());
+        for (MarketOHLC ohlc : priceEvolutionList) {
+            ItemBlueprint bp = gameStateManager.getItemBlueprint(ohlc.item_blueprint_id());
             MarketPriceEvolution marketPriceEvolution = new MarketPriceEvolution();
-            marketPriceEvolution.setOpen(ohcl.open()); //get last
-            marketPriceEvolution.setClose(ohcl.close());
-            marketPriceEvolution.setHigh(ohcl.high()); //fetch max price
-            marketPriceEvolution.setLow(ohcl.low()); //fetch min price
+            marketPriceEvolution.setOpen(ohlc.open()); //get last
+            marketPriceEvolution.setClose(ohlc.close());
+            marketPriceEvolution.setHigh(ohlc.high()); //fetch max price
+            marketPriceEvolution.setLow(ohlc.low()); //fetch min price
             marketPriceEvolution.setItemBlueprint(bp);
             marketPriceEvolution.setStartRoundId(startRoundId);
             marketPriceEvolution.setEndRoundId(startRoundId+duration);
@@ -92,7 +87,7 @@ public class ScheduledMarketService {
         marketPriceEvolutionRepository.saveAll(entityManager, marketPriceEvolutionList);
     }
 
-    private static MarketTrend getMarketTrend(MarketOHLC ohcl) {
+    private static MarketTrend getMarketTrend(MarketOHLC ohlc) {
         //TODO add logic for market trend - need to evaluate the need for this feature
         return MarketTrend.STABLE;
     }

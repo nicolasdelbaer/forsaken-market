@@ -47,18 +47,18 @@ public class MarketService {
 
         //cannot reroll if you've already used all available rerolls for the current round
         Integer nbReroll = playerRerollRepository.getRerollCount(entityManager, player.getId(), currentRound);
-        if(nbReroll >= GameConfiguration.maxRerollsPerRound)
+        if(nbReroll >= GameConfiguration.MAX_REROLLS_PER_ROUND)
             throw new MaxRerollReachedException("too many rerolls for this round");
 
         //remove player's money
-        player.debit(GameConfiguration.rerollCost); //TODO calculate the reroll price from dedicated static thresolds
-        playerRepository.save(entityManager, player);
+        player.debit(GameConfiguration.REROLL_COST); //TODO calculate the reroll price from dedicated static thresolds
+        playerRepository.update(entityManager, player);
 
         RerolledItem rerolledItem = new RerolledItem();
         rerolledItem.setMarketItem(itemInstance);
         rerolledItem.setPlayer(player);
         rerolledItem.setRoundId(currentRound);
-        playerRerollRepository.save(entityManager, rerolledItem);
+        playerRerollRepository.update(entityManager, rerolledItem);
     }
 
     /*
@@ -85,7 +85,7 @@ public class MarketService {
      */
     public List<MarketOHLCResponse> getMarketEvolution(Long itemId) {
         return marketPriceEvolutionRepository
-                .findByBlueprint(entityManager, itemId, GameConfiguration.OHLC_range)
+                .findByBlueprint(entityManager, itemId, GameConfiguration.OHLC_RANGE)
                 .stream()
                 .map(marketPriceEvolution ->
                     new MarketOHLCResponse(

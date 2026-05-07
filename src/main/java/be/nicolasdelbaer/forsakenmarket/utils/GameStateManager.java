@@ -29,13 +29,13 @@ public class GameStateManager {
         );
     }
 
-    public void handleNextRound(Map<Long, MarketPrice> marketPriceList){
+    public void handleNextRound(Map<Long, MarketPrice> marketPriceList, long newRoundId){
         gameStateSnapshot.updateAndGet (snapshot ->
                 new GameStateSnapshot(
                         marketPriceList,
                         snapshot.itemBlueprintMap(),
                         snapshot.itemBlueprintList(),
-                        snapshot.currentRound() +1
+                        newRoundId
                 )
         );
     }

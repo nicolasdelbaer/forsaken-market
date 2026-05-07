@@ -94,7 +94,7 @@ public class DataSeeder {
                 "Nidel",
                 "nidel@gmail.com",
                 BCrypt.withDefaults().hashToString(cost, defaultPassword.toCharArray()),
-                GameConfiguration.startingWallet,
+                GameConfiguration.STARTING_WALLET,
                 List.of(playerRoleMerchant, playerRoleAdmin)
         );
         playerRepository.save(entityManager, player);
@@ -102,7 +102,7 @@ public class DataSeeder {
                 "Foo",
                 "foo@gmail.com",
                 BCrypt.withDefaults().hashToString(cost, defaultPassword.toCharArray()),
-                GameConfiguration.startingWallet,
+                GameConfiguration.STARTING_WALLET,
                 List.of(playerRoleMerchant)
         );
         playerRepository.save(entityManager, player);
@@ -110,7 +110,7 @@ public class DataSeeder {
                 "Bar",
                 "bar@gmail.com",
                 BCrypt.withDefaults().hashToString(cost, defaultPassword.toCharArray()),
-                GameConfiguration.startingWallet,
+                GameConfiguration.STARTING_WALLET,
                 List.of(playerRoleMerchant, playerRoleNoble)
         );
         playerRepository.save(entityManager, player);

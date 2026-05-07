@@ -20,7 +20,7 @@ public class ScheduledPlayerService {
      *   - add fix amount of money into players wallet
      */
     public void itsPayday(EntityManager entityManager) {
-        playerRepository.addSalaryToPlayers(entityManager, GameConfiguration.paydayAmount);
+        playerRepository.addSalaryToPlayers(entityManager, GameConfiguration.PAYDAY_AMOUNT);
 
     }
 
