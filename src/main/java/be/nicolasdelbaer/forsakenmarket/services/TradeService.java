@@ -55,7 +55,7 @@ public class TradeService {
 
         //remove player's money
         player.debit(marketPrice.getCurrentPrice());
-        playerRepository.save(entityManager, player);
+        playerRepository.update(entityManager, player);
 
         //add item to inventory
         inventoryService.acquireItem(new BuyItemRequest(player, itemInstance, marketPrice, currentRound));
@@ -91,7 +91,7 @@ public class TradeService {
         player.addReputation(ReputationCalculator.calculate(new ReputationScoreData(
                 itemInstance.getBoughtPrice(), marketPrice.getCurrentPrice()
         )));
-        playerRepository.save(entityManager, player);
+        playerRepository.update(entityManager, player);
 
         //add item to inventory
         inventoryService.sellItem(itemInstance, currentRound);
