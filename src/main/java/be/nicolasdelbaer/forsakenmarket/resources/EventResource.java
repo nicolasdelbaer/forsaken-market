@@ -2,6 +2,7 @@ package be.nicolasdelbaer.forsakenmarket.resources;
 
 import be.nicolasdelbaer.forsakenmarket.annotations.Authenticated;
 import be.nicolasdelbaer.forsakenmarket.broadcaster.EventBroadcaster;
+import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
@@ -25,8 +26,9 @@ public class EventResource {
     @GET
     @Operation(summary = "End of day Server sent event", description = "Will send a signal when it's the end of the day")
     @Produces(MediaType.SERVER_SENT_EVENTS)
-    public void subscribe(@Context SseEventSink sink, @Context Sse sse) {
-            eventBroadcaster.register(sink, sse);
+    public void subscribe(@Context SseEventSink sink, @Context Sse sse, @Context SecurityContext securityContext) {
+        PlayerSession playerSession = (PlayerSession) securityContext.getUserPrincipal();
+        eventBroadcaster.register(sink, sse, playerSession.id());
     }
 
 }

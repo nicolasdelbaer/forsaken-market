@@ -5,23 +5,36 @@ import jakarta.ws.rs.sse.OutboundSseEvent;
 import jakarta.ws.rs.sse.Sse;
 import jakarta.ws.rs.sse.SseEventSink;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class EventBroadcaster {
     //CopyOnWriteArrayList is thread safe, ideal for few writes and many reads
     //List of client connections
-    private final List<SseEventSink> clients = new CopyOnWriteArrayList<>();
+    private final ConcurrentHashMap<Integer, List<SseEventSink>> clientsByPlayer = new ConcurrentHashMap<>();
     private final AtomicReference<Sse> sseRef = new AtomicReference<>();
 
-    public void register(SseEventSink sink, Sse sse){
+    public void register(SseEventSink sink, Sse sse, int playerId){
         sseRef.compareAndSet(null, sse);
-        clients.add(sink);
+        clientsByPlayer.computeIfAbsent(playerId, k -> new CopyOnWriteArrayList<>()).add(sink);
     }
 
-    public void broadcast(String eventName, String data){
+    public void broadcastToPlayer(String eventName, String data, int playerId){
+        broadcast(eventName, data, clientsByPlayer.get(playerId));
+    }
+    public void broadcastToAll(String eventName, String data){
+        broadcast(eventName, data, clientsByPlayer.values().stream()
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList())
+        );
+    }
+
+    private void broadcast(String eventName, String data, List<SseEventSink> clients){
         Sse sse = sseRef.get();
         if(sse == null || clients.isEmpty()) return;
 
