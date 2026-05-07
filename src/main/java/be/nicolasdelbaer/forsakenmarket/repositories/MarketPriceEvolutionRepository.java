@@ -13,14 +13,24 @@ public class MarketPriceEvolutionRepository extends CrudRepository<MarketPriceEv
     }
 
     public List<MarketPriceEvolution> findByBlueprint(EntityManager entityManager, long itemBlueprintId, int limit) {
+
+        List<Long> priceEvolutionIdList = entityManager.createQuery("""
+                    select mpe.id from MarketPriceEvolution mpe
+                    where mpe.itemBlueprint.id = :id
+                    order by mpe.endRoundId DESC
+                    """, Long.class)
+                .setParameter("id", itemBlueprintId)
+                .setMaxResults(50)
+                .getResultList();
+
+        if(priceEvolutionIdList.isEmpty()) return List.of();
+
         return entityManager.createQuery("""
-                        select t from MarketPriceEvolution t
-                        where t.itemBlueprint.id = :itemBlueprintId
-                        order by t.endRoundId ASC
-                        limit :limitMax
+                        select mpe from MarketPriceEvolution mpe
+                        where mpe.id IN :ids
+                        order by mpe.endRoundId ASC
                         """, MarketPriceEvolution.class)
-                .setParameter("itemBlueprintId", itemBlueprintId)
-                .setParameter("limitMax", limit)
+                .setParameter("ids", priceEvolutionIdList)
                 .getResultList();
     }
 
