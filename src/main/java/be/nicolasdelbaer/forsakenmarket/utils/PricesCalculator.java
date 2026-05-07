@@ -50,7 +50,7 @@ public class PricesCalculator {
         int baseSell = itemBlueprint.getPrice();
         int momentum  = (int) ((priceHistory.currentPrice() - priceHistory.previousPrice()) * momentumCoefficient);
         int reversion = (int) ((baseSell - priceHistory.currentPrice()) * reversionCoefficient);
-        int noise     = (int) (RandomGenerator.getDefault().nextInt(-1,1) * volatility * baseSell);
+        int noise     = (int) (RandomGenerator.getDefault().nextInt(-1,2) * volatility * baseSell);
         newPrice = priceHistory.currentPrice() + momentum + reversion + noise;
         newPrice += getMarketShockValue(baseSell);
 
@@ -65,7 +65,7 @@ public class PricesCalculator {
      */
     private static int getMarketShockValue(int baseSell) {
         int shockValue = 0;
-        boolean hasMarketShock = RandomGenerator.getDefault().nextInt(0, 100) <= SHOCK_PERCENT_CHANCE;
+        boolean hasMarketShock = RandomGenerator.getDefault().nextInt(0, 100) < SHOCK_PERCENT_CHANCE;
         if (hasMarketShock) {
             float direction = RandomGenerator.getDefault().nextBoolean() ? 1f : -1f;
             shockValue = (int) (baseSell * 0.15f * direction);
