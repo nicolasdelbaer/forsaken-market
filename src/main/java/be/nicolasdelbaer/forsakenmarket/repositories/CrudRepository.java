@@ -63,10 +63,10 @@ public abstract class CrudRepository<T, I> {
                 entityManager.flush();
                 entityManager.clear();
             }
-            //flush last batch
-            entityManager.flush();
-            entityManager.clear();
         }
+        //flush last batch
+        entityManager.flush();
+        entityManager.clear();
         return itemList;
     }
 
