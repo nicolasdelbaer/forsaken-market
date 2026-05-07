@@ -40,6 +40,11 @@
             <artifactId>jersey-cdi1x</artifactId>
             <version>${jersey.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-sse</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
         <!-- CDI / Weld -->
         <dependency>
             <groupId>org.jboss.weld.servlet</groupId>

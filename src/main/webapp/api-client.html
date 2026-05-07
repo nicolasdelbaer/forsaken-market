@@ -344,6 +344,17 @@
     document.getElementById(id + '-view').classList.add('active');
   }
 
+  function listenServer() {
+    const source = new EventSource("/api/events");
+
+    source.addEventListener("end-of-day", (e) => {
+      const data = JSON.parse(e.data);
+      console.log("End of day :", data);
+    });
+
+    source.onerror = () => console.warn("SSE déconnecté, reconnexion auto...");
+  }
+
   async function enterApp() {
     showView('main');
     document.getElementById('btn-logout').style.display = 'block';
@@ -355,6 +366,7 @@
     } catch {}
     refreshAll();
     startAutoRefresh();
+    listenServer();
   }
 
   function refreshAll() { loadMarket(); loadInventory(); loadWallet(); }

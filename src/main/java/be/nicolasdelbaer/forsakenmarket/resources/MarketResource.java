@@ -40,13 +40,14 @@ public class MarketResource {
     @Inject private TradeService tradeService;
     @Context private SecurityContext securityContext;
 
+
     @GET
     @Path("/history/{id}")
     @Operation(summary = "Market prices for items", description = "Prices with current trend and their values")
     public Response getMarketEvolution(@PathParam("id") Long itemId) {
         Response response;
         try {
-            response = Response.ok(marketService.getMarketEvolution(itemId)).build(); //TODO send back data with results
+            response = Response.ok(marketService.getMarketEvolution(itemId)).build();
         } catch (Exception e) {
             response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
             log.warn(e.getMessage(), e);
@@ -62,7 +63,7 @@ public class MarketResource {
         PlayerSession playerSession = (PlayerSession) securityContext.getUserPrincipal();
         try {
             tradeService.buyItem(playerSession.id(), itemId);
-            response = Response.ok().build(); //TODO send back data with results
+            response = Response.ok().build();
         } catch (PlayerInsufficientFundsException e) {
             response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(),
                     BadResponseUtils.InsufficientFunds).build();
@@ -81,7 +82,7 @@ public class MarketResource {
         PlayerSession playerSession = (PlayerSession) securityContext.getUserPrincipal();
         try {
             marketService.rerollItem(playerSession.id(), itemId);
-            response = Response.ok().build(); //TODO send back data with results
+            response = Response.ok().build();
         } catch (PlayerInsufficientFundsException | MaxRerollReachedException e) {
             response = Response.status(Response.Status.BAD_REQUEST).build();
         } catch (MarketItemDoesNotExistException | PlayerNotFoundException e) {
