@@ -32,13 +32,16 @@ public class DataSeeder {
     @Inject private ItemCategoryRepository itemCategoryRepository;
     @Inject private ItemBlueprintRepository itemBlueprintRepository;
     @Inject private EntityManagerFactory entityManagerFactory;
-    @Inject
-    private MarketPriceRepository marketPriceRepository;
+    @Inject private MarketPriceRepository marketPriceRepository;
 
 
-    public void seed(@Observes @Priority(GameConfiguration.DataFeedPriority) @Initialized(ApplicationScoped.class) Object init) {
+    public void onStart(@Observes @Priority(GameConfiguration.DATA_FEED_PRIORITY) @Initialized(ApplicationScoped.class) Object init) {
+        if("dev".equals(System.getenv("APP_ENV")))
+            seed();
+    }
+
+    private void seed() {
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
-
             try {
                 gameStateRepository.getData(entityManager);
                 return;
@@ -56,7 +59,6 @@ public class DataSeeder {
             } catch (Exception e) {
                 log.error("DataSeeder : erreur lors du seed des données.", e);
                 entityTransaction.rollback();
-
             }
         }
     }
