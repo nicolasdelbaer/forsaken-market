@@ -89,16 +89,13 @@ public class TradeService {
     @Transactional
     public void sellItem(Integer playerId, Long inventoryItemId)
             throws BadItemOwnershipException, CannotSellInactiveItemException, MarketPriceNotFoundException, PlayerNotFoundException, UndefinedMarketPriceException {
-
-        if(!inventoryService.isItemActive(playerId, inventoryItemId))
-            throw new CannotSellInactiveItemException("player cannot sell this item");
+        
+        InventoryItem itemInstance = inventoryItemRepository
+                .getItemFromPlayer(entityManager, inventoryItemId, playerId, List.of(MarketItemStatus.BOUGHT, MarketItemStatus.DECAYED))
+                .orElseThrow(() -> new CannotSellInactiveItemException(BadResponseUtils.CannotSellItem));
 
         //Note, the current round id is resolved here for keeping coherence
         Long currentRound = gameStateManager.getCurrentRound();
-
-        InventoryItem itemInstance = inventoryItemRepository
-                .getItemFromPlayer(entityManager, inventoryItemId, playerId, List.of(MarketItemStatus.BOUGHT, MarketItemStatus.DECAYED))
-                .orElseThrow(() -> new BadItemOwnershipException(BadResponseUtils.InvalidItemOrUnauthorized));
 
         MarketPrice marketPrice = gameStateManager.getCurrentMarketPrice(itemInstance.getItemBlueprint().getId());
 
