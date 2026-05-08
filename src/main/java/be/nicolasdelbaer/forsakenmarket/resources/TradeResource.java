@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class TradeResource {
-    private static final Logger log = LoggerFactory.getLogger(MarketResource.class);
+    private static final Logger log = LoggerFactory.getLogger(TradeResource.class);
 
     @Inject private TradeService tradeService;
     @Context private SecurityContext securityContext;
