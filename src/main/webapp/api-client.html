@@ -445,7 +445,7 @@
   }
 
   async function buyItemRequest(id) {
-    try { await api('POST', '/api/market/buy/' + id); toast('Acquis.', 'ok'); refreshAll(); }
+    try { await api('POST', '/api/trade/buy/' + id); toast('Acquis.', 'ok'); refreshAll(); }
     catch(e) { toast(e.message, 'err'); }
   }
 
@@ -488,7 +488,7 @@
   }
 
   async function sellItem(id) {
-    try { await api('POST', '/api/inventory/sell/' + id); toast('Vendu.', 'ok'); refreshAll(); }
+    try { await api('POST', '/api/trade/sell/' + id); toast('Vendu.', 'ok'); refreshAll(); }
     catch(e) { toast(e.message, 'err'); }
   }
 

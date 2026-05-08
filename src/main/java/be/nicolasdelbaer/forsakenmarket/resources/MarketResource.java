@@ -1,7 +1,6 @@
 package be.nicolasdelbaer.forsakenmarket.resources;
 
 import be.nicolasdelbaer.forsakenmarket.annotations.Authenticated;
-import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.AlreadyBoughtException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketItemDoesNotExistException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.MaxRerollReachedException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerInsufficientFundsException;
@@ -10,7 +9,6 @@ import be.nicolasdelbaer.forsakenmarket.models.market.MarketBlueprintResponse;
 import be.nicolasdelbaer.forsakenmarket.models.market.MarketItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.services.MarketService;
-import be.nicolasdelbaer.forsakenmarket.services.TradeService;
 import be.nicolasdelbaer.forsakenmarket.utils.BadResponseUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,7 +36,6 @@ public class MarketResource {
 
     private static final Logger log = LoggerFactory.getLogger(MarketResource.class);
     @Inject private MarketService marketService;
-    @Inject private TradeService tradeService;
     @Context private SecurityContext securityContext;
 
 
@@ -49,28 +46,6 @@ public class MarketResource {
         Response response;
         try {
             response = Response.ok(marketService.getMarketEvolution(itemId)).build();
-        } catch (Exception e) {
-            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-            log.warn(e.getMessage(), e);
-        }
-        return response;
-    }
-
-    @POST
-    @Path("/buy/{id}")
-    @Operation(summary = "Buy an item", description = "Buy an item from the market")
-    public Response buyItem(@PathParam("id") Long itemId) {
-        Response response;
-        PlayerSession playerSession = (PlayerSession) securityContext.getUserPrincipal();
-        try {
-            tradeService.buyItem(playerSession.id(), itemId);
-            response = Response.ok().build();
-        } catch (PlayerInsufficientFundsException e) {
-            response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(),
-                    BadResponseUtils.InsufficientFunds).build();
-        } catch (AlreadyBoughtException e) {
-            response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(),
-                    BadResponseUtils.AlreadyBought).build();
         } catch (Exception e) {
             response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
             log.warn(e.getMessage(), e);
