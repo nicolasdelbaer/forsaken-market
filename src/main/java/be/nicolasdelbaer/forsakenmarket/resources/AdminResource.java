@@ -1,5 +1,6 @@
 package be.nicolasdelbaer.forsakenmarket.resources;
 
+import be.nicolasdelbaer.forsakenmarket.annotations.Authenticated;
 import be.nicolasdelbaer.forsakenmarket.broadcaster.EventBroadcaster;
 import be.nicolasdelbaer.forsakenmarket.models.admin.PlayerConnections;
 import jakarta.annotation.security.RolesAllowed;
@@ -12,6 +13,7 @@ import jakarta.ws.rs.core.Response;
 
 
 @Path("/admin")
+@Authenticated
 @RolesAllowed("Admin")
 @Produces(MediaType.APPLICATION_JSON)
 public class AdminResource {
