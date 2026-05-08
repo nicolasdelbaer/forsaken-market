@@ -5,7 +5,6 @@ import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.CannotDiscardItemEx
 import be.nicolasdelbaer.forsakenmarket.models.inventory.InventoryItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.services.InventoryService;
-import be.nicolasdelbaer.forsakenmarket.services.TradeService;
 import be.nicolasdelbaer.forsakenmarket.utils.BadResponseUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,7 +40,7 @@ public class InventoryResource {
         PlayerSession playerSession = (PlayerSession) securityContext.getUserPrincipal();
         try {
             inventoryService.discardItem(playerSession.id(), itemId);
-            response = Response.ok().build(); //TODO send back data with results
+            response = Response.ok().build();
         } catch (CannotDiscardItemException e) {
             response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), BadResponseUtils.CannotDiscardItem).build();
         }

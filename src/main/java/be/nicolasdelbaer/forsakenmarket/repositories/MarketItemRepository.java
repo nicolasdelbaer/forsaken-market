@@ -23,7 +23,6 @@ public class MarketItemRepository extends CrudRepository<MarketItem, Long> {
                 .getResultList();
     }
 
-    //TODO
     public int getValidElementCount(EntityManager entityManager) {
         return entityManager
                 .createQuery("""

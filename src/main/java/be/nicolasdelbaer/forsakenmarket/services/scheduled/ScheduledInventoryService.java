@@ -72,7 +72,6 @@ public class ScheduledInventoryService {
         }
         inventoryItemRepository.updateAll(entityManager, ownedItems);
 
-        //TODO defer if transaction is ok
         for (Map.Entry<Integer, List<TradeBroadcast>> entry : expiredItems.entrySet()) {
             broadcastEventQueue.enqueue(() -> eventBroadcaster.broadcastToPlayer(BroadcastEvent.ItemExpiration,
                     new ExpiredItemsBroadcast(entry.getValue()),
