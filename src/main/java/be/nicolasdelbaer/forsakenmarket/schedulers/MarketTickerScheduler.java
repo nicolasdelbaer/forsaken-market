@@ -85,7 +85,6 @@ public class MarketTickerScheduler{
         }
     }
 
-
     private void startScheduler() {
         scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(
@@ -99,7 +98,6 @@ public class MarketTickerScheduler{
     public void onStop(@Observes @Destroyed(ApplicationScoped.class) Object e) {
         scheduler.shutdown();
     }
-
 
     private void tick() {
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
@@ -163,5 +161,4 @@ public class MarketTickerScheduler{
             log.error(e.getMessage(), e);
         }
     }
-
 }

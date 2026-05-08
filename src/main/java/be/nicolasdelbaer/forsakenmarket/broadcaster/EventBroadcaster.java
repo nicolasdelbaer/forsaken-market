@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class EventBroadcaster {
@@ -28,11 +29,19 @@ public class EventBroadcaster {
 
     @Inject ObjectMapper objectMapper;
 
+    public Map<Integer, Integer> getConnectionsPeek(){
+        return clientsByPlayer.entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        v -> v.getValue().size()
+        ));
+    }
+
     public void register(SseEventSink sink, Sse sse, int playerId){
         sseRef.compareAndSet(null, sse);
         clientsByPlayer.computeIfAbsent(playerId, k -> new CopyOnWriteArrayList<>()).add(sink);
     }
-
 
     /*
      * Direct broadcast to player sinks from their id
@@ -61,16 +70,22 @@ public class EventBroadcaster {
                     .build();
 
             for (Map.Entry<Integer, List<SseEventSink>> entry : clients.entrySet()) {
-
                 //remove old client or send the event
-                clientsByPlayer.get(entry.getKey()).removeIf(sink -> {
-                    if(sink.isClosed()) return true;
-                    try {
-                        sink.send(outboundSseEvent);
-                        return false;
-                    } catch (Exception e) {
-                        return true;
-                    }
+                List<SseEventSink> sseEventSinks = clientsByPlayer.get(entry.getKey());
+
+                //When player disconnect and the list is empty, the map is cleaned to obnly keep active connections.
+                clientsByPlayer.computeIfPresent(entry.getKey(),
+                    (k, sinkList) -> {
+                        sinkList.removeIf(sink -> {
+                            if(sink.isClosed()) return true;
+                            try {
+                                sink.send(outboundSseEvent);
+                                return false;
+                            } catch (Exception e) {
+                                return true;
+                            }
+                        });
+                        return sinkList.isEmpty() ? null : sinkList;
                 });
             }
 
@@ -78,6 +93,5 @@ public class EventBroadcaster {
             log.error("Json error while formatting broadcast dto ", e);
             throw new RuntimeException(e);
         }
-
     }
 }
