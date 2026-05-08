@@ -91,7 +91,7 @@ public class TradeService {
             throws BadItemOwnershipException, CannotSellInactiveItemException, MarketPriceNotFoundException, PlayerNotFoundException, UndefinedMarketPriceException {
 
         if(!inventoryService.isItemActive(playerId, inventoryItemId))
-            throw new CannotSellInactiveItemException("player already sell this item");
+            throw new CannotSellInactiveItemException("player cannot sell this item");
 
         //Note, the current round id is resolved here for keeping coherence
         Long currentRound = gameStateManager.getCurrentRound();
