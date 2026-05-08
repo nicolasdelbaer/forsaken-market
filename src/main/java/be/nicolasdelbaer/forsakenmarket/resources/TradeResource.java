@@ -68,7 +68,7 @@ public class TradeResource {
         PlayerSession playerSession = (PlayerSession) securityContext.getUserPrincipal();
         try {
             tradeService.sellItem(playerSession.id(), itemId);
-            response = Response.ok().build(); //TODO send back data with results
+            response = Response.ok().build();
         } catch (CannotSellInactiveItemException | BadItemOwnershipException e) {
             response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(), BadResponseUtils.CannotSellItem).build();
             log.warn(e.getMessage(), e);
