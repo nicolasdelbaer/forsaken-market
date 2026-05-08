@@ -72,6 +72,7 @@ public class MarketService {
                 .stream().map(
                     marketItem -> new MarketItemResponse(
                          marketItem.getId(),
+                         marketItem.getItemBlueprint().getId(),
                          marketItem.getItemBlueprint().getTitle(),
                          marketItem.getItemBlueprint().getDescription(),
                          marketItem.getItemBlueprint().getIcon(),

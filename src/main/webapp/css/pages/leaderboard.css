@@ -1,0 +1,45 @@
+.lb-table { display: flex; flex-direction: column; }
+
+.lb-row {
+  display: grid;
+  grid-template-columns: 40px 28px 1fr 100px 100px;
+  gap: 12px; align-items: center;
+  padding: 14px 24px;
+  border-bottom: var(--hairline);
+  font-size: 14px; transition: background 150ms ease;
+}
+.lb-row:last-child { border-bottom: 0; }
+.lb-row:hover { background: rgba(201,162,74,0.03); }
+
+.lb-row.lb-head {
+  border-bottom: var(--ornament);
+  font-family: var(--f-display); font-size: 9px;
+  letter-spacing: 0.28em; color: var(--vellum-ghost);
+  text-transform: uppercase;
+}
+.lb-row.self {
+  background: rgba(201,162,74,0.05);
+  box-shadow: inset 3px 0 0 var(--gold);
+}
+
+.lb-rank {
+  font-family: var(--f-display); color: var(--gold-dim);
+  font-size: 14px; text-align: center;
+}
+.lb-row.self .lb-rank { color: var(--gold); }
+.lb-medal { font-size: 16px; text-align: center; }
+
+.lb-name {
+  font-family: var(--f-display); font-size: 13px;
+  letter-spacing: 0.06em; color: var(--vellum);
+}
+.lb-row.self .lb-name { color: var(--gold-warm); }
+
+.lb-score, .lb-wallet {
+  font-family: var(--f-mono); font-size: 14px;
+  color: var(--vellum); text-align: right;
+}
+.lb-score .unit, .lb-wallet .unit {
+  font-family: var(--f-display); font-size: 10px;
+  color: var(--gold-dim); margin-left: 4px;
+}

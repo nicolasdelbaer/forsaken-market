@@ -4,5 +4,7 @@ public record PlayerInfoResponse(
     Integer id,
     String email,
     String name,
-    Integer wallet
+    Integer wallet,
+    Integer level,
+    Integer reput
 ) {}

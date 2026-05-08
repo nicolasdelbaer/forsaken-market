@@ -50,10 +50,14 @@ public class AuthResource {
         Response response;
         try {
             playerService.register(registerPlayerRequest);
-            response = Response.ok().build();
+            PlayerSession player = playerService.login(new LoginRequest(registerPlayerRequest.email(), registerPlayerRequest.password()));
+            String token = JwtUtils.generateToken(player);
+            NewCookie cookie = new NewCookie.Builder("auth_token")
+                    .value(token).httpOnly(true).secure(true).path("/").build();
+            response = Response.ok(new AuthResponse(token)).cookie(cookie).build();
         } catch (EmailAlreadyUsedException e) {
             response = Response.status(400).entity(BadResponseUtils.AlreadyUsedEmail).build();
-        } catch (MissingEnvConfigurationException | NumberFormatException e) {
+        } catch (MissingEnvConfigurationException | NumberFormatException | PlayerLoginException e) {
             response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(BadResponseUtils.MissingEnvConfiguration).build();
         }
 

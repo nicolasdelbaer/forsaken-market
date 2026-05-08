@@ -13,6 +13,7 @@ import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerLoginException;
 import be.nicolasdelbaer.forsakenmarket.models.broadcast.ReputationUpdateBroadcast;
 import be.nicolasdelbaer.forsakenmarket.models.player.LeaderboardResponse;
 import be.nicolasdelbaer.forsakenmarket.models.player.LoginRequest;
+import be.nicolasdelbaer.forsakenmarket.models.player.PlayerInfoResponse;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
 import be.nicolasdelbaer.forsakenmarket.models.player.RegisterPlayerRequest;
 import be.nicolasdelbaer.forsakenmarket.repositories.PlayerRepository;
@@ -74,6 +75,12 @@ public class PlayerService {
 
     public Integer getWallet(Integer playerId) {
         return playerRepository.getWallet(entityManager, playerId);
+    }
+
+    public PlayerInfoResponse getPlayerInfo(Integer id, String email, String name) {
+        return playerRepository.findById(entityManager, id)
+                .map(p -> new PlayerInfoResponse(id, email, name, p.getWallet(), p.getLevel(), p.getCurrentReput()))
+                .orElseThrow(() -> new RuntimeException("Player not found"));
     }
 
     public List<LeaderboardResponse> fetchLeaderboard(int limit) {

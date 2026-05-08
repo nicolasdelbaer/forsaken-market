@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Forsaken Market</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/effects.css">
+  <link rel="stylesheet" href="css/pages/auth.css">
+  <link rel="stylesheet" href="css/pages/market.css">
+  <link rel="stylesheet" href="css/pages/inventory.css">
+  <link rel="stylesheet" href="css/pages/collection.css">
+  <link rel="stylesheet" href="css/pages/leaderboard.css">
+</head>
+<body>
+  <div id="ember-container"></div>
+  <div class="fog-layer"></div>
+  <div class="fog-layer-2"></div>
+  <div class="vignette"></div>
+
+  <!-- Account chip — fixed overlay -->
+  <div id="account-chip" class="account-chip" hidden>
+    <div class="avatar" id="ac-avatar">—</div>
+    <div class="who">
+      <span id="ac-name"></span>
+      <span class="rank" id="ac-rank">Marchand</span>
+    </div>
+    <span class="caret">▾</span>
+  </div>
+  <div id="account-popover" class="account-popover" hidden>
+    <div class="ap-header">
+      <div class="avatar-lg" id="acp-avatar">—</div>
+      <div>
+        <div class="handle" id="acp-name"></div>
+        <div class="rank-line">Marchand de l'Emporium</div>
+      </div>
+    </div>
+    <div class="menu">
+      <button id="btn-logout" class="danger">Se déconnecter</button>
+    </div>
+  </div>
+
+  <div id="app">
+    <header id="site-header" class="chrome" hidden>
+      <div class="banner">
+        <div class="crest">
+          <div class="eyebrow">Dungeon Registry · The Forsaken Market</div>
+          <h1>The Emporium</h1>
+          <p class="sub">All items are cursed. No refunds.</p>
+        </div>
+        <div class="center">
+          <div class="ornament-rule">
+            <span class="line"></span>
+            ✦ · ✦ · ✦
+            <span class="line"></span>
+          </div>
+        </div>
+        <div class="session">
+          <div class="session-chip" id="session-chip">—</div>
+        </div>
+      </div>
+      <nav id="main-nav"></nav>
+    </header>
+
+    <div id="hud" class="hud" hidden></div>
+
+    <main id="page-container" style="padding-top:28px"></main>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/sse.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/router.js"></script>
+  <script src="js/pages/auth.js"></script>
+  <script src="js/pages/market.js"></script>
+  <script src="js/pages/inventory.js"></script>
+  <script src="js/pages/collection.js"></script>
+  <script src="js/pages/leaderboard.js"></script>
+  <script src="js/effects.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

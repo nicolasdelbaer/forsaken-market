@@ -101,6 +101,7 @@ public class InventoryService {
 
                     return new InventoryItemResponse(
                             inventoryItem.getId(),
+                            inventoryItem.getItemBlueprint().getId(),
                             inventoryItem.getItemBlueprint().getTitle(),
                             inventoryItem.getItemBlueprint().getDescription(),
                             inventoryItem.getItemBlueprint().getIcon(),

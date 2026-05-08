@@ -8,6 +8,8 @@ import be.nicolasdelbaer.forsakenmarket.exceptions.market.UndefinedMarketPriceEx
 import be.nicolasdelbaer.forsakenmarket.models.GameStateSnapshot;
 import jakarta.enterprise.context.ApplicationScoped;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -17,6 +19,8 @@ public class GameStateManager {
 
     private final AtomicReference<GameStateSnapshot> gameStateSnapshot =
             new AtomicReference<>(new GameStateSnapshot( Map.of(), Map.of(), List.of(), 1L));
+
+    private volatile Instant lastRoundStartedAt = null;
 
     public void startup(GameState data, Map<Long, MarketPrice> marketPriceList, Map<Long, ItemBlueprint> blueprints) {
         gameStateSnapshot.updateAndGet (snapshot ->
@@ -29,6 +33,7 @@ public class GameStateManager {
     }
 
     public void syncGameStateSnapshot(Map<Long, MarketPrice> marketPriceList, long newRoundId){
+        lastRoundStartedAt = Instant.now();
         gameStateSnapshot.updateAndGet (snapshot ->
                 new GameStateSnapshot(
                         marketPriceList,
@@ -37,6 +42,12 @@ public class GameStateManager {
                         newRoundId
                 )
         );
+    }
+
+    public int getSecondsUntilNextRound() {
+        if (lastRoundStartedAt == null) return GameConfiguration.ROUND_DURATION_SECONDS;
+        long elapsed = Duration.between(lastRoundStartedAt, Instant.now()).toSeconds();
+        return (int) Math.max(0, GameConfiguration.ROUND_DURATION_SECONDS - elapsed);
     }
 
     public long getCurrentRound(){
