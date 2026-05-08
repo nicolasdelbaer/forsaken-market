@@ -1,5 +1,6 @@
 package be.nicolasdelbaer.forsakenmarket.services.scheduled;
 
+import be.nicolasdelbaer.forsakenmarket.broadcaster.BroadcastEventQueue;
 import be.nicolasdelbaer.forsakenmarket.broadcaster.EventBroadcaster;
 import be.nicolasdelbaer.forsakenmarket.enums.BroadcastEvent;
 import be.nicolasdelbaer.forsakenmarket.models.broadcast.PaydayBroadcast;
@@ -18,6 +19,7 @@ public class ScheduledPlayerService {
 
     @Inject private PlayerRepository playerRepository;
     @Inject private EventBroadcaster eventBroadcaster;
+    @Inject private BroadcastEventQueue broadcastEventQueue;
 
     /*
      * Player Salary day consists on:
@@ -25,7 +27,11 @@ public class ScheduledPlayerService {
      */
     public void itsPayday(EntityManager entityManager) {
         playerRepository.addSalaryToPlayers(entityManager, GameConfiguration.PAYDAY_AMOUNT);
-        eventBroadcaster.broadcastToAll(BroadcastEvent.Payday, new PaydayBroadcast(GameConfiguration.PAYDAY_AMOUNT));
+        broadcastEventQueue.enqueue(() ->
+                eventBroadcaster.broadcastToAll(
+                        BroadcastEvent.Payday,
+                        new PaydayBroadcast(GameConfiguration.PAYDAY_AMOUNT)
+        ));
     }
 
 

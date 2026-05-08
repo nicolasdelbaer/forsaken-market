@@ -1,5 +1,6 @@
 package be.nicolasdelbaer.forsakenmarket.services;
 
+import be.nicolasdelbaer.forsakenmarket.broadcaster.BroadcastEventQueue;
 import be.nicolasdelbaer.forsakenmarket.broadcaster.EventBroadcaster;
 import be.nicolasdelbaer.forsakenmarket.entities.CollectionItem;
 import be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint;
@@ -20,6 +21,7 @@ public class CollectionService {
     @Inject private GameStateManager gameStateManager;
     @Inject private EntityManager entityManager;
     @Inject private EventBroadcaster eventBroadcaster;
+    @Inject private BroadcastEventQueue broadcastEventQueue;
 
     @Inject private CollectionItemRepository collectionItemRepository;
 
@@ -36,11 +38,15 @@ public class CollectionService {
         collectionItemRepository.save(entityManager, collectionItem);
 
         ItemBlueprint blueprint = itemInstance.getItemBlueprint();
-        eventBroadcaster.broadcastToPlayer(BroadcastEvent.NewCollectedItem, new CollectedItemBroadcast(
-            blueprint.getId(),
-                blueprint.getTitle(),
-                blueprint.getDescription(),
-                blueprint.getRarity().name()
-        ), player.getId());
+
+        broadcastEventQueue.enqueue(() -> eventBroadcaster.broadcastToPlayer(
+                BroadcastEvent.NewCollectedItem,
+                new CollectedItemBroadcast(
+                        blueprint.getId(),
+                        blueprint.getTitle(),
+                        blueprint.getDescription(),
+                        blueprint.getRarity().name()
+                ), player.getId())
+        );
     }
 }

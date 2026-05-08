@@ -2,6 +2,7 @@ package be.nicolasdelbaer.forsakenmarket.services;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import be.nicolasdelbaer.forsakenmarket.annotations.Transactional;
+import be.nicolasdelbaer.forsakenmarket.broadcaster.BroadcastEventQueue;
 import be.nicolasdelbaer.forsakenmarket.broadcaster.EventBroadcaster;
 import be.nicolasdelbaer.forsakenmarket.entities.Player;
 import be.nicolasdelbaer.forsakenmarket.enums.BroadcastEvent;
@@ -30,6 +31,7 @@ public class PlayerService {
     @Inject private EntityManager entityManager;
     @Inject private PlayerRoleRepository playerRoleRepository;
     @Inject private EventBroadcaster eventBroadcaster;
+    @Inject private BroadcastEventQueue broadcastEventQueue;
 
     public PlayerService() {
     }
@@ -85,7 +87,7 @@ public class PlayerService {
 
         player.addReputation(reputationScore);
 
-        eventBroadcaster.broadcastToPlayer(
+        broadcastEventQueue.enqueue(() -> eventBroadcaster.broadcastToPlayer(
                 BroadcastEvent.LevelUp,
                 new ReputationUpdateBroadcast(
                         currentReput,
@@ -93,7 +95,7 @@ public class PlayerService {
                         currentLevel,
                         player.getLevel()
                 ), player.getId()
-        );
+        ));
     }
 
     public void debit(Player player, Integer amount) throws PlayerInsufficientFundsException {

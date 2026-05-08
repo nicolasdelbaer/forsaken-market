@@ -1,5 +1,6 @@
 package be.nicolasdelbaer.forsakenmarket.services.scheduled;
 
+import be.nicolasdelbaer.forsakenmarket.broadcaster.BroadcastEventQueue;
 import be.nicolasdelbaer.forsakenmarket.broadcaster.EventBroadcaster;
 import be.nicolasdelbaer.forsakenmarket.entities.InventoryItem;
 import be.nicolasdelbaer.forsakenmarket.entities.MarketPrice;
@@ -28,6 +29,7 @@ public class ScheduledInventoryService {
     @Inject private InventoryItemRepository inventoryItemRepository;
     @Inject private GameStateManager gameStateManager;
     @Inject private EventBroadcaster eventBroadcaster;
+    @Inject private BroadcastEventQueue broadcastEventQueue;
 
     @Inject private PlayerRepository playerRepository;
     @Inject private PlayerService playerService;
@@ -72,10 +74,10 @@ public class ScheduledInventoryService {
 
         //TODO defer if transaction is ok
         for (Map.Entry<Integer, List<TradeBroadcast>> entry : expiredItems.entrySet()) {
-            eventBroadcaster.broadcastToPlayer(BroadcastEvent.ItemExpiration,
+            broadcastEventQueue.enqueue(() -> eventBroadcaster.broadcastToPlayer(BroadcastEvent.ItemExpiration,
                     new ExpiredItemsBroadcast(entry.getValue()),
             entry.getKey()
-            );
+            ));
         }
 
     }

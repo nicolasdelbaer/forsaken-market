@@ -1,5 +1,6 @@
 package be.nicolasdelbaer.forsakenmarket.schedulers;
 
+import be.nicolasdelbaer.forsakenmarket.broadcaster.BroadcastEventQueue;
 import be.nicolasdelbaer.forsakenmarket.broadcaster.EventBroadcaster;
 import be.nicolasdelbaer.forsakenmarket.entities.GameState;
 import be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint;
@@ -40,15 +41,19 @@ import java.util.stream.Collectors;
 public class MarketTickerScheduler{
     private static final Logger log = LoggerFactory.getLogger(MarketTickerScheduler.class);
     private ScheduledExecutorService scheduler;
+    @Inject private GameStateManager gameStateManager;
     @Inject private EntityManagerFactory entityManagerFactory;
+    @Inject private EventBroadcaster eventBroadcaster;
+    @Inject private BroadcastEventQueue broadcastEventQueue;
+
+    @Inject private GameStateRepository gameStateRepository;
+    @Inject private MarketPriceRepository marketPriceRepository;
+    @Inject private ItemBlueprintRepository itemBlueprintRepository;
+
     @Inject private ScheduledMarketService scheduledMarketService;
     @Inject private ScheduledInventoryService scheduledInventoryService;
-    @Inject private ItemBlueprintRepository itemBlueprintRepository;
-    @Inject private GameStateRepository gameStateRepository;
-    @Inject private GameStateManager gameStateManager;
     @Inject private ScheduledPlayerService scheduledPlayerService;
-    @Inject private MarketPriceRepository marketPriceRepository;
-    @Inject private EventBroadcaster eventBroadcaster;
+
 
     public void onStart(@Observes @Priority(GameConfiguration.SCHEDULER_PRIORITY) @Initialized(ApplicationScoped.class) Object obj) {
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
@@ -132,10 +137,10 @@ public class MarketTickerScheduler{
                     //Give salary to players
                     scheduledPlayerService.itsPayday(entityManager);
 
-                    //TODO postpose until transaction commited
-                    eventBroadcaster.broadcastToAll(
+                    broadcastEventQueue.enqueue(() -> eventBroadcaster.broadcastToAll(
                             BroadcastEvent.EndOfDay,
-                            new EndOfDayBroadcast(true));
+                            new EndOfDayBroadcast(true))
+                    );
                 }
                 gameStateRepository.update(entityManager, new GameState(newRoundId));
                 transaction.commit();
@@ -144,14 +149,18 @@ public class MarketTickerScheduler{
                 gameStateManager.syncGameStateSnapshot(updatedPrices, newRoundId);
                 log.info("Current round: %s".formatted(newRoundId));
 
-                //TODO postpose until transaction commited
-                eventBroadcaster.broadcastToAll(
+                broadcastEventQueue.enqueue(() -> eventBroadcaster.broadcastToAll(
                         BroadcastEvent.NewRound,
-                        new NewRoundBroadcast(newRoundId));
+                        new NewRoundBroadcast(newRoundId))
+                );
+                broadcastEventQueue.flush();
             } catch (Exception e) {
+                broadcastEventQueue.discard();
                 transaction.rollback();
                 log.error(e.getMessage(), e);
             }
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
         }
     }
 

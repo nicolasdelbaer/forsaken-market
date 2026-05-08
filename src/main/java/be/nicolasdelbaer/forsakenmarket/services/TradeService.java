@@ -1,6 +1,7 @@
 package be.nicolasdelbaer.forsakenmarket.services;
 
 import be.nicolasdelbaer.forsakenmarket.annotations.Transactional;
+import be.nicolasdelbaer.forsakenmarket.broadcaster.BroadcastEventQueue;
 import be.nicolasdelbaer.forsakenmarket.broadcaster.EventBroadcaster;
 import be.nicolasdelbaer.forsakenmarket.entities.InventoryItem;
 import be.nicolasdelbaer.forsakenmarket.entities.MarketItem;
@@ -34,6 +35,7 @@ public class TradeService {
     @Inject private GameStateManager gameStateManager;
     @Inject private EntityManager entityManager;
     @Inject private EventBroadcaster eventBroadcaster;
+    @Inject private BroadcastEventQueue broadcastEventQueue;
 
     @Inject private InventoryItemRepository inventoryItemRepository;
     @Inject private MarketItemRepository marketItemRepository;
@@ -68,12 +70,13 @@ public class TradeService {
         if(collectionService.isNewDiscovery(playerId, marketItem.getItemBlueprint().getId())) {
             collectionService.addToCollection(player, marketItem);
         }
-        eventBroadcaster.broadcastToPlayer(BroadcastEvent.ItemBought,
+        broadcastEventQueue.enqueue(() -> eventBroadcaster.broadcastToPlayer(
+                BroadcastEvent.ItemBought,
                 new TradeBroadcast(
                         itemInstance.getId(),
                         marketPrice.getCurrentPrice(),
                         itemInstance.getPriceDifference()
-                ), playerId);
+                ), playerId));
     }
 
     @Transactional
@@ -104,12 +107,13 @@ public class TradeService {
         //add item to inventory
         inventoryService.sellItem(itemInstance, currentRound);
 
-        eventBroadcaster.broadcastToPlayer(BroadcastEvent.ItemSold,
+        broadcastEventQueue.enqueue(() -> eventBroadcaster.broadcastToPlayer(
+                BroadcastEvent.ItemSold,
                 new TradeBroadcast(
                         itemInstance.getId(),
                         marketPrice.getCurrentPrice(),
                         itemInstance.getPriceDifference()
-                ), playerId);
+                ), playerId));
     }
 
 

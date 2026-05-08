@@ -1,6 +1,7 @@
 package be.nicolasdelbaer.forsakenmarket.interceptors;
 
 import be.nicolasdelbaer.forsakenmarket.annotations.Transactional;
+import be.nicolasdelbaer.forsakenmarket.broadcaster.BroadcastEventQueue;
 import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
 import jakarta.interceptor.AroundInvoke;
@@ -15,6 +16,7 @@ import jakarta.persistence.EntityTransaction;
 public class TransactionalInterceptor {
 
     @Inject private EntityManager entityManager;
+    @Inject private BroadcastEventQueue broadcastEventQueue;
 
     @AroundInvoke
     public Object manageTransaction(InvocationContext context) throws Exception {
@@ -26,10 +28,16 @@ public class TransactionalInterceptor {
         if(!isActive) transaction.begin();
         try {
             Object result = context.proceed();
-            if(!isActive) transaction.commit();
+            if(!isActive) {
+                transaction.commit();
+                broadcastEventQueue.flush();
+            }
             return result;
         } catch (Exception e) {
-            if(!isActive) transaction.rollback();
+            if(!isActive) {
+                transaction.rollback();
+                broadcastEventQueue.discard();
+            }
             throw e;
         }
     }
