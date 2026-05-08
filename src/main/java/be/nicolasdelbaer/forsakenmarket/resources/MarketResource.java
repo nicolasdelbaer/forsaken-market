@@ -1,6 +1,7 @@
 package be.nicolasdelbaer.forsakenmarket.resources;
 
 import be.nicolasdelbaer.forsakenmarket.annotations.Authenticated;
+import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.AlreadyBoughtException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketItemDoesNotExistException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.MaxRerollReachedException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.player.PlayerInsufficientFundsException;
@@ -67,6 +68,9 @@ public class MarketResource {
         } catch (PlayerInsufficientFundsException e) {
             response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(),
                     BadResponseUtils.InsufficientFunds).build();
+        } catch (AlreadyBoughtException e) {
+            response = Response.status(Response.Status.BAD_REQUEST.getStatusCode(),
+                    BadResponseUtils.AlreadyBought).build();
         } catch (Exception e) {
             response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
             log.warn(e.getMessage(), e);

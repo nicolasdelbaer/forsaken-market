@@ -5,13 +5,10 @@ import be.nicolasdelbaer.forsakenmarket.entities.InventoryItem;
 import be.nicolasdelbaer.forsakenmarket.entities.MarketPrice;
 import be.nicolasdelbaer.forsakenmarket.enums.MarketItemStatus;
 import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.CannotDiscardItemException;
-import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.CollectionNotFoundException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.CannotSellInactiveItemException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketPriceNotFoundException;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.BuyItemRequest;
-import be.nicolasdelbaer.forsakenmarket.models.inventory.CollectionItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.InventoryItemResponse;
-import be.nicolasdelbaer.forsakenmarket.repositories.CollectionItemRepository;
 import be.nicolasdelbaer.forsakenmarket.repositories.InventoryItemRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.GameStateManager;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -29,7 +26,6 @@ public class InventoryService {
     @Inject private InventoryItemRepository inventoryItemRepository;
     @Inject private EntityManager entityManager;
     @Inject private GameStateManager gameStateManager;
-    @Inject private CollectionItemRepository collectionItemRepository;
 
     /*
      * Buy action from the market and add the item to a player's inventory
@@ -54,7 +50,7 @@ public class InventoryService {
         return inventoryItem;
     }
 
-    //TODO calculte right round nb time
+    //TODO calculate right round nb time
     private Integer getDecayTime() {
         return RandomGenerator.getDefault().nextInt(6, 16);
     }
@@ -76,13 +72,13 @@ public class InventoryService {
      * When an item is decayed you have to thrown it away, you cannot sell it anymore and it'll occupy an inventory slot
      */
     @Transactional
-    public void discardItem(Integer playerId, Long itemId) throws CannotDiscardItemException {
+    public void discardItem(Integer playerId, Long inventoryItemId) throws CannotDiscardItemException {
         //Note, the current round id is resolved here for keeping coherence
         // Idea -> could use a window of tolerance in the future allowing players to get the item even with lags
         Long currentRound = gameStateManager.getCurrentRound();
 
         InventoryItem inventoryItem = inventoryItemRepository
-                .getItemFromPlayer(entityManager, itemId, playerId, MarketItemStatus.DECAYED)
+                .getItemFromPlayer(entityManager, inventoryItemId, playerId, List.of(MarketItemStatus.DECAYED))
                 .orElseThrow(() -> new CannotDiscardItemException("Invalid item or unauthorized access"));
 
         inventoryItem.setDiscardedAt(LocalDateTime.now());
@@ -116,11 +112,13 @@ public class InventoryService {
                 }).toList();
     }
 
-    /*
-     * Fetch Collection status
-     * Get all blueprints data + if they've been find or not
-     */
-    public List<CollectionItemResponse> fetchCollection(Integer playerId) throws CollectionNotFoundException {
-        return collectionItemRepository.findAllForPlayer(entityManager, playerId);
+    public boolean hasAlreadyBought(Integer playerId, Long marketItemId) {
+        return inventoryItemRepository
+                .possessItem(entityManager, playerId, marketItemId, MarketItemStatus.BOUGHT);
+    }
+
+    public boolean isItemActive(Integer playerId, Long inventoryItemId) {
+        return inventoryItemRepository
+                .isAvailable(entityManager, inventoryItemId, playerId, List.of(MarketItemStatus.BOUGHT, MarketItemStatus.DECAYED));
     }
 }

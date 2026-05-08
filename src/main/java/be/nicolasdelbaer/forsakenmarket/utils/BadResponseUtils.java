@@ -10,6 +10,7 @@ public class BadResponseUtils {
     public static final String CannotDiscardItem = "cannot discard item";
 
     public static final String InsufficientFunds = "insufficient funds";
+    public static final String AlreadyBought = "Already bought item";
     public static final String CannotRerollItem = "cannot reroll items";;
     public static final String WrongLoginOrPass = "wrong login or password";
 

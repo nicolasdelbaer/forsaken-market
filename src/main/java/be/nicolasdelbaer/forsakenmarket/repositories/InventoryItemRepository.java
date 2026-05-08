@@ -36,17 +36,44 @@ public class InventoryItemRepository extends CrudRepository<InventoryItem, Long>
     }
 
     public Optional<InventoryItem> getItemFromPlayer(
-            EntityManager entityManager, Long itemId, Integer playerId, MarketItemStatus status) {
+            EntityManager entityManager, Long inventoryItemId, Integer playerId, List<MarketItemStatus> statusList) {
         InventoryItem result = entityManager.createQuery("""
                     select bi from InventoryItem bi
-                    where bi.id = :itemId
-                        and bi.status = :status
+                    where bi.status IN (:statusList)
+                        and bi.id = :inventoryItemId
                         and bi.player.id = :playerId
                     """, InventoryItem.class)
-            .setParameter("itemId", itemId)
+            .setParameter("inventoryItemId", inventoryItemId)
+            .setParameter("statusList", statusList)
             .setParameter("playerId", playerId)
-            .setParameter("status", status)
             .getSingleResultOrNull();
         return Optional.ofNullable(result);
     }
+
+    public boolean possessItem(EntityManager entityManager, Integer playerId, Long marketItemId, MarketItemStatus status) {
+        return entityManager.createQuery("""
+                    select bi from InventoryItem bi
+                    where bi.player.id = :playerId
+                        and bi.marketItemId = :marketItemId
+                        and bi.status = :status
+                    """, InventoryItem.class)
+                .setParameter("playerId", playerId)
+                .setParameter("marketItemId", marketItemId)
+                .setParameter("status", status)
+                .getSingleResultOrNull() != null;
+    }
+
+    public boolean isAvailable(EntityManager entityManager, Long inventoryItemId, Integer playerId, List<MarketItemStatus> statusList) {
+        return entityManager.createQuery("""
+                    select bi from InventoryItem bi
+                    where bi.id = :inventoryItemId
+                        and bi.status IN (:statusList)
+                        and bi.player.id = :playerId
+                    """, InventoryItem.class)
+                .setParameter("inventoryItemId", inventoryItemId)
+                .setParameter("statusList", statusList)
+                .setParameter("playerId", playerId)
+                .getSingleResultOrNull() != null;
+    }
+
 }

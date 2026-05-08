@@ -3,7 +3,7 @@ package be.nicolasdelbaer.forsakenmarket.resources;
 import be.nicolasdelbaer.forsakenmarket.annotations.Authenticated;
 import be.nicolasdelbaer.forsakenmarket.models.inventory.CollectionItemResponse;
 import be.nicolasdelbaer.forsakenmarket.models.player.PlayerSession;
-import be.nicolasdelbaer.forsakenmarket.services.InventoryService;
+import be.nicolasdelbaer.forsakenmarket.services.CollectionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.RolesAllowed;
@@ -30,7 +30,7 @@ import java.util.List;
 public class CollectionResource {
 
     private static final Logger log = LoggerFactory.getLogger(CollectionResource.class);
-    @Inject private InventoryService inventoryService;
+    @Inject private CollectionService collectionService;
     @Context private SecurityContext securityContext;
 
     @GET
@@ -39,7 +39,7 @@ public class CollectionResource {
         Response response;
         PlayerSession playerSession = (PlayerSession) securityContext.getUserPrincipal();
         try {
-            List<CollectionItemResponse> itemList = inventoryService
+            List<CollectionItemResponse> itemList = collectionService
                     .fetchCollection(playerSession.id());
             response = Response.ok(itemList).build();
         } catch (Exception e) {

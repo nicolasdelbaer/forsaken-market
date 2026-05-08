@@ -7,7 +7,9 @@ import be.nicolasdelbaer.forsakenmarket.entities.ItemBlueprint;
 import be.nicolasdelbaer.forsakenmarket.entities.MarketItem;
 import be.nicolasdelbaer.forsakenmarket.entities.Player;
 import be.nicolasdelbaer.forsakenmarket.enums.BroadcastEvent;
+import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.CollectionNotFoundException;
 import be.nicolasdelbaer.forsakenmarket.models.broadcast.CollectedItemBroadcast;
+import be.nicolasdelbaer.forsakenmarket.models.inventory.CollectionItemResponse;
 import be.nicolasdelbaer.forsakenmarket.repositories.CollectionItemRepository;
 import be.nicolasdelbaer.forsakenmarket.utils.GameStateManager;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -15,6 +17,7 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @ApplicationScoped
 public class CollectionService {
@@ -48,5 +51,13 @@ public class CollectionService {
                         blueprint.getRarity().name()
                 ), player.getId())
         );
+    }
+
+    /*
+     * Fetch Collection status
+     * Get all blueprints data + if they've been find or not
+     */
+    public List<CollectionItemResponse> fetchCollection(Integer playerId) throws CollectionNotFoundException {
+        return collectionItemRepository.findAllForPlayer(entityManager, playerId);
     }
 }

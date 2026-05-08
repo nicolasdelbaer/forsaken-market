@@ -9,6 +9,7 @@ import be.nicolasdelbaer.forsakenmarket.entities.MarketPrice;
 import be.nicolasdelbaer.forsakenmarket.entities.Player;
 import be.nicolasdelbaer.forsakenmarket.enums.BroadcastEvent;
 import be.nicolasdelbaer.forsakenmarket.enums.MarketItemStatus;
+import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.AlreadyBoughtException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.inventory.BadItemOwnershipException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.CannotSellInactiveItemException;
 import be.nicolasdelbaer.forsakenmarket.exceptions.market.MarketItemDoesNotExistException;
@@ -29,6 +30,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 
+import java.util.List;
+
 @ApplicationScoped
 public class TradeService {
 
@@ -46,14 +49,18 @@ public class TradeService {
     @Inject private CollectionService collectionService;
 
     @Transactional
-    public void buyItem(Integer playerId, Long itemId)
-            throws PlayerInsufficientFundsException, MarketItemDoesNotExistException, PlayerNotFoundException, MarketPriceNotFoundException, UndefinedMarketPriceException {
+    public void buyItem(Integer playerId, Long marketItemId)
+            throws AlreadyBoughtException, PlayerInsufficientFundsException, MarketItemDoesNotExistException, PlayerNotFoundException, MarketPriceNotFoundException, UndefinedMarketPriceException {
+
+        if(inventoryService.hasAlreadyBought(playerId, marketItemId))
+            throw new AlreadyBoughtException("player already bought this item");
+
         //Note, the current round id is resolved here for keeping coherence
         Long currentRound = gameStateManager.getCurrentRound();
 
         //Retrieving items
         MarketItem marketItem = marketItemRepository
-                .findById(entityManager, itemId)
+                .findById(entityManager, marketItemId)
                 .orElseThrow(() -> new MarketItemDoesNotExistException("Item not found"));
         MarketPrice marketPrice = gameStateManager.getCurrentMarketPrice(marketItem.getItemBlueprint().getId());
         Player player = playerRepository
@@ -80,13 +87,17 @@ public class TradeService {
     }
 
     @Transactional
-    public void sellItem(Integer playerId, Long itemId)
+    public void sellItem(Integer playerId, Long inventoryItemId)
             throws BadItemOwnershipException, CannotSellInactiveItemException, MarketPriceNotFoundException, PlayerNotFoundException, UndefinedMarketPriceException {
+
+        if(!inventoryService.isItemActive(playerId, inventoryItemId))
+            throw new CannotSellInactiveItemException("player already sell this item");
+
         //Note, the current round id is resolved here for keeping coherence
         Long currentRound = gameStateManager.getCurrentRound();
 
         InventoryItem itemInstance = inventoryItemRepository
-                .getItemFromPlayer(entityManager, itemId, playerId, MarketItemStatus.BOUGHT)
+                .getItemFromPlayer(entityManager, inventoryItemId, playerId, List.of(MarketItemStatus.BOUGHT, MarketItemStatus.DECAYED))
                 .orElseThrow(() -> new BadItemOwnershipException(BadResponseUtils.InvalidItemOrUnauthorized));
 
         MarketPrice marketPrice = gameStateManager.getCurrentMarketPrice(itemInstance.getItemBlueprint().getId());
