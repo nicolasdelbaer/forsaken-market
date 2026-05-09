@@ -198,153 +198,153 @@ public class DataSeeder {
         // ITEMS ITEMS ITEMS ITEMS
         // ─── MUNDANE (36) ─────────────────────────────────────────────────────────────
         // Blades
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Notched Kitchen Knife",         "Used to cut bread, then rope, then something best left unnamed.",                              8,  "", ItemRarity.MUNDANE, bladesCategory));
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Bent Iron Sword",               "It has never been straight. Neither has its owner.",                                          15, "", ItemRarity.MUNDANE, bladesCategory));
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Snapped Sickle Blade",          "The handle is missing. The blade still holds an edge no one sharpened.",                      9,  "", ItemRarity.MUNDANE, bladesCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Notched Kitchen Knife",         "Used to cut bread, then rope, then something best left unnamed.",                              8,  "weapon-knife-notched.png",      ItemRarity.MUNDANE, bladesCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Bent Iron Sword",               "It has never been straight. Neither has its owner.",                                          15, "weapon-sword-bent.png",         ItemRarity.MUNDANE, bladesCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Snapped Sickle Blade",          "The handle is missing. The blade still holds an edge no one sharpened.",                      9,  "weapon-sickle-snapped.png",     ItemRarity.MUNDANE, bladesCategory));
 
         // Blunt Weapons
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Dented Candlestick",            "Heavy enough to serve as a weapon. Light enough to pretend it was not.",                      10, "", ItemRarity.MUNDANE, bluntWeaponsCategory));
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Chipped Stone Club",            "Older than the city. Older than the kingdom. Still functional.",                              12, "", ItemRarity.MUNDANE, bluntWeaponsCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Dented Candlestick",            "Heavy enough to serve as a weapon. Light enough to pretend it was not.",                      10, "weapon-candlestick-dented.png", ItemRarity.MUNDANE, bluntWeaponsCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Chipped Stone Club",            "Older than the city. Older than the kingdom. Still functional.",                              12, "weapon-club-stone.png",         ItemRarity.MUNDANE, bluntWeaponsCategory));
 
         // Body Armor
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Patched Leather Jerkin",        "Three different people tried to mend it. None of them finished.",                             20, "", ItemRarity.MUNDANE, bodyArmorCategory));
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Rusted Chain Shirt",            "Several rings are missing. The ones remaining argue about their responsibilities.",            25, "", ItemRarity.MUNDANE, bodyArmorCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Patched Leather Jerkin",        "Three different people tried to mend it. None of them finished.",                             20, "armor-jerkin-patched.png",      ItemRarity.MUNDANE, bodyArmorCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Rusted Chain Shirt",            "Several rings are missing. The ones remaining argue about their responsibilities.",            25, "armor-chainmail-rusted.png",    ItemRarity.MUNDANE, bodyArmorCategory));
 
         // Headgear
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Iron Pot Helm",                 "Never designed for battle. It served in one anyway.",                                         18, "", ItemRarity.MUNDANE, headgearCategory));
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Worn Leather Hood",             "Smells of rain and decisions made too quickly.",                                              11, "", ItemRarity.MUNDANE, headgearCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Iron Pot Helm",                 "Never designed for battle. It served in one anyway.",                                         18, "armor-helm-pot.png",            ItemRarity.MUNDANE, headgearCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Worn Leather Hood",             "Smells of rain and decisions made too quickly.",                                              11, "armor-hood-worn.png",           ItemRarity.MUNDANE, headgearCategory));
 
         // Shields
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Scratched Wooden Shield",       "It has stopped things. Not all of them were weapons.",                                        19, "", ItemRarity.MUNDANE, shieldsCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Scratched Wooden Shield",       "It has stopped things. Not all of them were weapons.",                                        19, "armor-shield-wooden.png",       ItemRarity.MUNDANE, shieldsCategory));
 
         // Bones
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Unnamed Finger Bone",           "Someone kept it. Someone lost it. Now it is yours.",                                          5,  "", ItemRarity.MUNDANE, bonesCategory));
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Cracked Molar",                 "It aches on rainy days.",                                                                     6,  "", ItemRarity.MUNDANE, bonesCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Unnamed Finger Bone",           "Someone kept it. Someone lost it. Now it is yours.",                                          5,  "relic-bone-finger.png",         ItemRarity.MUNDANE, bonesCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Cracked Molar",                 "It aches on rainy days.",                                                                     6,  "relic-bone-molar.png",          ItemRarity.MUNDANE, bonesCategory));
 
         // Scrolls
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Torn Map Fragment",             "It shows the eastern road. The road no longer exists.",                                       12, "", ItemRarity.MUNDANE, scrollsCategory));
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Debt Contract, Unsigned",       "The creditor's name is scratched out. The amount is not.",                                    9,  "", ItemRarity.MUNDANE, scrollsCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Torn Map Fragment",             "It shows the eastern road. The road no longer exists.",                                       12, "knowledge-map-torn.png",        ItemRarity.MUNDANE, scrollsCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Debt Contract, Unsigned",       "The creditor's name is scratched out. The amount is not.",                                    9,  "knowledge-contract-unsigned.png", ItemRarity.MUNDANE, scrollsCategory));
 
         // Notebooks & Journals
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Water-Stained Diary",           "Written in a shaking hand. The entries stop abruptly.",                                       17, "", ItemRarity.MUNDANE, notebooksCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Water-Stained Diary",           "Written in a shaking hand. The entries stop abruptly.",                                       17, "knowledge-diary-stained.png",   ItemRarity.MUNDANE, notebooksCategory));
 
         // Tablets
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Clay Tablet Fragment",          "Part of a longer message. The rest is either lost or deliberately destroyed.",                 9,  "", ItemRarity.MUNDANE, tabletsCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Clay Tablet Fragment",          "Part of a longer message. The rest is either lost or deliberately destroyed.",                 9,  "knowledge-tablet-clay.png",     ItemRarity.MUNDANE, tabletsCategory));
 
         // Flasks & Vials
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Cloudy Phial",                  "The liquid inside has no odor. That is the concerning part.",                                  8,  "", ItemRarity.MUNDANE, flasksVialsCategory));
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Empty Oil Flask",               "Smells of lavender and something that ate lavender.",                                          6,  "", ItemRarity.MUNDANE, flasksVialsCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Cloudy Phial",                  "The liquid inside has no odor. That is the concerning part.",                                  8,  "vessel-phial-cloudy.png",       ItemRarity.MUNDANE, flasksVialsCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Empty Oil Flask",               "Smells of lavender and something that ate lavender.",                                          6,  "vessel-flask-oil.png",          ItemRarity.MUNDANE, flasksVialsCategory));
 
         // Urns & Amphoras
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Cracked Clay Urn",              "Sealed with wax. The wax is very old. What it seals is older.",                               14, "", ItemRarity.MUNDANE, urnsAmphorasCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Cracked Clay Urn",              "Sealed with wax. The wax is very old. What it seals is older.",                               14, "vessel-urn-cracked.png",        ItemRarity.MUNDANE, urnsAmphorasCategory));
 
         // Chests & Boxes
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Splintered Wooden Box",         "The lock is broken. Whatever was inside left on its own.",                                    15, "", ItemRarity.MUNDANE, chestsBoxesCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Splintered Wooden Box",         "The lock is broken. Whatever was inside left on its own.",                                    15, "vessel-box-splintered.png",     ItemRarity.MUNDANE, chestsBoxesCategory));
 
         // Rings & Bands
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Bent Copper Ring",              "It left a green mark. The mark will not wash off.",                                            8,  "", ItemRarity.MUNDANE, ringsBandsCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Bent Copper Ring",              "It left a green mark. The mark will not wash off.",                                            8,  "jewelry-ring-copper.png",       ItemRarity.MUNDANE, ringsBandsCategory));
 
         // Necklaces & Pendants
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Knotted Rope Necklace",         "Seven knots. Each one tied differently. Each one tight.",                                     7,  "", ItemRarity.MUNDANE, necklacesPendantsCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Knotted Rope Necklace",         "Seven knots. Each one tied differently. Each one tight.",                                     7,  "jewelry-necklace-rope.png",     ItemRarity.MUNDANE, necklacesPendantsCategory));
 
         // Brooches & Pins
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Tarnished Tin Brooch",          "The insignia is unfamiliar. The loyalty it represents, unclear.",                              7,  "", ItemRarity.MUNDANE, broochesPinsCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Tarnished Tin Brooch",          "The insignia is unfamiliar. The loyalty it represents, unclear.",                              7,  "jewelry-brooch-tarnished.png",  ItemRarity.MUNDANE, broochesPinsCategory));
 
         // Cloaks & Robes
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Mud-Caked Travel Cloak",        "The mud has dried. The journey has not.",                                                     22, "", ItemRarity.MUNDANE, cloaksRobesCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Mud-Caked Travel Cloak",        "The mud has dried. The journey has not.",                                                     22, "clothing-cloak-muddy.png",      ItemRarity.MUNDANE, cloaksRobesCategory));
 
         // Hoods & Veils
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Black Mourning Veil",           "Worn past the acceptable period of grief.",                                                   13, "", ItemRarity.MUNDANE, hoodsVeilsCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Black Mourning Veil",           "Worn past the acceptable period of grief.",                                                   13, "clothing-veil-mourning.png",    ItemRarity.MUNDANE, hoodsVeilsCategory));
 
         // Gloves
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Mismatched Leather Gloves",     "Different sizes. Different origins. Both stained.",                                            9,  "", ItemRarity.MUNDANE, glovesCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Mismatched Leather Gloves",     "Different sizes. Different origins. Both stained.",                                            9,  "clothing-gloves-mismatched.png", ItemRarity.MUNDANE, glovesCategory));
 
         // Alchemist's Tools
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Chipped Ceramic Mortar",        "Whatever was ground in it left a permanent stain and a faint smell of sulfur.",               16, "", ItemRarity.MUNDANE, alchemistToolsCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Chipped Ceramic Mortar",        "Whatever was ground in it left a permanent stain and a faint smell of sulfur.",               16, "tool-mortar-chipped.png",       ItemRarity.MUNDANE, alchemistToolsCategory));
 
         // Keys & Locks
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Rusted Iron Key",               "The lock it belongs to is either lost or very well hidden.",                                  11, "", ItemRarity.MUNDANE, locksKeysCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Rusted Iron Key",               "The lock it belongs to is either lost or very well hidden.",                                  11, "tool-key-rusted.png",           ItemRarity.MUNDANE, locksKeysCategory));
 
         // Measurement & Observation
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Cracked Hourglass",             "The sand runs, but not at the expected rate.",                                                18, "", ItemRarity.MUNDANE, measurementCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Cracked Hourglass",             "The sand runs, but not at the expected rate.",                                                18, "tool-hourglass-cracked.png",    ItemRarity.MUNDANE, measurementCategory));
 
         // Human Remains
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Glass Eye",                     "It watches. That is all it does.",                                                            12, "", ItemRarity.MUNDANE, humanRemainsCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Glass Eye",                     "It watches. That is all it does.",                                                            12, "trophy-eye-glass.png",          ItemRarity.MUNDANE, humanRemainsCategory));
 
         // Hides & Furs
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Mangy Fox Pelt",                "Something fed on the original owner. Then something else fed on that.",                       11, "", ItemRarity.MUNDANE, hidesFursCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Mangy Fox Pelt",                "Something fed on the original owner. Then something else fed on that.",                       11, "trophy-pelt-fox.png",           ItemRarity.MUNDANE, hidesFursCategory));
 
         // Victory Tokens
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Bent Tin Medal",                "Awarded for valor. Pawned for food.",                                                          8,  "", ItemRarity.MUNDANE, victoryTokensCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Bent Tin Medal",                "Awarded for valor. Pawned for food.",                                                          8,  "trophy-medal-tin.png",          ItemRarity.MUNDANE, victoryTokensCategory));
 
         // Games & Entertainment
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Loaded Ivory Die",              "It always rolls six. Always.",                                                                14, "", ItemRarity.MUNDANE, gamesEntertainCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Loaded Ivory Die",              "It always rolls six. Always.",                                                                14, "curiosity-die-ivory.png",       ItemRarity.MUNDANE, gamesEntertainCategory));
 
         // Natura Morta
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Pressed Black Flower",          "It was alive once. It still smells like it remembers.",                                        7,  "", ItemRarity.MUNDANE, naturaMortaCategory));
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Smooth River Stone",            "Carried too far from its river.",                                                              4,  "", ItemRarity.MUNDANE, naturaMortaCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Pressed Black Flower",          "It was alive once. It still smells like it remembers.",                                        7,  "curiosity-flower-pressed.png",  ItemRarity.MUNDANE, naturaMortaCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Smooth River Stone",            "Carried too far from its river.",                                                              4,  "curiosity-stone-river.png",     ItemRarity.MUNDANE, naturaMortaCategory));
 
         // Currencies & Values
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Foreign Copper Coin",           "No kingdom claims it. It spends anyway.",                                                      5,  "", ItemRarity.MUNDANE, currenciesCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Foreign Copper Coin",           "No kingdom claims it. It spends anyway.",                                                      5,  "curiosity-coin-copper.png",     ItemRarity.MUNDANE, currenciesCategory));
 
         // ─── TAINTED (17) ─────────────────────────────────────────────────────────────
         // Blades
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Dagger That Warms",             "It is cold iron. It should not be warm.",                                                     85, "", ItemRarity.TAINTED, bladesCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Dagger That Warms",             "It is cold iron. It should not be warm.",                                                     85, "weapon-dagger-warm.png",        ItemRarity.TAINTED, bladesCategory));
 
         // Bones
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Skull of Unknown Proportions",  "The eye sockets are too large. The jaw too small. It fits no species on record.",            110, "", ItemRarity.TAINTED, bonesCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Skull of Unknown Proportions",  "The eye sockets are too large. The jaw too small. It fits no species on record.",            110, "relic-skull-unknown.png",       ItemRarity.TAINTED, bonesCategory));
 
         // Divine Symbols
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Icon of a Nameless Saint",      "The prayer it inspires is in a language you do not speak. Your lips move anyway.",            90, "✝", ItemRarity.TAINTED, divineSymbolsCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Icon of a Nameless Saint",      "The prayer it inspires is in a language you do not speak. Your lips move anyway.",            90, "relic-icon-saint.png",          ItemRarity.TAINTED, divineSymbolsCategory));
 
         // Ritual Instruments
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Tarnished Chalice, Stained Dark","The stain predates the current owner by three centuries.",                                  105, "", ItemRarity.TAINTED, ritualInstrCategory));
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Bell That Rings Alone",         "Only once, always at the same hour, always when no one expects it.",                         130, "", ItemRarity.TAINTED, ritualInstrCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Tarnished Chalice, Stained Dark","The stain predates the current owner by three centuries.",                                  105, "relic-chalice-stained.png",     ItemRarity.TAINTED, ritualInstrCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Bell That Rings Alone",         "Only once, always at the same hour, always when no one expects it.",                         130, "relic-bell-haunted.png",        ItemRarity.TAINTED, ritualInstrCategory));
 
         // Grimoires
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Annotated Spellbook",           "Every margin is annotated. The annotations contradict the text. The text contradicts itself.",120, "", ItemRarity.TAINTED, grimoiresCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Annotated Spellbook",           "Every margin is annotated. The annotations contradict the text. The text contradicts itself.",120, "knowledge-spellbook-annotated.png", ItemRarity.TAINTED, grimoiresCategory));
 
         // Scrolls
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Contract Signed in Red",        "Both parties signed. One of them is no longer a party to anything.",                         130, "", ItemRarity.TAINTED, scrollsCategory));
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Self-Completing Prophecy",      "Three predictions have already come true. Four remain.",                                     150, "", ItemRarity.TAINTED, scrollsCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Contract Signed in Red",        "Both parties signed. One of them is no longer a party to anything.",                         130, "knowledge-contract-blood.png",  ItemRarity.TAINTED, scrollsCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Self-Completing Prophecy",      "Three predictions have already come true. Four remain.",                                     150, "knowledge-scroll-prophecy.png", ItemRarity.TAINTED, scrollsCategory));
 
         // Flasks & Vials
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Phial of Black Tears",          "The bottle was sealed. The tears still flow.",                                                95, "", ItemRarity.TAINTED, flasksVialsCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Phial of Black Tears",          "The bottle was sealed. The tears still flow.",                                                95, "vessel-phial-black-tears.png",  ItemRarity.TAINTED, flasksVialsCategory));
 
         // Mirrors & Surfaces
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Pocket Mirror, Delayed",        "The reflection follows one second behind. Exactly one second.",                               140, "", ItemRarity.TAINTED, mirrorsSurfacesCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Pocket Mirror, Delayed",        "The reflection follows one second behind. Exactly one second.",                               140, "vessel-mirror-delayed.png",     ItemRarity.TAINTED, mirrorsSurfacesCategory));
 
         // Chests & Boxes
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Music Box That Plays Alone",    "The mechanism runs without winding. The song will become familiar.",                          160, "", ItemRarity.TAINTED, chestsBoxesCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Music Box That Plays Alone",    "The mechanism runs without winding. The song will become familiar.",                          160, "vessel-musicbox-haunted.png",   ItemRarity.TAINTED, chestsBoxesCategory));
 
         // Rings & Bands
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Whispering Band",               "It whispers at night. The words stay just below the threshold of understanding.",            140, "", ItemRarity.TAINTED, ringsBandsCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Whispering Band",               "It whispers at night. The words stay just below the threshold of understanding.",            140, "jewelry-ring-whispering.png",   ItemRarity.TAINTED, ringsBandsCategory));
 
         // Headgear
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Mask of a Hanged Judge",        "Still bears the expression of a verdict being delivered.",                                    95, "", ItemRarity.TAINTED, headgearCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Mask of a Hanged Judge",        "Still bears the expression of a verdict being delivered.",                                    95, "armor-mask-judge.png",          ItemRarity.TAINTED, headgearCategory));
 
         // Automatons & Mechanisms
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Porcelain Doll, Moving Fingers","Only when no one is looking.",                                                               175, "", ItemRarity.TAINTED, automatonsMechCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Porcelain Doll, Moving Fingers","Only when no one is looking.",                                                               175, "curiosity-doll-porcelain.png",  ItemRarity.TAINTED, automatonsMechCategory));
 
         // Navigation
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Compass That Points Elsewhere", "Not north. Not any direction with a name.",                                                  130, "", ItemRarity.TAINTED, navigationCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Compass That Points Elsewhere", "Not north. Not any direction with a name.",                                                  130, "tool-compass-cursed.png",       ItemRarity.TAINTED, navigationCategory));
 
         // Games & Entertainment
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Tarot Deck, Twenty-Three Cards","There should be twenty-two. The extra card is always the same card.",                         95, "", ItemRarity.TAINTED, gamesEntertainCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Tarot Deck, Twenty-Three Cards","There should be twenty-two. The extra card is always the same card.",                         95, "curiosity-tarot-deck.png",      ItemRarity.TAINTED, gamesEntertainCategory));
 
         // Polearms
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Ritual Scythe, Never Sharpened","It cuts regardless.",                                                                        185, "",  ItemRarity.TAINTED, polearmsCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Ritual Scythe, Never Sharpened","It cuts regardless.",                                                                        185, "weapon-scythe-ritual.png",      ItemRarity.TAINTED, polearmsCategory));
 
         // ─── CURSED (6) ───────────────────────────────────────────────────────────────
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Skull of a Nameless King",      "His kingdom is gone. His name is gone. The skull retains something that refuses to follow.",  340, "", ItemRarity.CURSED, bonesCategory));
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("The Judge's Mirror",            "Shows the room correctly. The people in it, incorrectly.",                                   390, "", ItemRarity.CURSED, mirrorsSurfacesCategory));
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Grimoire of the Third Covenant","Two covenants preceded it. Neither ended well. This one is still open.",                     420, "", ItemRarity.CURSED, grimoiresCategory));
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Key to a Door That Moved",      "The door was catalogued. It has since relocated. The key still turns.",                      280, "", ItemRarity.CURSED, locksKeysCategory));
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Icon of the Inverted Saint",    "The prayers work. The saint they reach is not the one depicted.",                            310, "", ItemRarity.CURSED, divineSymbolsCategory));
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Garrote of the Last Executioner","The last man to use this died in his sleep. Peacefully. That is the strange part.",          450, "", ItemRarity.CURSED, assassinToolsCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Skull of a Nameless King",      "His kingdom is gone. His name is gone. The skull retains something that refuses to follow.",  340, "relic-skull-king.png",          ItemRarity.CURSED, bonesCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("The Judge's Mirror",            "Shows the room correctly. The people in it, incorrectly.",                                   390, "vessel-mirror-judge.png",       ItemRarity.CURSED, mirrorsSurfacesCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Grimoire of the Third Covenant","Two covenants preceded it. Neither ended well. This one is still open.",                     420, "knowledge-grimoire-covenant.png", ItemRarity.CURSED, grimoiresCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Key to a Door That Moved",      "The door was catalogued. It has since relocated. The key still turns.",                      280, "tool-key-moving-door.png",      ItemRarity.CURSED, locksKeysCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Icon of the Inverted Saint",    "The prayers work. The saint they reach is not the one depicted.",                            310, "relic-icon-inverted.png",       ItemRarity.CURSED, divineSymbolsCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("Garrote of the Last Executioner","The last man to use this died in his sleep. Peacefully. That is the strange part.",          450, "weapon-garrote-executioner.png", ItemRarity.CURSED, assassinToolsCategory));
 
         // ─── FORSAKEN (1) ─────────────────────────────────────────────────────────────
-        itemBlueprintRepository.save(entityManager, new ItemBlueprint("The Eye of the Last Prophet",   "He saw the end of three kingdoms before he was silenced. The eye was not silenced with him.", 850, "", ItemRarity.FORSAKEN, divineFragmentsCategory));
+        itemBlueprintRepository.save(entityManager, new ItemBlueprint("The Eye of the Last Prophet",   "He saw the end of three kingdoms before he was silenced. The eye was not silenced with him.", 850, "relic-eye-prophet.png",         ItemRarity.FORSAKEN, divineFragmentsCategory));
     }
 
 }

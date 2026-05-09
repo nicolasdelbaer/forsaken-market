@@ -89,7 +89,6 @@ public class TradeService {
     @Transactional
     public void sellItem(Integer playerId, Long inventoryItemId)
             throws BadItemOwnershipException, CannotSellInactiveItemException, MarketPriceNotFoundException, PlayerNotFoundException, UndefinedMarketPriceException {
-        
         InventoryItem itemInstance = inventoryItemRepository
                 .getItemFromPlayer(entityManager, inventoryItemId, playerId, List.of(MarketItemStatus.BOUGHT, MarketItemStatus.DECAYED))
                 .orElseThrow(() -> new CannotSellInactiveItemException(BadResponseUtils.CannotSellItem));

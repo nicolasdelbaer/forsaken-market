@@ -1,0 +1,46 @@
+services:
+  db:
+    image: postgres:18.3-alpine
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${DB_USER}", "-d", "${DB_NAME}"]
+      interval: 5s
+      retries: 5
+    container_name: postgres_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql
+    networks:
+      - app-network
+
+  tomcat-app:
+    build: .
+    container_name: tomcat_servlet
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8009:8009" # Liaison AJP pour OpenLiteSpeed
+    environment:
+      APP_ENV: ${APP_ENV}
+      BCRYPT_COST: ${BCRYPT_COST}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_URL: ${DB_URL}
+      DB_USER: ${DB_USER}
+      DEFAULT_USER_PASSWORD: ${DEFAULT_USER_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      PERSISTENCE_UNIT_NAME: ${PERSISTENCE_UNIT_NAME}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  pgdata:

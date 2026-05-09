@@ -36,8 +36,7 @@ public class AccountResource {
         Response response;
         PlayerSession playerSession = (PlayerSession) securityContext.getUserPrincipal();
         try {
-            Integer wallet = playerService.getWallet(playerSession.id());
-            response = Response.ok(new PlayerInfoResponse(playerSession.id(), playerSession.email(), playerSession.name(), wallet)).build();
+            response = Response.ok(playerService.getPlayerInfo(playerSession.id(), playerSession.email(), playerSession.name())).build();
         } catch (Exception e) {
             response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
             log.warn(e.getMessage(), e);

@@ -1,0 +1,35 @@
+#ember-container {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: -1; overflow: hidden;
+}
+.ember {
+  position: absolute; bottom: -8px;
+  width: 4px; height: 3px; border-radius: 50%;
+  opacity: 0; animation: ember-rise linear infinite;
+  pointer-events: none;
+}
+@keyframes ember-rise {
+  0%   { transform: translateY(0) translateX(0); opacity: 0; }
+  10%  { opacity: 0.9; }
+  80%  { opacity: 0.4; }
+  100% { transform: translateY(-100vh) translateX(var(--drift)); opacity: 0; }
+}
+
+.fog-layer, .fog-layer-2, .vignette {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+}
+.fog-layer {
+  background: radial-gradient(ellipse 80% 40% at 50% 80%, rgba(60,30,80,0.18) 0%, transparent 70%);
+  animation: fog-pulse 8s ease-in-out infinite alternate;
+}
+.fog-layer-2 {
+  background: radial-gradient(ellipse 60% 30% at 30% 90%, rgba(30,10,50,0.15) 0%, transparent 70%);
+  animation: fog-pulse 11s ease-in-out infinite alternate-reverse;
+}
+.vignette {
+  background: radial-gradient(ellipse 90% 90% at 50% 50%, transparent 40%, rgba(4,3,8,0.85) 100%);
+}
+@keyframes fog-pulse {
+  from { opacity: 0.4; transform: scaleX(1); }
+  to   { opacity: 1;   transform: scaleX(1.08); }
+}

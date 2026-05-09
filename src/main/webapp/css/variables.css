@@ -1,0 +1,43 @@
+:root {
+  --ink-0: #07070c;
+  --ink-1: #0c0c14;
+  --ink-2: #11111c;
+  --ink-3: #181826;
+  --ink-4: #20202f;
+  --vellum: #ece0c4;
+  --vellum-dim: #c8bca0;
+  --vellum-ghost: #8a7f66;
+
+  --gold: #d4ac55;
+  --gold-warm: #e5c073;
+  --gold-dim: #a28540;
+  --gold-ghost: #6a5626;
+
+  --ember: #b8553a;
+  --ember-dim: #733426;
+
+  --r-mundane:   #a7a095;
+  --r-mundane-b: #2a2720;
+  --r-tainted:   #7aa08a;
+  --r-tainted-b: #1d2a23;
+  --r-cursed:    #8a7aa8;
+  --r-cursed-b:  #241e30;
+  --r-forsaken:  #c17a5a;
+  --r-forsaken-b:#2e1b14;
+
+  --trend-up:       #8aa07a;
+  --trend-down:     #b8786a;
+  --trend-flat:     var(--vellum-dim);
+  --trend-volatile: #c9a24a;
+
+  --radius: 2px;
+  --ornament: 1px solid rgba(201,162,74,0.22);
+  --ornament-strong: 1px solid rgba(201,162,74,0.42);
+  --hairline: 1px solid rgba(232,220,192,0.08);
+
+  --f-display: 'Cinzel', 'Trajan Pro', serif;
+  --f-body:    'EB Garamond', 'Iowan Old Style', Georgia, serif;
+  --f-mono:    'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
+
+  --t: 150ms ease;
+}

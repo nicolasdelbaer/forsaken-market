@@ -1,0 +1,76 @@
+#auth-page {
+  min-height: 70vh;
+  display: grid; place-items: center;
+  padding: 40px 20px;
+}
+
+.login-card {
+  width: min(420px, 92vw);
+  border: var(--ornament-strong);
+  background:
+    linear-gradient(180deg, rgba(201,162,74,0.05), transparent 30%),
+    rgba(12,12,20,0.95);
+  padding: 40px 36px 32px;
+  position: relative;
+}
+.login-card::before, .login-card::after {
+  content: '✦'; position: absolute; color: var(--gold); font-size: 14px;
+}
+.login-card::before { top: 14px; left: 18px; }
+.login-card::after  { bottom: 14px; right: 18px; }
+
+.login-card .eyebrow {
+  text-align: center; font-family: var(--f-display);
+  font-size: 10px; letter-spacing: 0.32em; color: var(--gold-dim);
+  text-transform: uppercase; margin-bottom: 4px;
+}
+.login-card h2 {
+  text-align: center; font-family: var(--f-display);
+  font-size: 28px; letter-spacing: 0.18em; color: var(--gold);
+  margin: 6px 0; text-transform: uppercase;
+}
+.login-card .sub {
+  text-align: center; font-style: italic;
+  color: var(--vellum-dim); margin-bottom: 24px; font-size: 14px;
+}
+
+.login-tabs {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 4px; margin-bottom: 22px;
+}
+.login-tabs button {
+  font-family: var(--f-display); font-size: 10px;
+  letter-spacing: 0.28em; text-transform: uppercase;
+  background: transparent; color: var(--vellum-dim);
+  border: 0; border-bottom: 1px solid rgba(232,220,192,0.15);
+  padding: 10px 0; cursor: pointer; transition: all var(--t);
+}
+.login-tabs button.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+.login-form { display: flex; flex-direction: column; gap: 14px; }
+.login-form label {
+  display: flex; flex-direction: column; gap: 6px;
+  font-family: var(--f-display); font-size: 9.5px;
+  letter-spacing: 0.28em; color: var(--vellum-dim); text-transform: uppercase;
+}
+.login-form input {
+  font-family: var(--f-body); font-size: 15px;
+  padding: 10px 14px; background: rgba(7,7,12,0.7);
+  border: 1px solid rgba(201,162,74,0.25); color: var(--vellum);
+  outline: none; transition: border-color var(--t);
+}
+.login-form input:focus { border-color: var(--gold); box-shadow: 0 0 12px rgba(201,162,74,0.15); }
+.login-form input::placeholder { color: var(--vellum-ghost); }
+
+.login-card .primary-action { width: 100%; margin-top: 10px; padding: 14px; }
+
+.login-card .rule {
+  height: 1px; margin: 20px 0;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+}
+
+.login-error {
+  color: var(--ember); font-family: var(--f-body);
+  font-size: 13px; text-align: center;
+  padding: 8px 0; font-style: italic;
+}
