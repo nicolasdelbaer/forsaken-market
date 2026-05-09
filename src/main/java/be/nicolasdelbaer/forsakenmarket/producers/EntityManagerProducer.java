@@ -8,7 +8,7 @@ import jakarta.enterprise.inject.Disposes;
 import jakarta.enterprise.inject.Produces;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
+import jakarta.persistence.spi.PersistenceProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +35,9 @@ public class EntityManagerProducer {
         props.put("jakarta.persistence.jdbc.url", url);
         props.put("jakarta.persistence.jdbc.user", user);
         props.put("jakarta.persistence.jdbc.password", password);
-        entityManagerFactory = Persistence.createEntityManagerFactory(unit, props);
+
+        PersistenceProvider provider = new org.hibernate.jpa.HibernatePersistenceProvider();
+        entityManagerFactory = provider.createEntityManagerFactory(unit, props);
     }
 
     @Produces
