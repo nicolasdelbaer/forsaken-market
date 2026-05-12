@@ -9,5 +9,4 @@ public record MarketOHLC(
         Integer high,
         Integer low,
         Integer close
-) {
-}
+) { }

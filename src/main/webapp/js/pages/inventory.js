@@ -28,7 +28,9 @@ const inventoryPage = {
     const pct = item.boughtPrice ? ((delta / item.boughtPrice) * 100).toFixed(1) : 0;
     const deltaClass = delta >= 0 ? 'positive' : 'negative';
     const sign = delta >= 0 ? '+' : '';
-    return `
+
+    if(!item.isDecayed){
+      return `
       <div class="inv-slot" data-decayed="${item.isDecayed}" data-inv-id="${item.inventoryId}">
         <div class="slot-head">
           <div class="frame sm clickable" title="Voir l'historique des prix"
@@ -39,7 +41,6 @@ const inventoryPage = {
             <div class="slot-name">
               <span>${item.title}</span>
               <span class="chip" data-rarity="${item.rarity}">${item.rarity}</span>
-              ${item.isDecayed ? '<span class="chip" data-rarity="DECAYED">CORROMPU</span>' : ''}
             </div>
             <div class="slot-sub">${item.description}</div>
           </div>
@@ -50,9 +51,35 @@ const inventoryPage = {
         </div>
         <div class="slot-actions">
           <button class="btn small primary btn-sell" data-id="${item.inventoryId}">Vendre</button>
-          ${item.isDecayed ? `<button class="btn small danger btn-discard" data-id="${item.inventoryId}">Jeter</button>` : ''}
         </div>
       </div>`;
+    }else{
+      return `
+      <div class="inv-slot" data-decayed="${item.isDecayed}" data-inv-id="${item.inventoryId}">
+        <div class="slot-head">
+          <div class="frame sm clickable" title="Voir l'historique des prix"
+               onclick="showOHLC(${item.blueprintId}, '${item.title.replace(/'/g,'&#39;')}')">
+            <img src="${resolveIcon(item.icon)}" alt="${item.title}" onerror="this.src='/img/items/default.png'">
+          </div>
+          <div class="meta">
+            <div class="slot-name">
+              <span>${item.title}</span>
+              <span class="chip" data-rarity="${item.rarity}">${item.rarity}</span>
+              <span class="chip" data-rarity="DECAYED">SOLD</span>
+            </div>
+            <div class="slot-sub">${item.description}</div>
+          </div>
+        </div>
+        <div class="slot-prices">
+          <div><div class="k">Acheté</div><div class="v">${item.boughtPrice}g</div></div>
+          <div><div class="k">Vendu</div><div class="v ${deltaClass}">${item.soldPrice}g <span class="pct">${sign}${delta}g (${sign}${pct}%)</span></div></div>
+        </div>
+        <div class="slot-actions">
+          <button class="btn small danger btn-discard" data-id="${item.inventoryId}">C'est noté</button>
+        </div>
+      </div>`;
+    }
+
   },
 
   _bindEvents() {

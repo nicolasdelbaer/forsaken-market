@@ -112,14 +112,14 @@ public class TradeService {
         playerRepository.update(entityManager, player);
 
         //add item to inventory
-        inventoryService.sellItem(itemInstance, currentRound);
+        InventoryItem finalItemInstance = inventoryService.sellItem(itemInstance, currentRound, marketPrice.getCurrentPrice());
 
         broadcastEventQueue.enqueue(() -> eventBroadcaster.broadcastToPlayer(
                 BroadcastEvent.ItemSold,
                 new TradeBroadcast(
-                        itemInstance.getId(),
+                        finalItemInstance.getId(),
                         marketPrice.getCurrentPrice(),
-                        itemInstance.getPriceDifference()
+                        finalItemInstance.getPriceDifference()
                 ), playerId));
     }
 

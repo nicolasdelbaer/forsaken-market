@@ -8,6 +8,7 @@ public record InventoryItemResponse(
         String icon,
         String rarity,
         Integer boughtPrice,
+        Integer soldPrice,
         Integer currentPrice,
         Boolean isDecayed
 ) {}

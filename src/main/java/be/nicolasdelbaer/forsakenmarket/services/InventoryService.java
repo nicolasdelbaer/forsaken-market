@@ -59,13 +59,14 @@ public class InventoryService {
      * Active bought items must be sold to get added value before they get decayed
      */
     @Transactional
-    public void sellItem(InventoryItem inventoryItem, Long currentRound) throws CannotSellInactiveItemException {
+    public InventoryItem sellItem(InventoryItem inventoryItem, Long currentRound, Integer soldPrice) throws CannotSellInactiveItemException {
         if(inventoryItem.getStatus() != MarketItemStatus.BOUGHT)
             throw new CannotSellInactiveItemException("The item is already decayed, sold or thrown away");
+        inventoryItem.setSoldPrice(soldPrice);
         inventoryItem.setSoldAt(LocalDateTime.now());
         inventoryItem.setStatus(MarketItemStatus.SOLD);
         inventoryItem.setSoldRoundId(currentRound);
-        inventoryItemRepository.update(entityManager, inventoryItem);
+        return inventoryItemRepository.update(entityManager, inventoryItem);
     }
 
     /*
@@ -107,6 +108,7 @@ public class InventoryService {
                             inventoryItem.getItemBlueprint().getIcon(),
                             inventoryItem.getItemBlueprint().getRarity().name(),
                             inventoryItem.getBoughtPrice(),
+                            inventoryItem.getSoldPrice(),
                             marketPrice.getCurrentPrice(),
                             inventoryItem.isDecayed()
                     );

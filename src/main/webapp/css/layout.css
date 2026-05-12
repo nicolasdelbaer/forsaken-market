@@ -150,7 +150,7 @@
   position: absolute;
   white-space: nowrap;
   display: inline-flex; gap: 48px;
-  animation: ticker 60s linear infinite;
+  animation: ticker 180s linear infinite;
   top: 50%; transform: translateY(-50%);
   padding-left: 100%;
   font-family: var(--f-body); font-style: italic;

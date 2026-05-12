@@ -50,6 +50,8 @@ public class ScheduledInventoryService {
                 MarketPrice marketPrice = gameStateManager
                         .getCurrentMarketPrice(ownedItem.getItemBlueprint().getId());
 
+                ownedItem.setSoldPrice(marketPrice.getCurrentPrice());
+
                 Player player = ownedItem.getPlayer();
                 playerService.credit(player, marketPrice.getCurrentPrice());
                 playerService.addReputation(
@@ -60,13 +62,14 @@ public class ScheduledInventoryService {
                 );
                 playerRepository.update(entityManager, player);
 
+                InventoryItem finalOwnedItem = inventoryItemRepository.update(entityManager, ownedItem);
                 expiredItems.computeIfAbsent(
-                        ownedItem.getPlayer().getId(),
+                        player.getId(),
                         ArrayList::new)
                     .add(new TradeBroadcast(
                             ownedItem.getId(),
                             marketPrice.getCurrentPrice(),
-                            ownedItem.getPriceDifference()
+                            finalOwnedItem.getPriceDifference()
                     ));
             }
         }
